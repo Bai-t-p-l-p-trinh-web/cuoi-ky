@@ -1,0 +1,83 @@
+$color-text: #3F4047;
+$color-text-hover: #7967e8;
+$color-bg-button: #F2863B;
+.header{
+    position: sticky;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #ddd;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    &__containner{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    &__menuPage{
+        display: flex;
+        align-items: center;
+        &__logo{
+            img{
+                width: 112px;
+                object-fit: cover;
+                filter: brightness(0) saturate(100%) invert(46%) sepia(89%) saturate(7490%) hue-rotate(189deg) brightness(97%) contrast(100%);
+            }
+        }
+        &__list{
+            list-style-type: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            &-item{
+                margin: 0 16px;
+                a{
+                    color: $color-text;
+                    font-weight: 600;
+                    text-decoration: none;
+                    transition: all 0.3s;
+                    &:hover{
+                        color: $color-text-hover;
+                    }
+                }
+                
+            }
+        }
+    }
+    &__menuUser{
+        display: flex;
+        align-items: center;
+        &__post{
+            background-color: $color-bg-button;
+            padding: 9px 25px;
+            border-radius: 5px;
+            margin-right: 30px;
+            a{
+                display: flex;
+                align-items: center;
+                color: #fff;
+                font-size: 17px;
+                font-weight: bold;
+                span{
+                    margin-left: 7px;
+                }
+            }
+        }
+        &__contact{
+            margin-right: 30px;
+            color: $color-text;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            svg{
+                margin-right: 5px;
+            }
+        }
+        &__myAccount{
+            display: flex;
+            align-items: center;
+            color: $color-text;
+            font-weight: 600;
+            svg{
+                font-size: 20px;
+            }
+        }
+    }
+}
