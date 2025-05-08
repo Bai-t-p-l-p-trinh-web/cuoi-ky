@@ -1,7 +1,17 @@
+import Filter from "../../components/Filter";
+import HomeSwiper from "../../components/Swiper";
+import "./Home.scss";
 function Home(){
     return (
         <>
-            Đây là trang chủ
+            <div className="home">
+                <div className="container">
+                    <HomeSwiper/>
+                    <div className="home__content">
+                        <Filter/>
+                    </div>
+                </div>
+            </div>
         </>
     )
 };

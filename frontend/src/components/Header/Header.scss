@@ -1,9 +1,11 @@
 $color-text: #3F4047;
 $color-text-hover: #7967e8;
 $color-bg-button: #F2863B;
+$color-bg-list-hover: #F1F5F9;
 .header{
     position: sticky;
-    padding: 0.8rem 0;
+    z-index: 999;
+    padding: 0.3rem 0;
     border-bottom: 1px solid #ddd;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     &__containner{
@@ -27,7 +29,9 @@ $color-bg-button: #F2863B;
             margin: 0;
             padding: 0;
             &-item{
+                position: relative;
                 margin: 0 16px;
+                padding: 20px 0;
                 a{
                     color: $color-text;
                     font-weight: 600;
@@ -75,8 +79,86 @@ $color-bg-button: #F2863B;
             align-items: center;
             color: $color-text;
             font-weight: 600;
+            padding: 20px 0;
             svg{
                 font-size: 20px;
+            }
+        }
+    }
+    &__dropdownMuaXe{
+        &__top{
+            display: flex;
+            width: 538.612px;
+            &-hang{
+                margin-right: 20px;
+                &Title{
+                    font-size: 20px;
+                }
+                &List{
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    &-item{
+                        padding: 5px 3px;
+                        &:hover{
+                            background: $color-bg-list-hover;
+                        }
+                    }
+                }
+            }
+            &-dong{
+                margin-right: 20px;
+                &Title{
+                    font-size: 20px;
+                }
+                &List{
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    &-item{
+                        padding: 5px 3px;
+                        &:hover{
+                            background: $color-bg-list-hover;
+                        }
+                    }
+                }
+            }
+            &-gia{
+                &Title{
+                    font-size: 20px;
+                }
+                &List{
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    &-item{
+                        padding: 5px 3px;
+                        &:hover{
+                            background: $color-bg-list-hover;
+                        }
+                    }   
+                }
+            }
+        }
+    }
+    &__dropdownUser{
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        // display: block;
+        &-item{
+            padding: 10px 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            a{
+                text-decoration: none;
+                color: #000;
+            }
+            &:hover{
+                background-color: #ddd;
             }
         }
     }

@@ -4,7 +4,6 @@ function Default(){
     return (
         <>
             <Header/>
-        
             <main className="main">
                 <Outlet/>
             </main>
