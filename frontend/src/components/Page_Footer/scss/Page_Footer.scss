@@ -1,0 +1,135 @@
+$color-bg-footer: #09253D;
+$color-bg-button: #1A6FB7;
+$color-text-contact: #A5B7C6;
+.footer{
+    background: $color-bg-footer;
+    display: flex;
+    padding: 57px;
+    &__contact{
+        width: 250px;
+        &__contain{
+            height: 50px;
+            margin-bottom : 15px;
+            &-image{
+                height: 100%;
+                aspect-ratio: 8/3;
+                object-fit: contain;
+            }
+        }
+        &__description{
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        &__list{
+            display: flex;
+            justify-content: space-between;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            &-item{
+                border: 1px solid #ddd;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                transition: all 0.3s;
+                svg{
+                    width: 16px;
+                    height: 16px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: #fff;
+                    transition: all 0.3s;
+                }
+                &:hover{
+                    background: #fff;
+                    svg{
+                        color: $color-bg-footer;
+                    }
+                }
+            }
+        }
+    }
+    &__about{
+        flex: 1;
+        padding-left: 30px;
+        display: flex;
+        flex-direction: column;
+        &-title{
+            font-size: 18px;
+            color: #fff;
+        }
+        &-description{
+            font-size: 14px;
+            color: #fff;
+        }
+        &__email{
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+
+            &--input{
+                padding: 7px 15px;
+                width: 20rem;
+                height: 48px;
+                border: 0;
+                border-radius: 5px 0 0 5px;
+            }
+            &--submit{
+                height: 48px;
+                border: 0;
+                border-radius: 0 5px 5px 0;
+                padding: 0 20px;
+                background: $color-bg-button;
+                color: #fff;
+                font-weight: bold;
+            }
+            
+        }
+        &__services{
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            &--service{
+                width: calc(100% / 4);
+                &__list{
+                    display: flex;
+                    flex-direction: column;
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+
+                    &--item{
+                        margin-bottom: 10px;
+                        &-link{
+                            color: $color-text-contact;
+                            font-size: 14px;
+                            &:hover{
+                                text-decoration: none;
+                                color: $color-text-contact;
+                            }
+                        }
+                        &--head{
+                            margin-bottom: 10px;
+                            &-link{
+                                color: #fff;
+                                font-weight: 600;
+                                font-size: 18px;
+                                
+                                &:hover{
+                                    text-decoration: none;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
