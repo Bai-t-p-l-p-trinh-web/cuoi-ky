@@ -16,6 +16,14 @@
             }
         }
     }
+    &__content{
+        display: flex;
+        
+        &__main{
+            flex: 1;
+            margin-bottom: 100px;
+        }
+    }
 }
 .swiper-button-prev::after, .swiper-button-next::after{
     font-size: 15px;
