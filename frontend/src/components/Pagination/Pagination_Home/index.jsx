@@ -39,7 +39,7 @@ function PaginationHome({max_page}){
                     <>
                         {
                             Array(curPage - 1).fill().map((_, page_index) => (
-                                <button className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
+                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
                             ))
                         }
                     </>
@@ -47,13 +47,13 @@ function PaginationHome({max_page}){
                     <>
                     {
                         Array(2).fill().map((_, page_index) => (
-                            <button className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
+                            <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
                         ))
                     }
                     <span className="home__content__pagination__dots">...</span>
                     {
                         Array(2).fill().map((_, page_index) => (
-                            <button className="home__content__pagination--page" onClick={() => {setPage(curPage - 2 + page_index)}}>{curPage - 2 + page_index}</button>
+                            <button key={page_index + 2} className="home__content__pagination--page" onClick={() => {setPage(curPage - 2 + page_index)}}>{curPage - 2 + page_index}</button>
                         ))
                     }
                     </>
@@ -64,7 +64,7 @@ function PaginationHome({max_page}){
                     <>
                         {
                             Array(max_page - curPage).fill().map((_, page_index) => (
-                                <button className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
+                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
                             ))
                         }
                     </>
@@ -72,13 +72,13 @@ function PaginationHome({max_page}){
                     <>
                         {
                             Array(2).fill().map((_, page_index) => (
-                                <button className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
+                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
                             ))
                         }
                         <span className="home__content__pagination__dots">...</span>
                         {
                             Array(2).fill().map((_, page_index) => (
-                                <button className="home__content__pagination--page" onClick={() => {setPage(max_page - page_index - 1)}}>{max_page - page_index - 1}</button>
+                                <button key={page_index + 2} className="home__content__pagination--page" onClick={() => {setPage(max_page - 1 + page_index)}}>{max_page - 1 + page_index}</button>
                             ))
                         }
                     </>
