@@ -1,0 +1,39 @@
+.home{
+    &__swiper{
+        margin: 15px 0;
+        &__card{
+            
+            &-item{
+                border-radius: 4px;
+       
+                
+                a{
+                    img{
+                        border-radius: 4px;
+                    }
+                }
+                
+            }
+        }
+    }
+    &__content{
+        display: flex;
+        
+        &__main{
+            flex: 1;
+            margin-bottom: 100px;
+        }
+    }
+}
+.swiper-button-prev::after, .swiper-button-next::after{
+    font-size: 15px;
+    padding: 15px;
+    background: #fff;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    
+}

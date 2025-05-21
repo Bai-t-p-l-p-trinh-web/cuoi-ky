@@ -1,0 +1,24 @@
+$color-button-current: #1D70B8;
+.home__content{
+    &__pagination{
+        display: flex;
+        flex-wrap: nowrap;
+        button{
+            border: 1px solid rgba(0,0,0,0.23);
+            border-radius: 4px;
+            width: 32px;
+            aspect-ratio: 1;
+            margin: 0 5px;
+            background: transparent;
+            &.current{
+                background-color: $color-button-current;
+                color: #fff;
+            }
+        }
+        &__dots{
+            margin: 0 5px;
+        }
+        
+    }
+    
+}

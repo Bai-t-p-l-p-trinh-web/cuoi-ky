@@ -1,0 +1,94 @@
+$color-text-name: #31406F;
+$color-text-price: #EF4C49;
+.home__content__main__display{
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+    flex: 1;
+    &--title{
+        font-size: 20px;
+        margin-bottom: 17px;
+
+    }
+    &--description{
+        font-size: 13px;
+        font-style: italic;
+        margin-bottom: 5px;
+    }
+    &__list{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        flex: 1;
+        &-item{
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            width: 250px;
+            
+            &:hover{
+                text-decoration: none;
+            }
+            &--description{
+                display: flex;
+                flex-direction: column;
+                &__swiper{
+                    margin-bottom: 10px;
+                    &__card{
+                        &-item{
+                            img{
+                                width: 100%;
+                                aspect-ratio: 4/3;
+                                object-fit: cover;
+                                border-radius: 10px 10px 0 0;
+                            }
+                        }
+                    }
+                }
+                &-name{
+                    font-size: 20px;
+                    padding: 0 10px;
+                    // margin-bottom: 20px;
+                    color: $color-text-name;
+                    overflow: hidden;
+                    height: 50px;
+                }
+                &-specific{
+                    display: flex;
+                    flex-wrap: wrap;
+                    padding: 0 10px;
+                    color: $color-text-name;
+                    height: 52px;
+                    overflow: hidden;
+                    &--year, &--km, &--fuel, &--seat{
+                        width: 50%;
+                        margin-bottom: 2px;
+                        display: flex;
+                        align-items: center;
+                        span{
+                            padding-left: 5px;
+                        }
+                    }
+                }
+                &-price{
+                    color: $color-text-price;
+                    font-size: 20px;
+                    font-weight: bold;
+                    padding: 0 10px;
+                }
+                &-location{
+                    color: $color-text-name;
+                    font-size: 11px;    
+                    display: flex;
+                    align-items: center;
+                    span{
+                        padding-left: 5px;
+                    }
+                    padding: 0 10px;
+                    margin-bottom: 20px;
+                }
+                
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+$color-text-title: #31406F;
+.home__content__filters{
+    display: flex;
+    flex-direction: column;
+    width: 286px;
+    height: 100%;
+    border: 1px solid #ddd;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin-right: 27px;
+    &-title{
+        font-size: 17px;
+        color: $color-text-title;
+        margin-bottom: 20px;
+    }
+}
