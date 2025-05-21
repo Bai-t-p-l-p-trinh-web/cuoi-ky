@@ -1,5 +1,5 @@
 export function MouseEnter(e, RectBounding, type, ArrowCoords){
-    console.log("IN");
+    // console.log("IN");
     const background = document.querySelector('.dropdownBackground');
     const arrow = background.querySelector('.arrow');
 

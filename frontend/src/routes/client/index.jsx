@@ -6,6 +6,8 @@ import Home from "../../pages/Home";
 import VayMuaXe from "../../pages/VayMuaXe";
 import Error404 from "../../pages/Error404";
 import BlogXeHoi from "../../pages/BlogXeHoi";
+import ClientAuth from "../../pages/Auth/client";
+import Message from "../../pages/Message";
 export const routes = [
     {
         path: "/blog-xe-hoi",
@@ -30,6 +32,14 @@ export const routes = [
             {
                 path: "vay-mua-xe",
                 element: <VayMuaXe/>
+            },
+            {
+                path: "login",
+                element: <ClientAuth/>
+            },
+            {
+                path: "chat",
+                element: <Message/>
             },
             {
                 path: ":slugCar",
