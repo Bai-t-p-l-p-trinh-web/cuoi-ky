@@ -11,7 +11,7 @@ function ClientAuth(){
 
     const handleChangeValue = (e) => {
         const {name, value} = e.target;
-        console.log(e);
+        
         setDataClientLogin((prev) => (
             {
                 ...prev,

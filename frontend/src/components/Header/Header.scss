@@ -37,6 +37,13 @@ $color-bg-list-hover: #F1F5F9;
                     font-weight: 600;
                     text-decoration: none;
                     transition: all 0.3s;
+                    display: flex;
+                    align-items: center;
+                    span{
+                        svg{
+                            transform: translate(3px, 2px);
+                        }
+                    }
                     &:hover{
                         color: $color-text-hover;
                     }
@@ -80,6 +87,10 @@ $color-bg-list-hover: #F1F5F9;
             color: $color-text;
             font-weight: 600;
             padding: 20px 0;
+            span{
+                display: flex;
+                align-items: center;
+            }
             svg{
                 font-size: 20px;
             }
