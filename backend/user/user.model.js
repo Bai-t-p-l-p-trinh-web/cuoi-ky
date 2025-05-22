@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  CCCD: String
+  ,
+  phone: String
+  ,
   password: {
     type: String,
     required: true,
@@ -19,6 +23,9 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "seller", "admin"],
     default: "user",
   },
+},
+{
+  timestamps: true
 });
 
 module.exports = mongoose.model("User", userSchema);

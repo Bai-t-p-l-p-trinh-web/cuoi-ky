@@ -1,5 +1,5 @@
-const User = require("../user/model");
-const { hashPassword, comparePassword, generateTokens } = require("./services");
+const User = require("../user/user.model");
+const { hashPassword, comparePassword, generateTokens } = require("./auth.services");
 
 exports.register = async (req, res) => {
   const { email, name, password } = req.body;
