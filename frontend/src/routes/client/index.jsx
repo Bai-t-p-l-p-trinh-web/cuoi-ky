@@ -7,6 +7,7 @@ import BlogXeHoi from "../../pages/BlogXeHoi";
 import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
+import OauthFillInfo from "../../pages/Auth/client/OauthFillInfo";
 export const routes = [
     {
         path: "/blog-xe-hoi",
@@ -39,6 +40,10 @@ export const routes = [
             {
                 path: "chat",
                 element: <Message/>
+            },
+            {
+                path: "fill-info",
+                element : <OauthFillInfo/>
             },
             {
                 path: ":slugCar",

@@ -23,6 +23,26 @@ function ClientAuth(){
     const ToggleShowPassword = () => {
         setShowPassword(prev => !prev);
     }
+
+    const getGoogleLink = () => {
+        const { VITE_GOOGLE_CLIENT_ID, VITE_GOOGLE_AUTHORIZED_REDIRECT_URI } = import.meta.env;
+        const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+        const options = {
+            redirect_uri : VITE_GOOGLE_AUTHORIZED_REDIRECT_URI,
+            client_id : VITE_GOOGLE_CLIENT_ID,
+            access_type : 'offline',
+            response_type : 'code',
+            scope : [
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/userinfo.email'
+            ].join(' ')
+        };
+        
+        const qs = new URLSearchParams(options);
+        return `${rootUrl}?${qs.toString()}`;
+        
+    }
+
     return (
         <>
             <div className="clientAuth">
@@ -58,7 +78,10 @@ function ClientAuth(){
                         <span className="clientAuth__or__horizontal"></span>
                     </div>
                     <div className="clientAuth__google">
-                        Sign in with Google
+                        <Link to={getGoogleLink()}>
+                            <img src="/google.png" alt="Google" className="clientAuth__google__img"/>
+                            <span className="clientAuth__google__span">Continue with Google</span>
+                        </Link>
                     </div>
                 </div>
             </div>

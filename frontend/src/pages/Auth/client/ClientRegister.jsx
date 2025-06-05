@@ -9,6 +9,25 @@ function ClientRegister(){
         rePassword: ""
     });
 
+    const getGoogleLink = () => {
+        const { VITE_GOOGLE_CLIENT_ID, VITE_GOOGLE_AUTHORIZED_REDIRECT_URI } = import.meta.env;
+        const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+        const options = {
+            redirect_uri : VITE_GOOGLE_AUTHORIZED_REDIRECT_URI,
+            client_id : VITE_GOOGLE_CLIENT_ID,
+            access_type : 'offline',
+            response_type : 'code',
+            scope : [
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/userinfo.email'
+            ].join(' ')
+        };
+        
+        const qs = new URLSearchParams(options);
+        return `${rootUrl}?${qs.toString()}`;
+        
+    }
+
     const handleChangeValue = (e) => {
         const {name, value} = e.target;
         
@@ -77,7 +96,10 @@ function ClientRegister(){
                             <span className="register__or-horizontal"></span>
                         </div>
                         <div className="register__google">
-                            Google
+                            <Link to={getGoogleLink()}>
+                                <img src="/google.png" alt="Google" className="register__google__icon"/>
+                                <span className="register__google__span">Continue with Google</span>
+                            </Link>
                         </div>
                         <p className="register__login">
                             Already Have An Account?

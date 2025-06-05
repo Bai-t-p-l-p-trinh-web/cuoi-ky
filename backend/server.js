@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./shared/config/db");
 require("dotenv").config();
@@ -8,13 +9,20 @@ const app = express();
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true
+}));
+
+app.use(cookieParser());
 
 // routes
 const categoryRoutes = require('./category/category.routes');
 const CarRoutes = require('./car/car.routes');
+const OauthRoutes = require('./oauth/oauth.routes');
 
 app.use("/api/v1/auth", require("./auth/auth.routes"));
+app.use("/api/v1/oauth", OauthRoutes);
 // app.use("/api/v1/admin", require("./admin/routes"));
 app.use("/api/v1/car", CarRoutes);
 // app.use("/api/v1/user", require("./user/user.routes"));
