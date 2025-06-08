@@ -8,7 +8,15 @@ import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
 import OauthFillInfo from "../../pages/Auth/client/OauthFillInfo";
-import MyAccount from "../../pages/myAccount";
+import MyAccount from "../../pages/MyAccount";
+import DashBoard from "../../pages/MyAccount/child/DashBoard";
+import ManageCar from "../../pages/MyAccount/child/ManageCar";
+import Sales from "../../pages/MyAccount/child/Sales";
+import Notify from "../../pages/MyAccount/child/Notify";
+import Insight from "../../pages/MyAccount/child/Insight";
+import History from "../../pages/MyAccount/child/History";
+import Faq from "../../pages/MyAccount/child/Faq";
+
 export const routes = [
     {
         path: "/blog-xe-hoi",
@@ -48,7 +56,37 @@ export const routes = [
             },
             {
                 path: "my_account",
-                element: <MyAccount/>
+                element: <MyAccount/>,
+                children : [
+                    {
+                        index : true,
+                        element : <DashBoard/>
+                    },
+                    {
+                        path : "manage-car",
+                        element : <ManageCar/>
+                    },
+                    {
+                        path : "statistics/sales",
+                        element : <Sales/>
+                    },
+                    {
+                        path : "statistics/insights",
+                        element : <Insight/>
+                    },
+                    {
+                        path : "inspection-history",
+                        element : <History/>
+                    },
+                    {
+                        path : "notifications",
+                        element : <Notify/>
+                    },
+                    {
+                        path : "faq",
+                        element : <Faq/>
+                    }
+                ]
             },
             {
                 path: ":slugCar",

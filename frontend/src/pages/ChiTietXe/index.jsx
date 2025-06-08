@@ -11,8 +11,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { useEffect, useState } from "react";
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
