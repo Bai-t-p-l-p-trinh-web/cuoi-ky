@@ -1,8 +1,12 @@
-import { useState } from "react";
-import {Link} from "react-router-dom";
+import { useState, useEffect } from "react";
+import {Link, useNavigate} from "react-router-dom";
 import "./scss/ClientLogin.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
 function ClientAuth(){
+    const { user, loading, error } = useFetchUserInfo();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [dataClientLogin, setDataClientLogin] = useState({
         email: "",
@@ -43,9 +47,18 @@ function ClientAuth(){
         
     }
 
+    useEffect (() => {
+        if(user) {
+            toast.error('Người dùng đã đăng nhập rồi');
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+        }
+    }, [user]);
     return (
         <>
             <div className="clientAuth">
+                <ToastContainer/>
                 <div className="clientAuth__contain">
                     <h3 className="clientAuth__title">
                         Login in to ? 

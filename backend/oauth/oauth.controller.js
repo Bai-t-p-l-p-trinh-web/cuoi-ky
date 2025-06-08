@@ -66,38 +66,44 @@ const getRepondsByGoogle = async (req, res) => {
 
         // chưa có user thì tạo user mới 
         if( !user ) {
-            user = await User.create({
-                email : googleUser.email,
-                name : googleUser.name,
-                avatar : googleUser.picture,
-                phone : null,
-                password : generateRandomString(50)
-            });
-
-            const tempToken = jwt.sign(
-                { userId : user._id },
-                process.env.JWT_SECRET,
-                { expiresIn : '10m' }
-            );
+            try {
+                user = await User.create({
+                    email : googleUser.email,
+                    name : googleUser.name,
+                    avatar : googleUser.picture,
+                    password : generateRandomString(50)
+                });
     
-            res.cookie('temp_oauth_token', tempToken, {
-                httpOnly : true,
-                secure: process.env.NODE_ENV === "production",
-                maxAge : 10 * 60 * 1000
-            });
+                
+                const tempToken = jwt.sign(
+                    { userId : user._id },
+                    process.env.JWT_SECRET,
+                    { expiresIn : '10m' }
+                );
     
-            res.redirect(`${process.env.CLIENT_URL}/fill-info`);
+        
+                res.cookie('temp_oauth_token', tempToken, {
+                    httpOnly : true,
+                    secure: process.env.NODE_ENV === "production",
+                    maxAge : 10 * 60 * 1000
+                });
+        
+                res.redirect(`${process.env.CLIENT_URL}/fill-info`);
+            } catch (error) {
+                res.send(error);
+            }
+            
         } else { // Có rồi thì đăng nhập 
             const accessToken = jwt.sign(
                 { userId: user._id },
                 process.env.JWT_SECRET,
-                { expiresIn: "7d" } // hoặc thời gian bạn muốn
+                { expiresIn: "7d" } 
             );
         
             res.cookie("access_token", accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+                maxAge: 7 * 24 * 60 * 60 * 1000, 
                 sameSite: "Lax"
             });
 
@@ -161,6 +167,19 @@ const updateUser = async(req, res) => {
             return res.status(404).json({message : "Không tìm thấy người dùng "});
         }
         
+        const accessToken = jwt.sign(
+            { userId: payload.userId },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" } 
+        );
+    
+        res.cookie("access_token", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 7 * 24 * 60 * 60 * 1000, 
+            sameSite: "Lax"
+        });
+
         return res.send({message : "Cập nhật thông tin người dùng thành công!"});
     } catch (error) {
         return res.status(500).json({ message : "Server Error!" });

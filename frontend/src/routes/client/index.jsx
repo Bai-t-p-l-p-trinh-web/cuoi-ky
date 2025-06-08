@@ -8,6 +8,7 @@ import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
 import OauthFillInfo from "../../pages/Auth/client/OauthFillInfo";
+import MyAccount from "../../pages/myAccount";
 export const routes = [
     {
         path: "/blog-xe-hoi",
@@ -44,6 +45,10 @@ export const routes = [
             {
                 path: "fill-info",
                 element : <OauthFillInfo/>
+            },
+            {
+                path: "my_account",
+                element: <MyAccount/>
             },
             {
                 path: ":slugCar",

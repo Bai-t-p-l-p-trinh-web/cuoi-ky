@@ -60,6 +60,10 @@ const carSchema = new mongoose.Schema(
             slug: "title",
             unique: true
         },
+        sellerId : {
+            type : String,
+            required : true
+        },
         deleted: {
             type: Boolean,
             default: false

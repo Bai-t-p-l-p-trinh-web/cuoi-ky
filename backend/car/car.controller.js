@@ -1,4 +1,5 @@
 const Car = require('./car.model');
+const User = require('../user/user.model');
 const Category = require('../category/category.model');
 
 // [GET] /api/v1/car 
@@ -88,11 +89,18 @@ module.exports.getCarBySlug = async (req, res) => {
         newResultFindingCar.fuel = newResultFindingCar.fuel_use.fuel_name;
 
         // find user 
-        newResultFindingCar.user = {
-            name: "Hùng Quý Auto",
-            phone: "0123456789",
-            email: "banxe@gmail.com"
+        const seller = await User.findById(resultFindingCar.sellerId);
+
+        if(!seller) {
+            return res.status(404).json ( { message : "Không tìm thấy thông tin người bán!" } );
         }
+
+        newResultFindingCar.user = {
+            id : seller._id,
+            name: seller.name,
+            phone: seller.phone,
+            email: seller.email
+        };
 
         return res.send(newResultFindingCar);
     } catch (error) {

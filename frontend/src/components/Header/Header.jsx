@@ -1,5 +1,6 @@
 import {Link} from "react-router-dom";
 import { FaPhoneAlt, FaCar, FaAngleDown  } from "react-icons/fa";
+import { CiChat1 } from "react-icons/ci";
 import { MdArrowDropDown, MdAccountBox  } from "react-icons/md";
 import "./Header.scss";
 import { MouseEnter, MouseOut } from "../../utils/Dropdown";
@@ -7,10 +8,15 @@ import { useRef } from "react";
 import HeaderMuaXe from "./HeaderMuaXe";
 import Dropdown from "../Dropdown";
 import HeaderUser from "./HeaderUser";
+import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
 
 function Header(){
-    const headerRef = useRef(null);
+    const { user, loading, error } = useFetchUserInfo(); 
 
+    console.log(user, loading, error);
+
+    const headerRef = useRef(null);
+    
     return (
         <>
             <header className="header" ref={headerRef}>
@@ -54,16 +60,32 @@ function Header(){
                             <FaPhoneAlt/>
                             <span>0123456789</span>
                         </div>
-                        <div className="header__menuUser__myAccount" onMouseEnter={(e) => MouseEnter(e.currentTarget, headerRef.current.getBoundingClientRect(), 'left', 30)} onMouseLeave={(e) => {MouseOut(e.currentTarget)}}>
-                            <span>
-                                <MdAccountBox/>
-                                <span>Tài khoản</span>
-                            </span>
-                            <MdArrowDropDown/>
-                            <div className="dropdown">
-                                <HeaderUser/>
+                        { user ? 
+                        (
+                            <div className="header__menuUser__myAccount">
+                                <Link className="header__menuUser__myAccount__link" to="/my_account">
+                                    <img src={user.avatar} alt="avatar"/>
+                                    <span>{user.name}</span>
+                                </Link>
+                                <Link className="header__menuUser__myAccount__chat" to="/chat">
+                                    <CiChat1/>
+                                </Link>
                             </div>
-                        </div>
+                        ) :
+                        (
+                            <div className="header__menuUser__myAccount" onMouseEnter={(e) => MouseEnter(e.currentTarget, headerRef.current.getBoundingClientRect(), 'left', 30)} onMouseLeave={(e) => {MouseOut(e.currentTarget)}}>
+                                <span>
+                                    <MdAccountBox/>
+                                    <span>Tài khoản</span>
+                                </span>
+                                <MdArrowDropDown/>
+                                <div className="dropdown">
+                                    <HeaderUser/>
+                                </div>
+                            </div>
+                        )
+                        }
+                        
                     </div>
                 </div>
 

@@ -1,7 +1,12 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./scss/ClientRegister.scss";
+import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
+import { ToastContainer, toast } from "react-toastify";
 function ClientRegister(){
+    const { user, loading, error } = useFetchUserInfo();
+    const navigate = useNavigate();
+
     const [registerData, setRegisterData] = useState({
         name: "",
         email: "",
@@ -38,10 +43,19 @@ function ClientRegister(){
             }
         ));
     }
-
+    useEffect(() => {
+        if(user) {
+            toast.error('Người dùng đã đăng nhập rồi !');
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+            
+        }
+    }, [user]);
     return (
         <>
             <div className="register">
+                <ToastContainer/>
                 <div className="register__box">
                     <div className="register__contain">
                         <h3 className="register__title">Create an Account</h3>

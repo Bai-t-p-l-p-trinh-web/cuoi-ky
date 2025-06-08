@@ -7,7 +7,7 @@ import { FaRegComment } from "react-icons/fa6";
 import { MdEventSeat } from "react-icons/md";
 import SwiperDetail from "../../components/Swiper/CustomSwiper/Swiper_Detail";
 import "./scss/ChiTietXe.scss";
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function ChiTietXe(){
+    const navigate = useNavigate();
     const { slugCar } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const [xe, setXe] = useState(null);
@@ -40,6 +41,28 @@ function ChiTietXe(){
         
         
     }, [slugCar]);
+
+    const contactSeller = () => {
+        const dataSend = {
+            sellerId : xe.user.id
+        };
+        const startMessage = async () => {
+            try {
+                const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/thread/start`, dataSend, {
+                    withCredentials : true
+                });
+                toast.success('Liên hệ người bán thành công đang điều hướng sang tin nhắn');
+                setTimeout(() => {
+                    navigate('/chat');
+                }, 3000);
+            } catch(error) {
+                console.log(error);
+                toast.error('Liên hệ người bán thất bại');
+            }
+        };
+        startMessage();
+
+    }
     return (
         <>
             <div className="chitiet">
@@ -130,7 +153,7 @@ function ChiTietXe(){
                                                 <FaPhoneAlt className="chitiet__xe__buttons__call-icon"/>
                                                 <span className="chitiet__xe__buttons__call-span">Gọi người bán</span>
                                             </button>
-                                            <button className="chitiet__xe__buttons__mess">
+                                            <button className="chitiet__xe__buttons__mess" onClick={contactSeller}>
                                                 <FaRegComment className="chitiet__xe__buttons__mess-icon"/>
                                                 <span className="chitiet__xe__buttons__mess-span">Nhắn người bán</span>
                                             </button>
