@@ -1,7 +1,7 @@
 export const formatTimeStamp = (isoString) => {
     const date = new Date(isoString);
     const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
@@ -15,7 +15,7 @@ export const formatDateDisplay = (isoString) => {
     const now  = new Date(Date.now());
 
     const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
@@ -36,7 +36,7 @@ export const formatDateDisplay = (isoString) => {
 export const getHour = (isoString) => {
     const date = new Date(isoString);
     const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
 
     return `${hours}:${minutes}`;
 }

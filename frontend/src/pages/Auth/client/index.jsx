@@ -1,8 +1,12 @@
-import { useState } from "react";
-import {Link} from "react-router-dom";
+import { useState, useEffect } from "react";
+import {Link, useNavigate} from "react-router-dom";
 import "./scss/ClientLogin.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
 function ClientAuth(){
+    const { user, loading, error } = useFetchUserInfo();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [dataClientLogin, setDataClientLogin] = useState({
         email: "",
@@ -11,7 +15,7 @@ function ClientAuth(){
 
     const handleChangeValue = (e) => {
         const {name, value} = e.target;
-        console.log(e);
+        
         setDataClientLogin((prev) => (
             {
                 ...prev,
@@ -23,9 +27,38 @@ function ClientAuth(){
     const ToggleShowPassword = () => {
         setShowPassword(prev => !prev);
     }
+
+    const getGoogleLink = () => {
+        const { VITE_GOOGLE_CLIENT_ID, VITE_GOOGLE_AUTHORIZED_REDIRECT_URI } = import.meta.env;
+        const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+        const options = {
+            redirect_uri : VITE_GOOGLE_AUTHORIZED_REDIRECT_URI,
+            client_id : VITE_GOOGLE_CLIENT_ID,
+            access_type : 'offline',
+            response_type : 'code',
+            scope : [
+                'https://www.googleapis.com/auth/userinfo.profile',
+                'https://www.googleapis.com/auth/userinfo.email'
+            ].join(' ')
+        };
+        
+        const qs = new URLSearchParams(options);
+        return `${rootUrl}?${qs.toString()}`;
+        
+    }
+
+    useEffect (() => {
+        if(user) {
+            toast.error('Người dùng đã đăng nhập rồi');
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+        }
+    }, [user]);
     return (
         <>
             <div className="clientAuth">
+                <ToastContainer/>
                 <div className="clientAuth__contain">
                     <h3 className="clientAuth__title">
                         Login in to ? 
@@ -58,7 +91,10 @@ function ClientAuth(){
                         <span className="clientAuth__or__horizontal"></span>
                     </div>
                     <div className="clientAuth__google">
-                        Sign in with Google
+                        <Link to={getGoogleLink()}>
+                            <img src="/google.png" alt="Google" className="clientAuth__google__img"/>
+                            <span className="clientAuth__google__span">Continue with Google</span>
+                        </Link>
                     </div>
                 </div>
             </div>

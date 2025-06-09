@@ -58,6 +58,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    contactFacebook : {
+      type: String,
+      default: null,
+    },
+    contactZalo : {
+      type: String,
+      default: null,
+    },
+    contactEmail : {
+      type: String,
+      default: null,
+    },
+    contactLinkedin : {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

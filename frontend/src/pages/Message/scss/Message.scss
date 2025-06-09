@@ -3,8 +3,22 @@ $color-bg-picked: #c9bfbf;
 $color-text-user: #9f6c6c;
 $color-text-name: #888585;
 $color-bg-chatting: #F7F7F7;
+
+@keyframes blink {
+    0% {
+        opacity: 0.1;
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.1;
+    }
+}
+
 .chat{
     margin: 20px 0;
+    
     &__header{
         background: $color-bg-header;
         display: flex;
@@ -109,7 +123,39 @@ $color-bg-chatting: #F7F7F7;
                     aspect-ratio: 1;
                     object-fit: cover;
                     border-radius: 50%;
-                    
+
+                    &__contain{
+                        position : relative;
+                        &[data-user-online=true] {
+                            &::after {
+                                content : "";
+                                position: absolute;
+                                
+                                width: 7px;
+                                height: 7px;
+                                border-radius: 50%;
+                                background-color: green;
+                                right : 5px;
+                                bottom : 0px;
+                                z-index: 5;
+                                transform: translate(-3px, -3px);
+                            }
+                            &::before {
+                                content : "";
+                                position: absolute;
+                                
+                                width: 13px;
+                                height: 13px;
+                                border-radius: 50%;
+                                background-color: white;
+                                right : 5px;
+                                bottom : 0px;
+                                z-index: 4;
+                                
+                            }
+                        }
+                        
+                    }
                 }
                 &__infor{
                     display: flex;
@@ -148,11 +194,14 @@ $color-bg-chatting: #F7F7F7;
         }
     }
     &__chatting{
+        position : relative;
+        
         &__header{
             border-bottom: 1px solid #ddd;
             padding: 15px;
             &__info{
                 display: flex;
+                align-items: center;
                 &-img{
                     width: 60px;
                     aspect-ratio: 1;
@@ -181,9 +230,13 @@ $color-bg-chatting: #F7F7F7;
             padding: 20px 30px;
             background-color: $color-bg-chatting;
             min-height: 707px;
-            &-item{
+            overflow-y: scroll;
+            scrollbar-width: none;     
+            -ms-overflow-style: none;
+            padding-bottom: 50px;
+            // &-item{
 
-            }
+            // }
             &__showTime{
                 display: flex;
                 align-items: center;
@@ -205,9 +258,9 @@ $color-bg-chatting: #F7F7F7;
                             padding-right: 20px;
                             text-align: end;
                         }
-                        &-name{
-                            // text-align: center;
-                        }
+                        // &-name{
+                        //     // text-align: center;
+                        // }
                     }
                 }
                 &-avatar{
@@ -229,8 +282,63 @@ $color-bg-chatting: #F7F7F7;
                     background-color: #fff;
                     max-width: 500px;
                     text-wrap: wrap;
+                    &.sender{
+                        border-radius: 5px 0 5px 5px;
+                    }
                 }
             }
+            &__typing{
+                position: relative;
+                height : 20px;
+                width: 50px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #efefef;
+                border-radius: 45px;
+                margin-top : 10px;
+                display: none;
+
+                &.typing {
+                    display: inline-flex;
+                }
+                
+                span{
+                    animation: blink 1.5s infinite;
+                    height: 5px;
+                    width: 5px;
+                    background: #252525;
+                    border-radius: 50%;
+                    display: inline-block;
+                    margin: 0 3px;
+
+                    &:nth-child(2) {
+                        animation-delay: 0.2s;
+                    }
+                    &:nth-child(3) {
+                        animation-delay: 0.4s;
+                    }
+                }
+            }
+        }
+    }
+    &__input{
+        flex : 1;
+        height : 40px;
+        border-radius: 4px 0 0 4px;
+        &__container{
+            display: flex;
+            align-items: center;
+            position : absolute;
+            bottom : 0;
+            right : 0;
+            width: 100%;
+        }
+        &__button{
+            height : 40px;
+            width: 40px;
+            border : 1px solid #ddd;
+            border-radius: 0 4px 4px 0;
         }
     }
 }

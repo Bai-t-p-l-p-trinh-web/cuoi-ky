@@ -85,4 +85,24 @@ $color-button-submit: #5744E3;
         }
 
     }
+    &__google{
+        a{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #000;
+            border-radius: 4px;
+            padding: 5px 10px;
+            &:hover{
+                text-decoration: none;
+            }
+        }
+        &__img{
+            width: 50px;
+        }
+        &__span{
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
 }
