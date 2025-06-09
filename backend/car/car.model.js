@@ -67,6 +67,15 @@ const carSchema = new mongoose.Schema(
         deleted: {
             type: Boolean,
             default: false
+        },
+        status : {
+            type : String,
+            enum : ['selling', 'deposited', 'hidden', 'sold'],
+            default: 'selling'
+        },
+        isVerified : {
+            type : Boolean,
+            default : false
         }
     },
     {

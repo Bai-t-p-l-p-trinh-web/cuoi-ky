@@ -13,7 +13,7 @@ import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
 function Header(){
     const { user, loading, error } = useFetchUserInfo(); 
 
-    console.log(user, loading, error);
+    // console.log(user, loading, error);
 
     const headerRef = useRef(null);
     
@@ -64,7 +64,9 @@ function Header(){
                         (
                             <div className="header__menuUser__myAccount">
                                 <Link className="header__menuUser__myAccount__link" to="/my_account">
-                                    <img src={user.avatar} alt="avatar"/>
+                                    <div className="header__menuUser__myAccount__link__img__contain">
+                                        <img src={user.avatar} alt="avatar"/>
+                                    </div>
                                     <span>{user.name}</span>
                                 </Link>
                                 <Link className="header__menuUser__myAccount__chat" to="/chat">

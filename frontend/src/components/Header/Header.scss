@@ -98,11 +98,16 @@ $color-bg-list-hover: #F1F5F9;
                 display: flex;
                 margin-right: 10px;
                 img{
-                    width: 30px;
+                    width: 40px;
                     aspect-ratio: 1;
                     object-fit: cover;
                     border-radius: 4px;
                     margin-right: 5px;
+                }
+                &__img__contain{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                 }
                 span{
                     color: #000;

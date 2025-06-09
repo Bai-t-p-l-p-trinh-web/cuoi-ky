@@ -10,11 +10,18 @@ import { logout } from "../../features/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
+
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 import "./scss/MyAccount.scss";
 
 function MyAccount () {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { user, loading, error } = useFetchUserInfo(); 
+    
     const handleLogout = () => {
         const loadingToastLogout = toast.loading('Đang đăng xuất ... ');
 
@@ -52,14 +59,6 @@ function MyAccount () {
         
     }
 
-    const user = {
-        name : "Lê Viết Xuân",
-        email : "xuantryingbetter@gmail.com",
-        phone : "0356446244",
-        role : "user",
-        avatar : "https://lh3.googleusercontent.com/a/ACg8ocJfwxvlLs47ak5VknxBypL2Mdp4I9CJEIkmiSJscdebFx5z=s96-c",
-        createdAt : "2025-06-05T18:40:36.239+00:00"
-    };
 
     return (
         <>  
@@ -67,13 +66,33 @@ function MyAccount () {
                 <ToastContainer/>
                 <div className="myAccount__pages">
                     <div className="myAccount__pages__card">
-                        <div className="myAccount__pages__card__avatar__contain">
-                            <img src={user.avatar} className="myAccount__pages__card__avatar"/>
-                        </div>
-                        <div className="myAccount__pages__card__info">
-                            <span className="myAccount__pages__card__info__username">{user.name}</span>
-                            <p className="myAccount__pages__card__info__email">{user.email}</p>
-                        </div>
+                        {
+                            loading ? 
+                            (
+                                <>
+                                    <div className="myAccount__pages__card__avatar__contain">
+                                        <Skeleton className="myAccount__pages__card__avatar"/>
+                                    </div>
+                                    
+                                    <div className="myAccount__pages__card__info">
+                                        <Skeleton width={70} height={10} className="myAccount__pages__card__info__username"/>
+                                        <Skeleton width={160} height={10} className="myAccount__pages__card__info__email"/>
+                                    </div>
+                                </>
+                            ) : 
+                            (
+                                <>
+                                    <div className="myAccount__pages__card__avatar__contain">
+                                        <img src={user?.avatar || "'https://greekherald.com.au/wp-content/uploads/2020/07/default-avatar.png'"} className="myAccount__pages__card__avatar"/>
+                                    </div>
+                                    
+                                    <div className="myAccount__pages__card__info">
+                                        <span className="myAccount__pages__card__info__username">{user?.name || ""}</span>
+                                        <p className="myAccount__pages__card__info__email">{user?.email || ""}</p>
+                                    </div>
+                                </>
+                            )
+                        }
                     </div>
                     <ul className="myAccount__pages__list">
                         <li className="myAccount__pages__item">

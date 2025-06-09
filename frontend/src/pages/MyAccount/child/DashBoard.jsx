@@ -6,8 +6,10 @@ import { Link } from "react-router-dom";
 import "../scss/DashBoard.scss";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
+import UploadButton from "../../../components/UploadButton";
+import { Cloudinary } from "@cloudinary/url-gen";
 
-
+ 
 function DashBoard() {
 
     const [profile, setProfile] = useState({
@@ -27,6 +29,30 @@ function DashBoard() {
         oldPassword : "",
         newPassword : ""
     });
+    
+    // cloudinary 
+
+    const [uploadImage, setUploadImage] = useState("");
+
+    const cloudName = import.meta.env.VITE_CLOUDINARY_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    const cld = new Cloudinary({
+        cloud : {
+            cloudName
+        }
+    });
+
+    const uwConfig = {
+        cloudName,
+        uploadPreset,
+        cropping: true, 
+        croppingAspectRatio: 1,
+        multiple: false,
+        sources: ['local', 'url', 'camera']
+    };
+
+    // end cloudinary 
 
     const constProfile = useRef(null); 
 
@@ -59,6 +85,7 @@ function DashBoard() {
             (profile.contactZalo !== constProfile.current.contactZalo) || 
             (profile.contactEmail !== constProfile.current.contactEmail) || 
             (profile.contactLinkedin !== constProfile.current.contactLinkedin) || 
+            (uploadImage) ||
             (changePassword.oldPassword && changePassword.newPassword)
         ) {
             return true;
@@ -66,6 +93,10 @@ function DashBoard() {
             return false;
         }
     }
+
+    const handleDeleteImg = () => {
+        setUploadImage("");
+    };
 
     useEffect(() => {
         const getInfoMe = async () => {
@@ -119,8 +150,8 @@ function DashBoard() {
             updatedInfo.name = profile.name;
         }
 
-        if(profile.avatar !== constProfile.current.avatar) {
-            updatedInfo.avatar = profile.avatar;
+        if(uploadImage !== constProfile.current.avatar) {
+            updatedInfo.avatar = uploadImage;
         }
 
         if(profile.contactEmail !== constProfile.current.contactEmail) {
@@ -187,16 +218,17 @@ function DashBoard() {
                     <div className="dashboard__header__settings">
                         <h3 className="dashboard__header__settings__title">Quản lý tài khoản</h3>
                         <div className="dashboard__header__settings__img__contain">
-                            <img src={profile.avatar || 'https://greekherald.com.au/wp-content/uploads/2020/07/default-avatar.png'} alt="avatar" />
-                            <button className="dashboard__header__settings__img__delete">
-                                <span>+</span>
-                            </button>
+                            <img src={uploadImage || profile.avatar || 'https://greekherald.com.au/wp-content/uploads/2020/07/default-avatar.png'} alt="avatar" />
+                            {
+                                uploadImage && 
+                                <button className="dashboard__header__settings__img__delete" onClick={handleDeleteImg}>
+                                    <span>+</span>
+                                </button>
+                            }
+                            
                         </div>
-                        <div className="dashboard__header__settings__button__contain">
-                            <button className="dashboard__header__settings__button">
-                                Upload Photo
-                            </button>
-                        </div>
+                        
+                        <UploadButton cloudName={cloudName} uwConfig={uwConfig} setUploadImage={setUploadImage} />
 
                         <form className="dashboard__header__settings__form">
                             <div className="dashboard__header__settings__box">

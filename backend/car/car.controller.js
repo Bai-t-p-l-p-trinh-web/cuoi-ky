@@ -127,3 +127,40 @@ module.exports.createCar = async (req, res) => {
         return res.status(500).json({message : "Server Error!!!"});
     }
 }
+
+// [GET] /api/v1/car/display 
+module.exports.getCarsDisplay = async(req, res) => {
+    try {
+        const find = {
+            deleted : false,
+            isVerified : true
+        };
+    
+        const userId = req.userId;
+    
+        const user = await User.findById(userId);
+    
+        if(!user) return res.status(404).json({ message : "Không tìm thấy người dùng" });
+        if(user.role !== "seller") return res.status(401).json({ message : "Phải đăng ký làm người bán" });
+    
+        find.sellerId = userId;
+    
+        const cars = await Car.find(find);
+    
+        if(!cars) return res.send([]);
+        const respondCars = cars.map((car) => {
+            return {
+                title: car.title,
+                price: car.price,
+                img_src: (car.img_src?.[0] || "https://static.vecteezy.com/system/resources/previews/008/255/803/non_2x/page-not-found-error-404-system-updates-uploading-computing-operation-installation-programs-system-maintenance-a-hand-drawn-layout-template-of-a-broken-robot-illustration-vector.jpg"),
+                status: car.status,
+                slug: car.slug
+            }
+        });
+    
+        return res.send(respondCars);
+    } catch(error) {
+        return res.status(500).json( { message : "Server Error!" });
+    }
+
+}
