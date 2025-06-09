@@ -67,12 +67,13 @@ $color-bg-manageCar : #F7F7F7;
     }
     
     &__status{
-        width: 120px;
+        width: 100px;
         padding-bottom: 20px;
         border-bottom: 3px solid #ddd;
         text-align: center;
+        cursor: pointer;
 
-        &:hover{
+        &.picked, &:hover{
             border-bottom: 3px solid #000;
         }
 
@@ -99,19 +100,47 @@ $color-bg-manageCar : #F7F7F7;
 
     &__search{
         margin-right : 20px;
+        display: flex;
+        position : relative;
+        &__svg{
+            position: absolute;
+            top: 50%;
+            left : 5px;
+            transform: translate(0, -50%);
+        }
+        &__input{
+            padding: 4px 20px;
+            width: 200px;
+            height: 36px;
+            outline : none;
+        }
     }
 
     &__sort{
         margin-right : 20px;
+        height: 36px;
+
+        &__button{
+            border : 1px solid #ddd;
+            background : transparent;
+            padding : 4px 10px;
+            text-wrap: wrap;
+        }
     }
 
-    // &__add{
-
-    // }
+    &__add{
+        border : 1px solid #ddd;
+        height: 36px;
+        width: 130px;
+        padding: 4px 5px;
+        text-wrap: wrap;
+    }
 
     &__link{
         display: flex;
         align-items: center;
+        justify-content: center;
+        width: 100%;
 
         &__svg{
             margin-right: 4px;
@@ -121,6 +150,9 @@ $color-bg-manageCar : #F7F7F7;
 
     &__table{
         width: 100%;
+        td {
+            background-color: #fff;
+        }
         
         &__item{
 
