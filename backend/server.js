@@ -8,7 +8,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 
 const connectDB = require("./shared/config/db");
-require("dotenv").config();
+require("dotenv").config({ path: "./shared/config/.env" });
 
 const app = express();
 const httpServer = createServer(app);
@@ -18,10 +18,9 @@ cleanupUnverifiedUsers(); // Start the cron job to clean up unverified users
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Added to parse URL-encoded bodies
-app.use(cors());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -145,13 +144,14 @@ app.use((req, res, next) => {
 });
 
 // routes
+const authRoutes = require("./auth/auth.routes");
 const categoryRoutes = require("./category/category.routes");
 const CarRoutes = require("./car/car.routes");
 const OauthRoutes = require("./oauth/oauth.routes");
 const UserRoutes = require("./user/user.routes");
 const threadRoutes = require("./thread/thread.routes");
 
-app.use("/api/v1/auth", require("./auth/auth.routes"));
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/oauth", OauthRoutes);
 app.use("/api/v1/thread", threadRoutes);
 // app.use("/api/v1/admin", require("./admin/routes"));
