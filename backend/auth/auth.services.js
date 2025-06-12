@@ -126,16 +126,36 @@ exports.sendOtp = async (user, type) => {
       },
     });
 
+    let mailSubject;
+    switch (type) {
+      case "VERIFY_REGISTER":
+        mailSubject = "Xác nhận đăng ký tài khoản";
+        break;
+      case "VERIFY_CHANGE_PASSWORD":
+        mailSubject = "Xác nhận thay đổi mật khẩu";
+        break;
+      case "VERIFY_RESET_PASSWORD":
+        mailSubject = "Xác nhận quên mật khẩu";
+        break;
+      case "VERIFY_CHANGE_EMAIL" || "VERIFY_NEW_EMAIL":
+        mailSubject = "Xác nhận thay đổi địa chỉ Email";
+        break;
+      case "VERIFY_2FA_LOGIN":
+        mailSubject = "Xác nhận đăng nhập 2 yếu tố";
+        break;
+      case "VERIFY_ACCOUNT":
+        mailSubject = "Xác nhận địa chỉ Email";
+        break;
+      case "REQUEST_OTP_AGAIN":
+        mailSubject = "Gửi lại mã OTP mới";
+        break;
+    }
+
     // send email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: type === "verify-new-email" ? user.pendingEmail : user.email,
-      subject:
-        type === "register"
-          ? "Xác minh địa chỉ email"
-          : type === "2fa"
-          ? "Mã đăng nhập 2 yếu tố (2FA)"
-          : "Xác nhận thay đổi email",
+      to: type === "VERIFY_NEW_EMAIL" ? user.pendingEmail : user.email,
+      subject: mailSubject,
       html: emailTemplate,
     });
 
@@ -175,10 +195,31 @@ exports.verifyOtp = async (user, inputOtp, type) => {
       await Otp.findByIdAndDelete(otp._id);
 
       switch (type) {
-        case "register":
+        case "VERIFY_REGISTER":
           await User.findByIdAndUpdate(user._id, { isVerified: true });
           break;
-        case "verify-new-email":
+        case "VERIFY_FIRST_TIME":
+          await User.findByIdAndUpdate(user._id, { isVerified: true });
+          const { accessToken, refreshToken } = await exports.generateTokens(
+            user
+          );
+          return {
+            accessToken,
+            refreshToken,
+            success: true,
+            message: "Xác minh OTP thành công. Đăng nhập hoàn tất.",
+            data: {
+              user: {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                is2FAEnabled: user.is2FAEnabled,
+                isVerified: user.isVerified,
+              },
+            },
+          };
+        case "VERIFY_NEW_EMAIL":
           const newEmail = user.pendingEmail;
           console.log(newEmail);
           await User.findByIdAndUpdate(user._id, {
