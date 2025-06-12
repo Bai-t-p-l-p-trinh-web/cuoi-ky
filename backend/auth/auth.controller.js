@@ -11,46 +11,61 @@ const {
 
 exports.register = async (req, res) => {
   try {
-    let { email, phoneNumber, name, password } = req.body;
+    let { email, name, password } = req.body;
 
     email = email?.trim();
-    phoneNumber = phoneNumber?.trim();
     name = name?.trim();
     password = password?.trim();
 
     // Validate required fields
-    if (!email || !phoneNumber || !name || !password) {
+    if (!email || !name || !password) {
       return res.status(400).json({
-        message: "Email, số điện thoại, tên và mật khẩu không được bỏ trống",
+        success: false,
+        message: "Email, tên và mật khẩu không được bỏ trống.",
+        error_code: "VALIDATION_ERROR",
+        errors: {
+          email: !email ? "Email là bắt buộc" : undefined,
+          name: !name ? "Tên là bắt buộc" : undefined,
+          password: !password ? "Mật khẩu là bắt buộc" : undefined,
+        },
       });
     }
 
     if (!validatePassword(password)) {
       return res.status(400).json({
+        success: false,
         message:
           "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 ký tự đặc biệt.",
+        error_code: "WEAK_PASSWORD",
       });
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       if (existingUser.isVerified) {
-        return res
-          .status(400)
-          .json({ message: "Email đã tồn tại trên hệ thống" });
+        return res.status(400).json({
+          success: false,
+          message: "Email đã tồn tại trên hệ thống.",
+          error_code: "EMAIL_ALREADY_EXISTS",
+        });
       } else {
         // Người dùng tồn tại nhưng chưa xác minh, gửi lại OTP
-        const otpResult = await sendOtp(existingUser, "register");
+        const otpResult = await sendOtp(existingUser, "VERIFY_ACCOUNT");
         if (otpResult && otpResult.success) {
           return res.status(200).json({
+            success: true,
             message:
               "Tài khoản đã tồn tại nhưng chưa được xác minh. OTP mới đã được gửi đến địa chỉ email của bạn.",
-            actionRequired: "VERIFY_ACCOUNT",
+            data: {
+              actionRequired: "VERIFY_REGISTER",
+            },
           });
         } else {
-          return res
-            .status(500)
-            .json({ message: "Gửi OTP qua email thất bại. Vui lòng thử lại." });
+          return res.status(500).json({
+            success: false,
+            message: "Gửi OTP qua email thất bại. Vui lòng thử lại.",
+            error_code: "OTP_SEND_FAILED",
+          });
         }
       }
     }
@@ -58,31 +73,40 @@ exports.register = async (req, res) => {
     const hashedPassword = await hashPassword(password);
     const newUser = await User.create({
       email,
-      phoneNumber,
       name,
       password: hashedPassword,
       isVerified: false,
     });
 
-    const otpSendResult = await sendOtp(newUser, "register");
+    const otpSendResult = await sendOtp(newUser, "VERIFY_REGISTER");
 
     if (otpSendResult && otpSendResult.success) {
       res.status(201).json({
+        success: true,
         message:
           "Tài khoản đã được tạo thành công. Mã OTP đã được gửi đến địa chỉ email của bạn để xác thực tài khoản.",
-        actionRequired: "VERIFY_ACCOUNT",
+        data: {
+          actionRequired: "VERIFY_REGISTER",
+        },
       });
     } else {
       res.status(201).json({
+        success: true,
         message:
           "Tài khoản đã được tạo thành công, nhưng xảy ra lỗi khi gửi OTP xác thực. Vui lòng thử yêu cầu OTP lại.",
-        actionRequired: "REQUEST_OTP_AGAIN",
-        userId: newUser._id,
+        data: {
+          actionRequired: "REQUEST_OTP_AGAIN",
+          userId: newUser._id,
+        },
       });
     }
   } catch (error) {
     console.error("Register error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      success: false,
+      message: "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.",
+      error_code: "INTERNAL_SERVER_ERROR",
+    });
   }
 };
 
@@ -92,57 +116,85 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user || !(await comparePassword(password, user.password))) {
-      return res
-        .status(400)
-        .json({ message: "Email đăng nhập hoặc mật khẩu không hợp lệ" });
+      return res.status(400).json({
+        success: false,
+        message: "Email hoặc mật khẩu không hợp lệ.",
+        error_code: "INVALID_CREDENTIALS",
+      });
     }
     if (!user.isVerified) {
-      const otpSendResult = await sendOtp(user, "register");
+      const otpSendResult = await sendOtp(user, "VERIFY_ACCOUNT");
       if (otpSendResult && otpSendResult.success) {
-        return res.status(403).json({
-          message: "Tài khoản chưa được xác thực. OTP đã được gửi qua email.",
-          actionRequired: "VERIFY_ACCOUNT",
+        return res.status(200).json({
+          success: false,
+          message: "Tài khoản chưa xác thực. Mã OTP đã được gửi qua email.",
+          error_code: "ACCOUNT_NOT_VERIFIED",
+          data: { actionRequired: "VERIFY_FIRST_TIME" },
         });
       } else {
         return res.status(500).json({
-          message: "Lỗi gửi OTP xác thực tài khoản. Vui lòng thử lại.",
+          success: false,
+          message: "Không thể gửi OTP xác thực. Vui lòng thử lại.",
+          error_code: "OTP_SEND_FAILED",
         });
       }
     }
 
     // Kiểm tra 2FA
     if (user.is2FAEnabled) {
-      const otpResult = await sendOtp(user, "2fa");
+      const otpResult = await sendOtp(user, "VERIFY_2FA_LOGIN");
       if (otpResult && otpResult.success) {
         return res.status(200).json({
-          message:
-            "Yêu cầu đăng nhập 2 yếu tố. Vui lòng nhập mã OTP đã được gửi đến email của bạn.",
-          actionRequired: "VERIFY_2FA_OTP",
+          success: true,
+          message: "Vui lòng nhập mã OTP được gửi đến email của bạn.",
+          data: { actionRequired: "VERIFY_2FA_LOGIN" },
         });
       } else {
-        return res
-          .status(500)
-          .json({ message: "Không thể gửi mã OTP cho 2FA. Vui lòng thử lại." });
+        return res.status(500).json({
+          success: false,
+          message: "Không thể gửi mã OTP cho 2FA. Vui lòng thử lại.",
+          error_code: "2FA_OTP_SEND_FAILED",
+        });
       }
     }
 
     // Nếu không bật 2FA, đăng nhập bình thường
     const tokens = await generateTokens(user);
-    res.status(200).json({
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      user: {
-        id: user._id,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        name: user.name,
-        role: user.role,
-        is2FAEnabled: user.is2FAEnabled,
-      },
-    });
+    res
+      .cookie("accessToken", tokens.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 15, // 15 phút
+      })
+      .cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Đăng nhập thành công.",
+        data: {
+          user: {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            is2FAEnabled: user.is2FAEnabled,
+            isVerified: user.isVerified,
+          },
+        },
+      });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ nội bộ.",
+      error_code: "INTERNAL_SERVER_ERROR",
+    });
   }
 };
 
@@ -150,42 +202,74 @@ exports.verifyLoginOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     if (!email || !otp) {
-      return res
-        .status(400)
-        .json({ message: "Email và OTP không được để trống." });
+      return res.status(400).json({
+        success: false,
+        message: "Email và OTP là bắt buộc.",
+        error_code: "VALIDATION_ERROR",
+      });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại." });
+      return res.status(404).json({
+        success: false,
+        message: "Người dùng không tồn tại.",
+        error_code: "USER_NOT_FOUND",
+      });
     }
 
     // Verify OTP
-    const otpVerificationResult = await verifyOtp(user, otp, "2fa");
-
+    const otpVerificationResult = await verifyOtp(
+      user,
+      otp,
+      "VERIFY_2FA_LOGIN"
+    );
     if (!otpVerificationResult.success) {
-      return res.status(400).json({ message: otpVerificationResult.message });
+      return res.status(400).json({
+        success: false,
+        message: otpVerificationResult.message,
+        error_code: "INVALID_OTP",
+      });
     }
 
     // Generate new tokens
     const { accessToken, refreshToken } = await generateTokens(user);
 
-    res.status(200).json({
-      message: "Xác minh OTP thành công, đăng nhập thành công.",
-      accessToken,
-      refreshToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        is2FAEnabled: user.is2FAEnabled,
-      },
-    });
+    res
+      .cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 15,
+      })
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Xác minh OTP thành công. Đăng nhập hoàn tất.",
+        data: {
+          user: {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            is2FAEnabled: user.is2FAEnabled,
+            isVerified: user.isVerified,
+          },
+        },
+      });
   } catch (error) {
     console.error("Error verifying login OTP:", error);
-    res.status(500).json({ message: "Lỗi máy chủ nội bộ." });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ nội bộ.",
+      error_code: "INTERNAL_SERVER_ERROR",
+    });
   }
 };
 
@@ -193,49 +277,80 @@ exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken: token } = req.body;
     if (!token) {
-      return res.status(400).json({ message: "Refresh token is required" });
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token là bắt buộc.",
+        error_code: "MISSING_TOKEN",
+      });
     }
 
     const tokens = await refreshToken(token);
     if (!tokens) {
-      return res
-        .status(401)
-        .json({ message: "Invalid or expired refresh token" });
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token không hợp lệ hoặc đã hết hạn.",
+        error_code: "INVALID_REFRESH_TOKEN",
+      });
     }
 
-    res.json(tokens);
+    res
+      .cookie("accessToken", tokens.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 15,
+      })
+      .cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Làm mới token thành công.",
+      });
   } catch (error) {
     console.error("Token refresh error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ nội bộ.",
+      error_code: "INTERNAL_SERVER_ERROR",
+    });
   }
 };
 
 exports.logout = async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) {
-      return res.status(400).json({ message: "Refresh token is required" });
+    if (refreshToken) {
+      await UserToken.findOneAndDelete({ token: refreshToken });
     }
 
-    // Delete the refresh token from database
-    await UserToken.findOneAndDelete({ token: refreshToken });
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+    });
 
-    res.json({ message: "Đăng xuất thành công." });
+    res.status(200).json({ success: true, message: "Đăng xuất thành công." });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
 exports.sendOtp = async (req, res) => {
   try {
     const { email, type } = req.body;
-
     if (!email) {
-      return res.status(400).json({ message: "Email không được để trống" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email không được để trống." });
     }
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -244,20 +359,18 @@ exports.sendOtp = async (req, res) => {
     }
 
     const otpServiceResult = await sendOtp(user, type);
-
-    if (otpServiceResult && otpServiceResult.success) {
+    if (otpServiceResult?.success) {
       return res
         .status(200)
         .json({ success: true, message: "OTP đã được gửi thành công." });
-    } else {
-      return res.status(500).json({
-        success: false,
-        message: "Gửi OTP thất bại. Vui lòng thử lại.",
-      });
     }
+
+    return res
+      .status(500)
+      .json({ success: false, message: "Gửi OTP thất bại. Vui lòng thử lại." });
   } catch (error) {
     console.error("Controller Send OTP error:", error);
-    res.status(500).json({ success: false, message: "Internal server error." });
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
@@ -265,24 +378,52 @@ exports.verifyOtp = async (req, res) => {
   try {
     const { email, otp, type } = req.body;
     const user = await User.findOne({
-      $or: [{ email: email }, { pendingEmail: email }],
+      $or: [{ email }, { pendingEmail: email }],
     });
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Không tìm thấy người dùng." });
     }
 
     const result = await verifyOtp(user, otp, type);
     if (!result.success) {
-      return res.status(400).json({ message: result.message });
+      return res.status(400).json({ success: false, message: result.message });
     }
+
+    if (result.success && type === "VERIFY_FIRST_TIME") {
+      return res
+        .cookie("accessToken", result.accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "Strict",
+          maxAge: 1000 * 60 * 15,
+        })
+        .cookie("refreshToken", result.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "Strict",
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+        })
+        .status(200)
+        .json({
+          success: true,
+          message: result.message,
+          data: { ...result.data, userId: user._id, verificationType: type },
+        });
+    }
+
     return res.status(200).json({
-      message: result.message,
-      verificationType: type,
       success: true,
+      message: result.message,
+      data: { userId: user._id, verificationType: type },
     });
   } catch (error) {
     console.error("OTP verification error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
@@ -290,56 +431,52 @@ exports.changePassword = async (req, res) => {
   try {
     const { userId, oldPassword, newPassword } = req.body;
 
-    if (!userId) {
+    if (!userId || !oldPassword || !newPassword) {
       return res
-        .status(401)
-        .json({ message: "Người dùng chưa được xác thực." });
+        .status(400)
+        .json({ success: false, message: "Thiếu thông tin bắt buộc." });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Người dùng không tồn tại." });
     }
 
-    const currentPassword = user.password;
-
-    if (!oldPassword || !newPassword) {
+    if (newPassword === oldPassword) {
       return res.status(400).json({
-        message: "Mật khẩu mới và mật khẩu cũ không được để trống.",
+        success: false,
+        message: "Mật khẩu mới không được trùng với mật khẩu cũ.",
       });
     }
 
     if (!validatePassword(newPassword)) {
       return res.status(400).json({
+        success: false,
         message:
           "Mật khẩu mới phải có ít nhất 8 ký tự, 1 chữ hoa và 1 ký tự đặc biệt.",
       });
     }
 
-    if (newPassword === oldPassword) {
-      return res.status(400).json({
-        message: "Mật khẩu mới không được giống mật khẩu cũ.",
-      });
+    const isMatch = await comparePassword(oldPassword, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Mật khẩu cũ không đúng." });
     }
 
-    if (!(await comparePassword(oldPassword, currentPassword))) {
-      return res.status(400).json({
-        message: "Mật khẩu cũ không đúng",
-      });
-    }
+    user.password = await hashPassword(newPassword);
+    await user.save();
 
-    const hashedPassword = await hashPassword(newPassword);
-    await User.findByIdAndUpdate(userId, {
-      password: hashedPassword,
-    });
-    res.status(200).json({
-      message: "Đổi mật khẩu thành công.",
-    });
+    return res
+      .status(200)
+      .json({ success: true, message: "Đổi mật khẩu thành công." });
   } catch (error) {
     console.error("Error changing password:", error);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    return res
+      .status(500)
+      .json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
@@ -350,75 +487,69 @@ exports.changeEmail = async (req, res) => {
     if (!oldEmail || !newEmail) {
       return res
         .status(400)
-        .json({ message: "Email cũ và email mới không được để trống." });
+        .json({ success: false, message: "Thiếu email cũ hoặc mới." });
     }
 
     if (oldEmail === newEmail) {
-      return res.status(400).json({ message: "Email mới phải khác email cũ." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email mới phải khác email cũ." });
     }
 
-    // Check if the new email is already in use by another verified user
-    const existingUserWithNewEmail = await User.findOne({ email: newEmail });
-    if (existingUserWithNewEmail) {
-      return res.status(400).json({ message: "Email này đã được sử dụng." });
+    const existed = await User.findOne({ email: newEmail });
+    if (existed) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email mới đã được sử dụng." });
     }
 
     const user = await User.findOne({ email: oldEmail });
     if (!user) {
       return res
         .status(404)
-        .json({ message: "Không tìm thấy người dùng với email hiện tại." });
+        .json({ success: false, message: "Không tìm thấy người dùng." });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      user._id,
-      { pendingEmail: newEmail },
-      { new: true }
-    );
+    user.pendingEmail = newEmail;
+    await user.save();
 
-    if (!updatedUser) {
-      return res
-        .status(404)
-        .json({ message: "Không tìm thấy người dùng để cập nhật email." });
-    }
+    const otpResult = await sendOtp(user, "verify-new-email");
 
-    const otpResult = await sendOtp(updatedUser, "verify-new-email");
-
-    if (otpResult && otpResult.success) {
+    if (otpResult?.success) {
       return res.status(200).json({
-        message:
-          "Mã OTP đã được gửi đến địa chỉ email mới. Vui lòng xác thực để hoàn tất thay đổi email.",
-        actionRequired: "VERIFY_NEW_EMAIL",
-      });
-    } else {
-      // Rollback pendingEmail if OTP sending fails
-      await User.findByIdAndUpdate(updatedUser._id, { pendingEmail: null });
-      return res.status(500).json({
-        message: "Gửi OTP xác thực email mới thất bại. Vui lòng thử lại.",
+        success: true,
+        message: "Đã gửi OTP xác thực đến email mới.",
+        data: { actionRequired: "VERIFY_NEW_EMAIL" },
       });
     }
+
+    user.pendingEmail = null;
+    await user.save();
+    return res.status(500).json({
+      success: false,
+      message: "Không thể gửi OTP. Vui lòng thử lại.",
+    });
   } catch (error) {
     console.error("Change email error:", error);
-    return res.status(500).json({
-      message: "Lỗi máy chủ nội bộ khi xử lý yêu cầu thay đổi email.",
-    });
+    return res
+      .status(500)
+      .json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
 exports.resetPassword = async (req, res) => {
   try {
     const { userId, newPassword } = req.body;
-    if (!userId) {
-      return res.status(400).json({ message: "User ID không được để trống." });
+
+    if (!userId || !newPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Thiếu userId hoặc mật khẩu mới." });
     }
 
-    if (!newPassword) {
-      return res.status(400).json({
-        message: "Mật khẩu mới không được để trống.",
-      });
-    }
     if (!validatePassword(newPassword)) {
       return res.status(400).json({
+        success: false,
         message:
           "Mật khẩu mới phải có ít nhất 8 ký tự, 1 chữ hoa và 1 ký tự đặc biệt.",
       });
@@ -426,31 +557,22 @@ exports.resetPassword = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại." });
-    }
-
-    const hashedPassword = await hashPassword(newPassword);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        password: hashedPassword,
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) {
       return res
         .status(404)
-        .json({ message: "Không thể đặt lại mật khẩu cho người dùng này." });
+        .json({ success: false, message: "Người dùng không tồn tại." });
     }
-    res.status(200).json({
-      message: "Đặt lại mật khẩu thành công.",
-    });
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Đặt lại mật khẩu thành công." });
   } catch (error) {
-    console.error("Error reset password:", error);
-    res.status(500).json({
-      message: "Internal server error.",
-    });
+    console.error("Reset password error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
 
@@ -461,36 +583,28 @@ exports.toggle2FA = async (req, res) => {
     if (!userId) {
       return res
         .status(401)
-        .json({ message: "Người dùng chưa được xác thực." });
+        .json({ success: false, message: "Người dùng chưa được xác thực." });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại." });
-    }
-
-    const is2FAEnabled = user.is2FAEnabled;
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        is2FAEnabled: !is2FAEnabled,
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) {
       return res
         .status(404)
-        .json({ message: "Không thể cập nhật trạng thái 2FA cho người dùng." });
+        .json({ success: false, message: "Người dùng không tồn tại." });
     }
-    res.status(200).json({
-      message: updatedUser.is2FAEnabled
+
+    user.is2FAEnabled = !user.is2FAEnabled;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: user.is2FAEnabled
         ? "Đã bật tính năng đăng nhập hai lớp."
         : "Đã tắt tính năng đăng nhập hai lớp.",
-      is2FAEnabled: updatedUser.is2FAEnabled, // Trả về trạng thái mới
+      data: { is2FAEnabled: user.is2FAEnabled },
     });
   } catch (error) {
-    console.error("Error toggle 2FA:", error);
-    res.status(500).json({ message: "Internal server error." });
+    console.error("Toggle 2FA error:", error);
+    res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ." });
   }
 };
