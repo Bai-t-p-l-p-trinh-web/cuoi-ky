@@ -11,10 +11,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    phoneNumber: {
+    phone: {
       type: String,
-      required: true,
-      unique: true,
+      default: null,
     },
     pendingEmail: {
       type: String,
@@ -58,19 +57,23 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    contactFacebook : {
+    CCCD: {
       type: String,
       default: null,
     },
-    contactZalo : {
+    contactFacebook: {
       type: String,
       default: null,
     },
-    contactEmail : {
+    contactZalo: {
       type: String,
       default: null,
     },
-    contactLinkedin : {
+    contactEmail: {
+      type: String,
+      default: null,
+    },
+    contactLinkedin: {
       type: String,
       default: null,
     },
