@@ -1,0 +1,23 @@
+.sales {
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0 4px 4px 0;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+  
+    @media (max-width: 768px) {
+      padding: 1rem;
+  
+      h2 {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  

@@ -16,6 +16,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
 
 function ChiTietXe(){
     const navigate = useNavigate();
@@ -27,10 +28,13 @@ function ChiTietXe(){
     useEffect(() => {
         const getDataCar = async() => {
             try {
-                const resDataCar = await axios.get(`http://localhost:3000/api/v1/car/${slugCar}`);
+                const resDataCar = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/car/${slugCar}`, {
+                    withCredentials : true
+                });
                 setXe(resDataCar.data);
             } catch (error) {
                 toast.error(error?.response?.data?.message);
+                
             } finally {
                 setIsLoading(false);
             }
@@ -56,8 +60,7 @@ function ChiTietXe(){
                     navigate('/chat');
                 }, 3000);
             } catch(error) {
-                console.log(error);
-                toast.error('Liên hệ người bán thất bại');
+                toast.error(error.response?.data?.message || 'Liên hệ người bán thất bại');
             }
         };
         startMessage();

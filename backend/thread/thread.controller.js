@@ -1,6 +1,8 @@
 const User = require("../user/user.model");
 const Thread = require('./thread.model');
 const Chat = require('../chat/chat.model');
+const { getInTouchContact } = require("../statistics/statistic.controller");
+const { sendMessages } = require("./thread.service");
 
 // [GET] /api/v1/threads     
 // {userId} => {full Threads}
@@ -115,6 +117,9 @@ const startMessage = async (req, res) => {
 
         if(!seller) return res.status(404).json({ message : "Người dùng đã bị cấm hoặc xóa tài khoản !"});
 
+        if(sellerId === userId) {
+            return res.status(401).json({ message : "Không thể chat với chính bản thân mình!"});
+        } 
         let thread = await Thread.findOne({
             $or : [
                 {
@@ -135,7 +140,12 @@ const startMessage = async (req, res) => {
                 msgIds : []
             });
             await thread.save();
+            await sendMessages(thread._id, userId, 'Bắt đầu chat!');
         } 
+
+        await getInTouchContact({ sellerId : sellerId });
+
+        
         
         return res.json({
             message : "Thread ready!",

@@ -16,6 +16,7 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 import "./scss/MyAccount.scss";
+import { useEffect } from "react";
 
 function MyAccount () {
     const dispatch = useDispatch();
@@ -42,6 +43,7 @@ function MyAccount () {
                 });
                 
                 setTimeout(() => {
+                    dispatch(logout());
                     navigate('/');
                 }, 3000);
                 
@@ -55,7 +57,7 @@ function MyAccount () {
             }
         };
         logoutUser();
-        dispatch(logout());
+        
         
     }
 

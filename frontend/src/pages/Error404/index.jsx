@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import "./scss/Error404.scss";
 
 function Error404(){
     const navigate = useNavigate();

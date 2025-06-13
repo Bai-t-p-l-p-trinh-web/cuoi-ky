@@ -199,9 +199,15 @@ $color-bg-chatting: #F7F7F7;
         &__header{
             border-bottom: 1px solid #ddd;
             padding: 15px;
+            position : sticky;
+            top: 0;
+            left: 0;
+            background-color: #fff;
+
             &__info{
                 display: flex;
                 align-items: center;
+
                 &-img{
                     width: 60px;
                     aspect-ratio: 1;
@@ -302,7 +308,7 @@ $color-bg-chatting: #F7F7F7;
                 &.typing {
                     display: inline-flex;
                 }
-                
+                 
                 span{
                     animation: blink 1.5s infinite;
                     height: 5px;
@@ -326,10 +332,11 @@ $color-bg-chatting: #F7F7F7;
         flex : 1;
         height : 40px;
         border-radius: 4px 0 0 4px;
+
         &__container{
             display: flex;
             align-items: center;
-            position : absolute;
+            position : sticky;
             bottom : 0;
             right : 0;
             width: 100%;

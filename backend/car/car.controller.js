@@ -1,12 +1,14 @@
 const Car = require('./car.model');
 const User = require('../user/user.model');
 const Category = require('../category/category.model');
+const { getInTouchView } = require('../statistics/statistic.controller');
 
 // [GET] /api/v1/car 
 module.exports.index = async (req, res) => {
     try {
         const find = {
-            deleted : false 
+            deleted : false,
+            status : "selling"
         };
 
         // Filter By Price 
@@ -59,7 +61,6 @@ module.exports.index = async (req, res) => {
             }
         }
 
-        
 
         const recordsCar = await Car.find(find).select('-__v -deleted -_id');
         return res.send(recordsCar);
@@ -69,13 +70,31 @@ module.exports.index = async (req, res) => {
     }
 }
 
+// [GET] /api/v1/car/:slugCar 
 module.exports.getCarBySlug = async (req, res) => {
     try {
+
         const slugCar = req.params.slugCar;
-        const find = {
+        if(!slugCar) {
+            return res.status(404).json({ message : "Không có slug Car" });
+        }
+
+        let find = {
             deleted: false,
+            status : "selling",
             slug: slugCar
         };
+
+        if(req.userId) {
+            let find2 = {
+                deleted : false,
+                slug : slugCar,
+                sellerId : req.userId
+            };
+            find = {$or : [find, find2]};
+            
+        }
+        
 
         const resultFindingCar = await Car.findOne(find).select('-__v -deleted -_id');
 
@@ -102,12 +121,15 @@ module.exports.getCarBySlug = async (req, res) => {
             email: seller.email
         };
 
+        await getInTouchView({sellerId : seller._id});
+
         return res.send(newResultFindingCar);
     } catch (error) {
         console.error("Error In Finding Car By Slug ! ! ! : ", error);
         return res.status(500).json({message : "Server Error!!!"});
     }
 }
+
 
 
 // [POST] /api/v1/car 
@@ -132,8 +154,7 @@ module.exports.createCar = async (req, res) => {
 module.exports.getCarsDisplay = async(req, res) => {
     try {
         const find = {
-            deleted : false,
-            isVerified : true
+            deleted : false
         };
     
         const userId = req.userId;
@@ -163,4 +184,74 @@ module.exports.getCarsDisplay = async(req, res) => {
         return res.status(500).json( { message : "Server Error!" });
     }
 
+}
+
+// [PATCH] /api/v1/car/:slugCar
+module.exports.UpdateCar = async(req, res) => {
+    try {
+        const slug = req.params.slugCar;
+        if(!slug) {
+            return res.status(400).json({ message : "Không có slug" });
+        }
+
+        const userId = req.userId;
+        const user = await User.findById(userId);
+
+        if(!user) {
+            return res.status(404).json({ message : "Không tìm thấy người dùng!" });
+        }
+
+        const car = await Car.findOne({
+            sellerId : userId,
+            slug,
+            deleted : false
+        });
+
+
+        if(!car) {
+            return res.status(404).json({ message : "Không tìm thấy xe!" });
+        }
+
+        let { price , comment, status } = req.body;
+        if(!price && !comment && !status) {
+            return res.status(400).json({ message : "Không có thay đổi gì!" });
+        }
+        price = parseInt(price);
+        
+        if(isNaN(price) || !Number.isInteger(price)) {
+            return res.status(400).json({ message : "Giá bán phải là một số!"});
+        }
+        const changeData = {};
+        if(price) {
+            changeData.price = price;
+        }
+        if(comment) {
+            changeData.comment = comment;
+        }
+        if(status) {
+            if(car.status === "sold") {
+                return res.status(403).json({ message : "Xe đã bán không thể sửa được !" });
+            }
+            changeData.status = status;
+        }
+
+        if(status && status === "sold") {
+            const timestamps = new Date(Date.now());
+            changeData.time_sold  = timestamps;
+        }
+
+        const updatedCar = await Car.findOneAndUpdate(
+            { _id: car._id },
+            { $set: changeData },
+            { new: true }
+        );
+
+
+        return res.status(200).json({
+            message: "Đã chỉnh sửa thông tin thành công!",
+            data: updatedCar
+        });
+    } catch(error) {
+        return res.status(500).json({ message : "Server Error!" });
+    }
 }

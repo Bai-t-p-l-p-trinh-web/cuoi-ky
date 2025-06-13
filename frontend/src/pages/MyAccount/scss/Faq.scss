@@ -1,0 +1,130 @@
+@use 'sass:color';
+
+$primary-color: #007bff;
+$text-color: #333;
+$border-color: #e0e0e0;
+$background-color: #f8f9fa;
+$border-radius: 8px;
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+
+.faq{
+  &__container{
+    width: 100%;
+    padding: 30px;
+    border: 1px solid #ddd;
+    background: $background-color;
+    border-radius: 0 4px 4px 0;
+    box-shadow: $box-shadow;
+  }
+
+  &__title{
+    font-size: 2rem;
+    text-align: center;
+    color: $text-color;
+    margin-bottom: 20px;
+    font-weight: 600;
+    background-color: #fff;
+    padding: 6px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+
+    &__icon{
+      font-size: 16px;
+
+      &__contain{
+        border: 1px solid #ddd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 4px;
+        margin: 0 20px;
+        padding: 7px;
+      }
+    }
+
+    &__span{
+      font-weight: 500;
+      font-size: 29px;
+    }
+  }
+
+  &__section{
+    margin-bottom: 30px;
+
+    h2{
+      font-size: 1.5rem;
+      color: $text-color;
+      margin-bottom: 15px;
+    }
+  }
+
+  &__item{
+    margin-bottom: 10px;
+  }
+
+  &__question{
+    width: 100%;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    font-size: 1.1rem;
+    color: $text-color;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.active{
+      background: $primary-color;
+      color: #fff;
+      border-color: $primary-color;
+    }
+
+    &:hover{
+      background: color.adjust($primary-color, $lightness: 40%);
+    }
+  }
+
+  &__answer{
+    padding: 15px;
+    background: #fff;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-radius: 0 0 $border-radius $border-radius;
+    font-size: 1rem;
+    color: $text-color;
+    white-space: pre-wrap; 
+    line-height: 1.5;
+  }
+}
+@media screen and (max-width: 768px) {
+  .faq{
+
+    &__container{
+      padding: 10px;
+      margin: 10px;
+    }
+
+    &__title{
+      font-size: 1.5rem;
+    }
+
+    &__section{
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+
+    &__question{
+      font-size: 1rem;
+    }
+
+    &__answer{
+      font-size: 0.9rem;
+    }
+  }
+  
+}

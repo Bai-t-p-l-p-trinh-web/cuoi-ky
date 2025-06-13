@@ -18,8 +18,8 @@ function DisplayCar(){
                 price: 535,
                 slug: "vinfast-lux-a20-plus",
                 location: {
-                    query_location: "HaNoi+DongAnh",
-                    query_name: "Hà Nội - Đông Anh"
+                    query_location: "HaNoi",
+                    query_name: "Hà Nội"
                 },
                 img_src: [
                     "https://www.carmudi.vn/_next/image/?url=https%3A%2F%2Fstatic.carmudi.vn%2Fcarmudi_v3%2Fstorage%2F1066712%2Fconversions%2F68070f3623486_5DCCD97C-2F08-4241-A87F-E2454C3EAD39-636_424.jpg&w=1200&q=75",
@@ -40,8 +40,8 @@ function DisplayCar(){
                 seat_capacity: 7,
                 price: 2125,
                 location: {
-                    query_location: "VinhPhuc+VinhYen",
-                    query_name: "Vĩnh Phúc - Vĩnh Yên"
+                    query_location: "VinhPhuc",
+                    query_name: "Vĩnh Phúc"
                 },
                 slug: "toyota-camry-30V",
                 img_src: [

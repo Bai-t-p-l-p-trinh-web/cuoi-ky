@@ -62,6 +62,7 @@ const LocationEnum = {
     VINH_LONG: { query_location: "VinhLong", query_name: "Vĩnh Long" },
     VINH_PHUC: { query_location: "VinhPhuc", query_name: "Vĩnh Phúc" },
     YEN_BAI: { query_location: "YenBai", query_name: "Yên Bái" },
+    DEFAULT: { query_location : "", query_name : ""}
   };
   
   module.exports = LocationEnum;

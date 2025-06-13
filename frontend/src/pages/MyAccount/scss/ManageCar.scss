@@ -1,165 +1,157 @@
-$color-bg-selling : #FFF3E8;
-$color-text-selling : #DBA650;
-$color-bg-sold : #EAF9EF;
+$color-bg-selling: #FFF3E8;
+$color-text-selling: #DBA650;
+$color-bg-sold: #EAF9EF;
 $color-text-sold: #27A663;
 $color-bg-hidden: #EFF3F8;
 $color-text-hidden: #1B4372;
 $color-bg-deposited: #CAE8BD;
 $color-text-deposited: #B0DB9C;
 $color-button-delete: #362C63;
-$color-bg-manageCar : #F7F7F7;
+$color-bg-manageCar: #F7F7F7;
 
-.manageCar{
-    padding : 30px;
+.manageCar {
+    padding: 30px;
     border: 1px solid #ddd;
     background-color: $color-bg-manageCar;
-    &__header{
-        display : flex;
-        border : 1px solid #ddd;
-        padding : 13px 20px;
-        border-radius: 4px 4px 0 0; 
+    
+    &__header {
+        display: flex;
+        border: 1px solid #ddd;
+        padding: 13px 20px;
+        border-radius: 4px 4px 0 0;
         margin-bottom: 20px;
         background-color: #fff;
 
-        &__title{
+        &__title {
             display: flex;
             align-items: center;
             font-weight: 500;
 
-
-            &__contain{
+            &__contain {
                 display: flex;
                 align-items: center;
                 border: 1px solid #ddd;
-                padding : 7px;
+                padding: 7px;
                 border-radius: 4px;
-                margin-right : 12px;
+                margin-right: 12px;
 
-                svg{
-                    color : #979090;
+                svg {
+                    color: #979090;
                 }
             }
         }
-
-        &__contain{
-            display: flex;
-            padding : 20px;
-            border: 1px solid #ddd;
-            border-radius: 0 0 4px 4px;
-        }
     }
 
-    &__title{
+    &__title {
         font-size: 23px;
         margin-bottom: 20px;
     }
 
-    &__contain{
+    &__contain {
         border: 1px solid #ddd;
         border-radius: 4px;
     }
 
-    &__options{
+    &__options {
         display: flex;
         justify-content: space-between;
         padding: 14px 10px;
         background-color: #fff;
     }
     
-    &__status{
+    &__status {
         width: 100px;
         padding-bottom: 20px;
         border-bottom: 3px solid #ddd;
         text-align: center;
         cursor: pointer;
 
-        &.picked, &:hover{
+        &.picked, &:hover {
             border-bottom: 3px solid #000;
         }
 
-        &__svg{
+        &__svg {
             font-size: 18px;
-            margin-right : 3px;
+            margin-right: 3px;
         }
 
-        &__list{
-            margin : 0;
+        &__list {
+            margin: 0;
             padding: 0;
             list-style: none;
             display: flex;
             align-items: flex-end;
-            
         }
     }
 
-    &__filters{
+    &__filters {
         display: flex;
         align-items: flex-end;
-
     }
 
-    &__search{
-        margin-right : 20px;
+    &__search {
+        margin-right: 20px;
         display: flex;
-        position : relative;
-        &__svg{
+        position: relative;
+        
+        &__svg {
             position: absolute;
             top: 50%;
-            left : 5px;
+            left: 5px;
             transform: translate(0, -50%);
         }
-        &__input{
+        
+        &__input {
             padding: 4px 20px;
             width: 200px;
             height: 36px;
-            outline : none;
+            outline: none;
         }
     }
 
-    &__sort{
-        margin-right : 20px;
+    &__sort {
+        margin-right: 20px;
         height: 36px;
 
-        &__button{
-            border : 1px solid #ddd;
-            background : transparent;
-            padding : 4px 10px;
+        &__button {
+            border: 1px solid #ddd;
+            background: transparent;
+            padding: 4px 10px;
             text-wrap: wrap;
         }
     }
 
-    &__add{
-        border : 1px solid #ddd;
+    &__add {
+        border: 1px solid #ddd;
         height: 36px;
         width: 130px;
         padding: 4px 5px;
         text-wrap: wrap;
     }
 
-    &__link{
+    &__link {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
 
-        &__svg{
+        &__svg {
             margin-right: 4px;
             font-size: 20px;
         }
     }
 
-    &__table{
+    &__table {
         width: 100%;
+        
         td {
             background-color: #fff;
         }
         
-        &__item{
-
-            &__image{
-
-                &__contain{
-                    img{
+        &__item {
+            &__image {
+                &__contain {
+                    img {
                         width: 50px;
                         aspect-ratio: 1;
                         object-fit: cover;
@@ -169,137 +161,159 @@ $color-bg-manageCar : #F7F7F7;
             }
         }
 
-        &__tr{
+        &__tr {
             border-bottom: 1px solid #ddd;
         }
 
-        &__th{
-
-            &--checkbox{
+        &__th {
+            &--checkbox {
                 max-width: 50px;
                 padding: 10px 20px;
             }
 
-            &--title{
+            &--title {
                 min-width: 340px;
                 max-width: 450px;
                 padding: 10px 0;
             }
 
-            &--price{
+            &--createdAt {
                 min-width: 120px;
                 max-width: 150px;
                 text-align: center;
                 padding: 10px 0;
             }
 
-            &--status{
+            &--status {
                 width: 100px;
                 text-align: center;
                 padding: 10px 0;
             }
 
-            &--functions{
+            &--functions {
                 text-align: center;
                 padding: 10px 0;
             }
-            
         }
 
-        &__td{
+        &__td {
             background-color: #fff;
 
-            &--checkbox{
+            &--checkbox {
                 padding: 0 20px;
             }
 
-            &--title{
+            &--title {
                 padding: 15px 0;
-                
 
-                div{
+                div {
                     display: inline;
                     margin-right: 8px;
                 }
             }
 
-            &--price{
+            &--createdAt {
                 text-align: center;
             }
 
-            &--status{
+            &--status {
                 text-align: center;
 
-                span{
-                    // width: 100px;
+                span {
                     padding: 5px 12px;
                     border-radius: 32px;
 
-                    &[data-type="selling"]{
+                    &[data-type="selling"] {
                         color: $color-text-selling;
                         background-color: $color-bg-selling;
                     }
 
-                    &[data-type="deposited"]{
+                    &[data-type="deposited"] {
                         color: $color-text-deposited;
                         background-color: $color-bg-deposited;
                     }
 
-                    &[data-type="hidden"]{
+                    &[data-type="hidden"] {
                         color: $color-text-hidden;
                         background-color: $color-bg-hidden;
                     }
 
-                    &[data-type="sold"]{
-                        color: $color-text-sold;;
+                    &[data-type="sold"] {
+                        color: $color-text-sold;
                         background-color: $color-bg-sold;
                     }
                 }
-                
-                
             }
 
-            &--functions{
+            &--functions {
                 text-align: center;
                 padding: 0 20px;
                 height: auto;
             }
         }
     }
-    &__functions{
 
-
-        &__link{
+    &__functions {
+        &__link {
             display: inline-flex;
             align-items: center;
             margin-right: 10px;
 
-            &.edit{
+            &.edit {
                 color: orange;
             }
-            &:hover{
+            
+            &:hover {
                 text-decoration: none;
             }
         }
 
-        &__box{
-            display: inline;
-        }
-
-        &__svg{
+        &__svg {
             margin-right: 5px;
         }
 
-        
-
-        &__delete{
+        &__delete {
             background-color: $color-button-delete;
             outline: none;
-            border : 0;
-            color : #fff;
+            border: 0;
+            color: #fff;
             border-radius: 6px;
             display: inline-flex;
             align-items: center;
+        }
+    }
+
+    &__pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 10px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+
+        &__button {
+            margin: 0 5px;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+
+            &:hover:not(:disabled) {
+                background-color: #f0f0f0;
+            }
+
+            &.active {
+                background-color: $color-button-delete;
+                color: #fff;
+                border-color: $color-button-delete;
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
         }
     }
 }

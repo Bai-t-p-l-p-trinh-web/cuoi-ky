@@ -133,13 +133,17 @@ const CarRoutes = require('./car/car.routes');
 const OauthRoutes = require('./oauth/oauth.routes');
 const UserRoutes = require('./user/user.routes');
 const threadRoutes = require('./thread/thread.routes');
+const RequestFormRoutes = require('./requestAdd/request_add.routes');
+const StatisticRoutes = require('./statistics/statistics.routes');
 
 app.use("/api/v1/auth", require("./auth/auth.routes"));
 app.use("/api/v1/oauth", OauthRoutes);
 app.use("/api/v1/thread", threadRoutes);
+app.use("/api/v1/requestAdd", RequestFormRoutes);
 // app.use("/api/v1/admin", require("./admin/routes"));
 app.use("/api/v1/car", CarRoutes);
 app.use("/api/v1/user", UserRoutes);
+app.use('/api/v1/statistic', StatisticRoutes);
 // app.use("/api/v1/payment", require("./payment/routes"));
 app.use('/api/v1/category', categoryRoutes);
 
