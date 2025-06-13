@@ -8,7 +8,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 
 const connectDB = require("./shared/config/db");
-require("dotenv").config({ path: "./shared/config/.env" });
+require("dotenv").config();
 
 const app = express();
 const httpServer = createServer(app);
