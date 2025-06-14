@@ -8,12 +8,14 @@ const { generateDateRangeObject } = require('../utils/Date');
 module.exports.getInTouchView = async(props) => {
     try {
         const { sellerId } = props;
+
         const dateNow = new Date(Date.now());
-        const day = dateNow.getDate().padStart(2, "0");
-        const month = (dateNow.getMonth() + 1).padStart(2, "0");
+        const day = String(dateNow.getDate()).padStart(2, "0");
+        const month = String(dateNow.getMonth() + 1).padStart(2, "0");
         const year = dateNow.getFullYear();
 
         const fullDate = `${day}/${month}/${year}`;
+        
         const views = await View.findOne({
             sellerId
         });
@@ -53,8 +55,8 @@ module.exports.getInTouchContact = async(props) => {
     try {
         const { sellerId } = props;
         const dateNow = new Date(Date.now());
-        const day = dateNow.getDate().padStart(2, "0");
-        const month = (dateNow.getMonth() + 1).padStart(2, "0");
+        const day = String(dateNow.getDate()).padStart(2, "0");
+        const month = String(dateNow.getMonth() + 1).padStart(2, "0");
         const year = dateNow.getFullYear();
 
         const fullDate = `${day}/${month}/${year}`;

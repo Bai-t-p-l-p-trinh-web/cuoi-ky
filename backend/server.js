@@ -138,8 +138,8 @@ io.on("connection", (socket) => {
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  console.log("Request Body:", req.body);
+  // console.log(`${req.method} ${req.path}`);
+  // console.log("Request Body:", req.body);
   next();
 });
 

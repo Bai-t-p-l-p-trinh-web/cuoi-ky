@@ -9,7 +9,8 @@ import "./scss/Filter.scss";
 import Filter_2 from "./Filter_2";
 import Filter_3 from "./Filter_3";
 
-function Filter(){
+function Filter(props){
+    const { ReloadAllPage } = props;
     const getTypeLocation = () => {
         const result = [];
         for (const [key, value] of Object.entries(LocationEnum)) {
@@ -32,7 +33,7 @@ function Filter(){
         title: "GIÁ",
         icon: <CiBitcoin/>,
         defaultMin: 1,
-        defaultMax: 500,
+        defaultMax: 2000,
         gapMin_Max: 50,
         unit: "Triệu",
         query_name: "price"
@@ -50,7 +51,7 @@ function Filter(){
         title: "SỐ KM",
         icon: <FaRoad/>,
         defaultMin: 0,
-        defaultMax: 50000,
+        defaultMax: 200000,
         gapMin_Max: 1000,
         unit: "Km",
         query_name: "km"
@@ -118,12 +119,12 @@ function Filter(){
         <>
             <div className="home__content__filters">
                 <h2 className="home__content__filters-title">BỘ LỌC</h2>
-                <Filter_3 data={filter2_list}/>
-                <Filter_2 data={filter3_list}/>
-                <Filter_2 data={filter4_list}/>
-                <Filter_2 data={filter5_list}/>
-                <Filter_3 data={filter6_list}/>
-                <Filter_3 data={filter7_list}/>
+                <Filter_3 data={filter2_list} ReloadAllPage={ReloadAllPage}/>
+                <Filter_2 data={filter3_list} ReloadAllPage={ReloadAllPage}/>
+                <Filter_2 data={filter4_list} ReloadAllPage={ReloadAllPage}/>
+                <Filter_2 data={filter5_list} ReloadAllPage={ReloadAllPage}/>
+                <Filter_3 data={filter6_list} ReloadAllPage={ReloadAllPage}/>
+                <Filter_3 data={filter7_list} ReloadAllPage={ReloadAllPage}/>
             </div>
         </>
     )

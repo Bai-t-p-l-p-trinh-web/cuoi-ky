@@ -200,6 +200,10 @@ const checkedTheRequest = async(req, res) => {
             return res.status(404).json({ message : "Không tìm thấy người bán !" });
         }
 
+        if(request.status !== "pending") {
+            return res.status(403).json({ message : "Đã duyệt rồi không thể duyệt nữa!" });
+        }
+
         request.status = "checked";
         request.img_src = req.body.img_src || [];
         request.examine = req.body.examine;
@@ -242,6 +246,10 @@ const rejectRequest = async(req, res) => {
 
         if(!request) {
             return res.status(404).json({ message : "Không tìm thấy request yêu cầu!" });
+        }
+
+        if(request.status !== "pending") {
+            return res.status(403).json({ message : "Đã duyệt rồi không thể duyệt nữa!" });
         }
 
         request.status = "reject";

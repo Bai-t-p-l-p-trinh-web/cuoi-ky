@@ -61,9 +61,46 @@ module.exports.index = async (req, res) => {
             }
         }
 
+        if (req.query.keyword && req.query.keyword.trim() !== "") {
+            const keyword = req.query.keyword.trim();
+            find.title = { $regex: keyword, $options: "i" }; 
+        }
+
 
         const recordsCar = await Car.find(find).select('-__v -deleted -_id');
-        return res.send(recordsCar);
+
+        let prices = recordsCar.map(car => car.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+
+        recordsCar.forEach(car => {
+            if(!car.location) {
+                car.location = {
+                    query_location : "",
+                    query_name : "Toàn Quốc"
+                }
+            }
+            else if (!car.location.query_location || car.location.query_location.trim() === "") {
+                car.location.query_name = "Toàn Quốc";
+            }
+        });
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6;
+        const start = (page - 1) * limit;
+        const end = page * limit;
+
+        const paginatedCars = recordsCar.slice(start, end);
+
+        const DataSend = {
+            num : recordsCar.length,
+            minPrice,
+            maxPrice,
+            cars : paginatedCars || []
+        }
+
+
+        return res.send(DataSend);
     } catch (error) {
         console.error("Error In Finding Car ! ! ! : ", error);
         return res.status(500).json({message : "Server Error!!!"});
