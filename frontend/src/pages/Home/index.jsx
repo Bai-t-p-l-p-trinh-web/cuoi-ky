@@ -20,7 +20,7 @@ function Home(){
                     <div className="home__content">
                         <Filter ReloadAllPage={ReloadAllPage}/>
                         <div className="home__content__main">
-                            <CarFilter/>
+                            <CarFilter ReloadAllPage={ReloadAllPage}/>
                             <DisplayCar setPage={setPage} />
                             {
                                 page > 0
