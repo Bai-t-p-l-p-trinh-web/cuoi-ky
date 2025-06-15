@@ -2,6 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const cleanupUnverifiedUsers = require("./shared/utils/unverifiedCleanup");
 const cookieParser = require("cookie-parser");
+const {
+  maintenanceMiddleware,
+  healthCheckHandler,
+} = require("./shared/middleware/maintenance");
 
 // server socket
 const { createServer } = require("http");
@@ -143,6 +147,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check endpoint - for frontend monitoring
+app.get("/api/v1/health", healthCheckHandler);
+
 // routes
 const authRoutes = require("./auth/auth.routes");
 const categoryRoutes = require("./category/category.routes");
@@ -151,8 +158,14 @@ const OauthRoutes = require("./oauth/oauth.routes");
 const UserRoutes = require("./user/user.routes");
 const threadRoutes = require("./thread/thread.routes");
 
+// Auth routes - ALWAYS accessible (even during maintenance)
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/oauth", OauthRoutes);
+
+// Maintenance middleware - applies to all routes EXCEPT auth
+app.use(maintenanceMiddleware);
+
+// Other routes - protected by maintenance middleware
 app.use("/api/v1/thread", threadRoutes);
 // app.use("/api/v1/admin", require("./admin/routes"));
 app.use("/api/v1/car", CarRoutes);
