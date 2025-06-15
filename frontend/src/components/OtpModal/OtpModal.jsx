@@ -77,38 +77,38 @@ const OtpModal = ({
       switch (actionRequired) {
         case "VERIFY_REGISTER":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "VERIFY_REGISTER",
           };
         case "VERIFY_FIRST_TIME":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "VERIFY_FIRST_TIME",
           };
         case "VERIFY_2FA_LOGIN":
           return {
-            endpoint: "/api/v1/auth/verify-login-otp",
+            endpoint: "/auth/verify-login-otp",
             type: "VERIFY_2FA_LOGIN",
             customPayload: true,
           };
         case "VERIFY_NEW_EMAIL":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "VERIFY_NEW_EMAIL",
           };
         case "REQUEST_OTP_AGAIN":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "REQUEST_OTP_AGAIN",
           };
         case "VERIFY_RESET_PASSWORD":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "VERIFY_RESET_PASSWORD",
           };
         case "VERIFY_ACCOUNT":
           return {
-            endpoint: "/api/v1/auth/verify-otp",
+            endpoint: "/auth/verify-otp",
             type: "VERIFY_ACCOUNT",
           };
       }
@@ -168,7 +168,7 @@ const OtpModal = ({
         type: "REQUEST_OTP_AGAIN",
       };
 
-      const response = await apiClient.post("/api/v1/auth/send-otp", payload);
+      const response = await apiClient.post("/auth/send-otp", payload);
       const responseData = response.data;
 
       if (responseData.success) {

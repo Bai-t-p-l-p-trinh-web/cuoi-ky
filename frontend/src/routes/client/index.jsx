@@ -17,8 +17,13 @@ import Notify from "../../pages/MyAccount/child/Notify";
 import Insight from "../../pages/MyAccount/child/Insight";
 import History from "../../pages/MyAccount/child/History";
 import Faq from "../../pages/MyAccount/child/Faq";
-
+import MaintenancePage from "../../pages/Maintenance";
+import Error404 from "../../pages/Error404";
 export const routes = [
+  {
+    path: "/maintenance",
+    element: <MaintenancePage />,
+  },
   {
     path: "/blog-xe-hoi",
     element: <BlogXeHoi />,
@@ -94,8 +99,12 @@ export const routes = [
         ],
       },
       {
-        path: ":slugCar",
+        path: "chi-tiet-xe/:id",
         element: <ChiTietXe />,
+      },
+      {
+        path: "*",
+        element: <Error404 />,
       },
     ],
   },

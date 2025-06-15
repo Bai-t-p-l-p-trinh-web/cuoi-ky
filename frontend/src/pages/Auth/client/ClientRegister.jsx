@@ -132,7 +132,7 @@ function ClientRegister() {
 
     setIsLoading(true);
     try {
-      const response = await apiClient.post("/api/v1/auth/register", {
+      const response = await apiClient.post("/auth/register", {
         name: registerData.name.trim(),
         email: registerData.email.trim(),
         password: registerData.password.trim(),

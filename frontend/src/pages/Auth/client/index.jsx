@@ -57,7 +57,7 @@ function ClientAuth() {
 
     setIsLoading(true);
     try {
-      const response = await apiClient.post("/api/v1/auth/login", {
+      const response = await apiClient.post("/auth/login", {
         email: dataClientLogin.email.trim(),
         password: dataClientLogin.password.trim(),
       });

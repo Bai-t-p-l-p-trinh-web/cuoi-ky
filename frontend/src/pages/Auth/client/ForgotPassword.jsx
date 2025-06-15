@@ -49,7 +49,7 @@ function ForgotPassword() {
 
     setIsLoading(true);
     try {
-      const response = await apiClient.post("/api/v1/auth/send-otp", {
+      const response = await apiClient.post("/auth/send-otp", {
         email: email.trim(),
         type: "VERIFY_RESET_PASSWORD",
       });
@@ -103,7 +103,7 @@ function ForgotPassword() {
 
     setIsLoading(true);
     try {
-      const response = await apiClient.post("/api/v1/auth/reset-password", {
+      const response = await apiClient.post("/auth/reset-password", {
         userId: userId,
         newPassword: newPassword.trim(),
       });
