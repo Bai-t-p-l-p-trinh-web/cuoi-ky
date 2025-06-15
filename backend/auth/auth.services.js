@@ -26,6 +26,9 @@ exports.validatePassword = (password) => {
 
 exports.generateTokens = async (user) => {
   try {
+    // Delete all existing refresh tokens for this user
+    await UserToken.deleteMany({ userId: user._id });
+
     // Create access token
     const accessToken = jwt.sign(
       { id: user._id, role: user.role },
@@ -77,15 +80,33 @@ exports.refreshToken = async (refreshToken) => {
       return null; // Token not found in database or revoked
     }
 
-    // Generate a new access token
+    // Delete the old refresh token (token rotation for security)
+    await UserToken.findByIdAndDelete(storedToken._id);
+
+    // Generate new access token
     const accessToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
       process.env.JWT_SECRET,
       { expiresIn: "15m" }
     );
 
+    // Generate new refresh token (token rotation)
+    const newRefreshToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Save the new refresh token in database
+    const userToken = new UserToken({
+      userId: decoded.id,
+      token: newRefreshToken,
+    });
+    await userToken.save();
+
     return {
       accessToken,
+      refreshToken: newRefreshToken,
     };
   } catch (error) {
     console.error("Error refreshing token:", error);

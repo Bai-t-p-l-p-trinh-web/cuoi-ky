@@ -275,17 +275,26 @@ exports.verifyLoginOtp = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
   try {
-    const { refreshToken: token } = req.body;
+    const token = req.cookies?.refreshToken; // Read from HttpOnly cookie
+
     if (!token) {
       return res.status(400).json({
         success: false,
-        message: "Refresh token là bắt buộc.",
-        error_code: "MISSING_TOKEN",
+        message:
+          "Refresh token là bắt buộc và không được tìm thấy trong cookie.",
+        error_code: "MISSING_REFRESH_TOKEN_COOKIE",
       });
     }
 
     const tokens = await refreshToken(token);
     if (!tokens) {
+      // If the refresh token service returns null (e.g., token invalid, expired, or not found in DB)
+      // Clear the potentially invalid refreshToken cookie
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
       return res.status(401).json({
         success: false,
         message: "Refresh token không hợp lệ hoặc đã hết hạn.",
@@ -296,13 +305,13 @@ exports.refreshToken = async (req, res) => {
     res
       .cookie("accessToken", tokens.accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 1000 * 60 * 15,
       })
       .cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
       })
@@ -310,12 +319,15 @@ exports.refreshToken = async (req, res) => {
       .json({
         success: true,
         message: "Làm mới token thành công.",
+        data: {
+          accessToken: tokens.accessToken,
+        },
       });
   } catch (error) {
     console.error("Token refresh error:", error);
     res.status(500).json({
       success: false,
-      message: "Lỗi máy chủ nội bộ.",
+      message: "Lỗi máy chủ nội bộ khi làm mới token.",
       error_code: "INTERNAL_SERVER_ERROR",
     });
   }
@@ -328,10 +340,16 @@ exports.logout = async (req, res) => {
       await UserToken.findOneAndDelete({ token: refreshToken });
     }
 
-    res.clearCookie("access_token", {
+    res.clearCookie("accessToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
     });
 
     res.status(200).json({ success: true, message: "Đăng xuất thành công." });
