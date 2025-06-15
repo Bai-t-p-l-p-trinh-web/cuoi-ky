@@ -41,7 +41,7 @@ function Message(){
             }, 3000);
         }
         isLoading.current = false;
-    }, [user, loading, isLoading]);
+    }, [user, loading, isLoading.current]);
 
     useEffect(() => {
         const getMessages = async() => {

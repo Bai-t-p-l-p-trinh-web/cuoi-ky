@@ -19,11 +19,11 @@ const carSchema = new mongoose.Schema(
             query_location: {
                 type: String,
                 enum: allowedLocations,
-                required: true
+                default : ""
             },
             query_name: {
                 type: String,
-                required: true
+                default : ""
             }
         },
         price: {
@@ -58,7 +58,7 @@ const carSchema = new mongoose.Schema(
         slug: {
             type: String,
             slug: "title",
-            unique: true
+            unique: true 
         },
         sellerId : {
             type : String,
@@ -73,9 +73,9 @@ const carSchema = new mongoose.Schema(
             enum : ['selling', 'deposited', 'hidden', 'sold'],
             default: 'selling'
         },
-        isVerified : {
-            type : Boolean,
-            default : false
+        time_sold : {
+            type : Date,
+            default : null
         }
     },
     {

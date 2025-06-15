@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import "./Error404.css";
+import "./scss/Error404.scss";
 
 function Error404() {
   const navigate = useNavigate();

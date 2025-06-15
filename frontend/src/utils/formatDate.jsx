@@ -49,3 +49,11 @@ export const getDate = (isoString) => {
 
     return `${day}/${month}/${year}`;
 }
+
+export const getMonthYear = () => {
+    const dateNow = new Date(Date.now());
+    const month = String(dateNow.getMonth() + 1).padStart(2, "0");
+    const year = dateNow.getFullYear();
+
+    return `${month}/${year}`;
+}

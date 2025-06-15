@@ -18,7 +18,14 @@ import Insight from "../../pages/MyAccount/child/Insight";
 import History from "../../pages/MyAccount/child/History";
 import Faq from "../../pages/MyAccount/child/Faq";
 import MaintenancePage from "../../pages/Maintenance";
+import RequestForm from "../../pages/RequestForm/child/RequestForm";
+import RequestDetail from "../../pages/RequestForm";
+import RequestInfo from "../../pages/RequestForm/child/RequestInfo";
+import RequestVerify from "../../pages/RequestForm/child/RequestVerify";
+import RequestDone from "../../pages/RequestForm/child/RequestDone";
 import Error404 from "../../pages/Error404";
+import EditCar from "../../pages/MyAccount/child/EditCar";
+
 export const routes = [
   {
     path: "/maintenance",
@@ -95,6 +102,37 @@ export const routes = [
           {
             path: "faq",
             element: <Faq />,
+          },
+          {
+            path: "edit-car/:slugCar",
+            element: <EditCar />,
+          },
+        ],
+      },
+      {
+        path: "request-form",
+        element: <RequestForm />,
+      },
+      {
+        path: "request-detail/:slugRequest",
+        element: <RequestDetail />,
+        children: [
+          {
+            path: "info",
+            element: <RequestInfo />,
+          },
+          {
+            path: "verify",
+            element: <RequestVerify />,
+          },
+          {
+            path: "done",
+            element: <RequestDone />,
+          },
+          {
+            index: true,
+            path: "*",
+            element: <Error404 />,
           },
         ],
       },

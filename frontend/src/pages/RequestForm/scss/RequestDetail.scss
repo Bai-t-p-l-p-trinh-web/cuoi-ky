@@ -1,0 +1,206 @@
+@use 'sass:color';
+
+$color-primary: #4C9AFE; 
+$color-secondary: #D5EBFE; 
+$color-background: #F8FAFC; 
+$color-text: #1A202C; 
+$color-button: #4B9BFB; 
+$color-button-hover: #3B82F6; 
+$border-radius: 8px; 
+$transition: all 0.3s ease; 
+
+.requestDetail {
+  background-color: $color-background;
+  padding: 40px 20px;
+  min-height: 100vh;
+
+  &__progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    gap: 10px;
+
+    &__gif {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+
+      img {
+        width: 120px;
+        height: 120px;
+        border-radius: $border-radius;
+        border: 1px solid $color-secondary;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: $transition;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    &__current {
+      display: flex;
+      align-items: center;
+      padding: 8px 30px;
+      background-color: $color-primary;
+      color: #fff;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: $transition;
+
+      &:hover {
+        background-color: $color-button-hover;
+      }
+    }
+
+    &__future {
+      display: flex;
+      align-items: center;
+      padding: 8px 30px;
+      background-color: $color-secondary;
+      color: $color-text;
+      border: 2px solid $color-primary;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: $transition;
+
+      &:hover {
+        background-color: color.adjust($color-secondary, $lightness: -5%);
+      }
+    }
+
+    &__horizontal {
+      width: 60px;
+      height: 4px;
+      background-color: $color-secondary;
+      border-radius: 2px;
+    }
+
+    &__contain {
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+    }
+  }
+
+  &__main {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+  }
+
+  &__buttons {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: $border-radius;
+      background-color: $color-button;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover:not(:disabled) {
+        background-color: $color-button-hover;
+        transform: translateY(-2px);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .requestDetail__navigate__prev {
+      background-color: $color-secondary;
+      color: $color-text;
+
+      &:hover:not(:disabled) {
+        background-color: color.adjust($color-secondary, $lightness: -10%);
+      }
+    }
+
+    .requestDetail__navigate__next {
+      background-color: $color-button;
+
+      &:hover:not(:disabled) {
+        background-color: $color-button-hover;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__progress {
+      flex-direction: column;
+      gap: 10px;
+
+      &__horizontal {
+        width: 4px;
+        height: 40px;
+      }
+    }
+
+    &__buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+
+      button {
+        width: 100%;
+        padding: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__progress {
+      &__gif {
+        img {
+          width: 100px;
+          height: 100px;
+        }
+      }
+
+      &__current,
+      &__future {
+        font-size: 14px;
+        padding: 6px 20px;
+      }
+    }
+
+    &__buttons {
+      button {
+        font-size: 14px;
+      }
+    }
+  }
+}

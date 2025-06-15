@@ -71,7 +71,8 @@ const getRepondsByGoogle = async (req, res) => {
                     email : googleUser.email,
                     name : googleUser.name,
                     avatar : googleUser.picture,
-                    password : generateRandomString(50)
+                    password : generateRandomString(50),
+                    isVerified : true
                 });
     
                 

@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"], // C2C (Customer-to-Customer)
+      enum: ["user", "seller", "admin"], // C2C (Customer-to-Customer)
       default: "user",
     },
     address: {

@@ -12,7 +12,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 
 const connectDB = require("./shared/config/db");
-require("dotenv").config({ path: "./shared/config/.env" });
+require("dotenv").config();
 
 const app = express();
 const httpServer = createServer(app);
@@ -142,8 +142,8 @@ io.on("connection", (socket) => {
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  console.log("Request Body:", req.body);
+  // console.log(`${req.method} ${req.path}`);
+  // console.log("Request Body:", req.body);
   next();
 });
 
@@ -157,6 +157,8 @@ const CarRoutes = require("./car/car.routes");
 const OauthRoutes = require("./oauth/oauth.routes");
 const UserRoutes = require("./user/user.routes");
 const threadRoutes = require("./thread/thread.routes");
+const RequestFormRoutes = require('./requestAdd/request_add.routes');
+const StatisticRoutes = require('./statistics/statistics.routes');
 
 // Auth routes - ALWAYS accessible (even during maintenance)
 app.use("/api/v1/auth", authRoutes);
@@ -167,9 +169,11 @@ app.use(maintenanceMiddleware);
 
 // Other routes - protected by maintenance middleware
 app.use("/api/v1/thread", threadRoutes);
+app.use("/api/v1/requestAdd", RequestFormRoutes);
 // app.use("/api/v1/admin", require("./admin/routes"));
 app.use("/api/v1/car", CarRoutes);
 app.use("/api/v1/user", UserRoutes);
+app.use('/api/v1/statistic', StatisticRoutes);
 // app.use("/api/v1/payment", require("./payment/routes"));
 app.use("/api/v1/category", categoryRoutes);
 
