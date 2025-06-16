@@ -39,6 +39,6 @@ jobs:
             echo "$ENV_FRONTEND" > .env
             npm install
             npm run build
-            pm2 startOrRestart ecosystem.config.js --name ReactVite
+            pm2 startOrRestart ecosystem.config.cjs --name ReactVite
 
             echo "Deploy Complete!"
