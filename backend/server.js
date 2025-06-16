@@ -188,7 +188,7 @@ const PORT = process.env.PORT || 5000;
 const startSever = async () => {
   await connectDB();
   httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT} `);
   });
 };
 startSever();

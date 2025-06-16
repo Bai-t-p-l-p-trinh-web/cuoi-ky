@@ -154,7 +154,7 @@ export const routes = [
         ],
       },
       {
-        path: "chi-tiet-xe/:id",
+        path: "chi-tiet-xe/:slugCar",
         element: <ChiTietXe />,
       },
       {

@@ -1,0 +1,92 @@
+name: Deploy WebCuoiKy
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            echo "Pulling latest code..."
+            cd /home/prod/cuoi-ky
+            git reset --hard
+            git pull origin main
+
+            echo "Deploying Backend..."
+            cd backend
+            npm install
+            pm2 startOrRestart ecosystem.config.js --name ServerExpress
+
+            echo "Deploying Frontend..."
+            cd ../frontend
+            npm install
+            npm run build
+            pm2 startOrRestart ecosystem.config.cjs --name ReactVite
+
+            echo "Deploy Complete!"
+
+      - name: ✅ Notify Discord Success!
+        if: success()
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+          COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "username": "Peter Parker 🕸️",
+              "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFhtUfX2QPakxwIHOK4G1zf9ZIVi5FYhqyoQ&s",
+              "embeds": [
+                {
+                  "title": "✅ Deploy thành công!",
+                  "description": "**Branch**: `${{ github.ref_name }}`\n**Commit**: [`${{ github.sha }}`]('"$COMMIT_URL"')\n**Người thực hiện**: `${{ github.actor }}`\n**Nội dung commit**: '"${COMMIT_MESSAGE}"'",
+                  "color": 3066993,
+                  "footer": {
+                    "text": "GitHub Actions • Deploy Completed"
+                  },
+                  "timestamp": "'$(date --utc +%Y-%m-%dT%H:%M:%SZ)'"
+                }
+              ]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: ❌ Notify Discord Failure
+        if: failure()
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+          COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d '{
+              "username": "Peter Parker 🕸️",
+              "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFhtUfX2QPakxwIHOK4G1zf9ZIVi5FYhqyoQ&s",
+              "embeds": [
+                {
+                  "title": "❌ Deploy thất bại!",
+                  "description": "**Branch**: `${{ github.ref_name }}`\n**Commit**: [`${{ github.sha }}`]('"$COMMIT_URL"')\n**Người thực hiện**: `${{ github.actor }}`\n**Nội dung commit**: '"${COMMIT_MESSAGE}"'",
+                  "color": 15158332,
+                  "footer": {
+                    "text": "GitHub Actions • Deploy Failed"
+                  },
+                  "timestamp": "'$(date --utc +%Y-%m-%dT%H:%M:%SZ)'"
+                }
+              ]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK }}

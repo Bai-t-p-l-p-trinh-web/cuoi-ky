@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../features/auth/authSlice";
 import apiClient from "../../../utils/axiosConfig";
-
+import "./scss/OauthFillInfo.scss";
 import "react-toastify/dist/ReactToastify.css";
 
 function OauthFillInfo() {
@@ -41,18 +41,21 @@ function OauthFillInfo() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!user.name) {
       toast.error("Tên người dùng không được để trống!");
+      return;
     }
     if (!user.email) {
       toast.error("Email không được để trống!");
+      return;
     }
     if (!user.password) {
       toast.error("Mật khẩu không được để trống!");
+      return;
     }
     if (!user.phone) {
-      toast.error("Mật khẩu không được để trống!");
+      toast.error("Số điện thoại không được để trống!");
+      return;
     }
 
     if (user.password !== user.rePassword) {
@@ -107,7 +110,15 @@ function OauthFillInfo() {
     <>
       <div className="fillInfo">
         <ToastContainer />
-        <div className="fillInfo__avatar"></div>
+        <div className="fillInfo__avatar">
+          <img
+            src={
+              user.avatar ||
+              "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"
+            }
+            alt="avatar"
+          />
+        </div>
         <form className="fillInfo__user">
           <div className="fillInfo__box">
             <label
