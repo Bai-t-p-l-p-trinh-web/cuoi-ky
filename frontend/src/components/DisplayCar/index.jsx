@@ -44,7 +44,7 @@ function DisplayCar(props){
                     {
                         list?.cars.length > 0 && 
                         list?.cars.map((item, index) => (
-                            <Link to={`/${item.slug}`} className="home__content__main__display__list-item" key={index}>
+                            <Link to={`/chi-tiet-xe/${item.slug}`} className="home__content__main__display__list-item" key={index}>
                                 <CardCar item={item} />
                             </Link>
                         ))
