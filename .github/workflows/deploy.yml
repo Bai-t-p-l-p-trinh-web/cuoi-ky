@@ -12,7 +12,7 @@ jobs:
 
     steps: 
       - name: Checkout source code
-        uses: action/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -42,7 +42,7 @@ jobs:
             pm2 startOrRestart ecosystem.config.cjs --name ReactVite
 
             echo "Deploy Complete!"
-            
+
       - name: ✅ Notify Discord Success!
         if: success()
         run: |
