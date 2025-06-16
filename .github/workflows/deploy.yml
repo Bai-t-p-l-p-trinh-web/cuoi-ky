@@ -1,0 +1,42 @@
+name: Deploy WebCuoiKy
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with: 
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          envs: ENV_BACKEND, ENV_FRONTEND
+          script: |
+            set -e
+
+            echo "Pulling latest code..."
+            cd /home/prod/cuoi-ky
+            git reset --hard
+            git pull origin main
+
+            echo "Deploying Backend..."
+            cd backend
+            echo "$ENV_BACKEND" > .env
+            npm install
+            pm2 startOrRestart ecosystem.config.js --name ServerExpress
+
+            echo "Deploying Frontend..."
+            cd ../frontend
+            echo "$ENV_FRONTEND" > .env
+            npm install
+            npm run build
+            pm2 startOrRestart ecosystem.config.js --name ReactVite
+
+            echo "Deploy Complete!"
