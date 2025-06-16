@@ -30,6 +30,10 @@ jobs:
 
             echo "Deploying Backend..."
             cd backend
+            echo "ENV_BACKEND preview:"
+            echo "$ENV_BACKEND"
+
+            echo "Saving to .env file..."
             echo "$ENV_BACKEND" > .env
             npm install
             pm2 startOrRestart ecosystem.config.js --name ServerExpress
