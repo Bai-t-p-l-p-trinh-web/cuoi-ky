@@ -17,7 +17,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
-          envs: ENV_BACKEND, ENV_FRONTEND
           script: |
             set -e
             export NVM_DIR="$HOME/.nvm"
@@ -30,17 +29,11 @@ jobs:
 
             echo "Deploying Backend..."
             cd backend
-            echo "ENV_BACKEND preview:"
-            echo "$ENV_BACKEND"
-
-            echo "Saving to .env file..."
-            echo "$ENV_BACKEND" > .env
             npm install
             pm2 startOrRestart ecosystem.config.js --name ServerExpress
 
             echo "Deploying Frontend..."
             cd ../frontend
-            echo "$ENV_FRONTEND" > .env
             npm install
             npm run build
             pm2 startOrRestart ecosystem.config.cjs --name ReactVite
