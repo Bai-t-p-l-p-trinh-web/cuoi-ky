@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   preview : {
     port : 4173,
-    host : true
+    host : true,
+    allowedHosts: ['fakeauto.id.vn']
   }
 });
