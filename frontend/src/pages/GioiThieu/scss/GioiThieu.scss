@@ -1,145 +1,142 @@
-$color-line-horizontal: #1868AC;
-$color-bg-tamnhin: #0D385C;
-$color-bg-dots: #FF9C00;
-$color-button: #2C7ABD;
-.gioithieu{
-    &__web{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 80px 0;
-        &__title{
-            font-size: 30px;
-            font-weight: 650;
-            margin-bottom: 10px;
-        }
-        &__horizontal{
-            width: 150px;
-            height: 5px;
-            background-color: $color-line-horizontal;
-            text-align: center;
-            border-radius: 5px;
-            margin-bottom: 60px;
-
-        }
-        &__description{
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 50px;
-            &__div{
-                width: calc(100% - 400px - 50px);
-                text-align: justify;
-            }
-            &__img{
-                // margin-left: auto;
-                &-img{
-                    width: 400px;
-                    height: auto;
-                    object-fit: cover;
-                    filter: brightness(0) saturate(100%) invert(46%) sepia(89%) saturate(7490%) hue-rotate(189deg) brightness(97%) contrast(100%);
-                }
-            }
-        }
+$color-line-horizontal: #1868ac;
+$color-bg-tamnhin: #0d385c;
+$color-bg-dots: #ff9c00;
+$color-button: #2c7abd;
+.gioithieu {
+  &__web {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 0;
+    &__title {
+      font-size: 30px;
+      font-weight: 650;
+      margin-bottom: 10px;
     }
-    &__tamnhin{
-        background-color: $color-bg-tamnhin;
-        color: #fff;
-        padding: 80px 0;
-        &__title{
-            font-weight: bold;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        &__description{
-            line-height: 1.9;
-            font-size: 18px;
-            text-align: justify;
-        }
+    &__horizontal {
+      width: 150px;
+      height: 5px;
+      background-color: $color-line-horizontal;
+      text-align: center;
+      border-radius: 5px;
+      margin-bottom: 60px;
     }
-    &__lichsu{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 80px 0;
-        &__title{
-            font-size: 30px;
-            margin-bottom: 40px;
+    &__description {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 50px;
+      &__div {
+        width: calc(100% - 400px - 50px);
+        text-align: justify;
+      }
+      &__img {
+        // margin-left: auto;
+        &-img {
+          width: 400px;
+          height: auto;
+          object-fit: cover;
+          // Removed filter to show original logo colors
         }
-        &__list{
-            margin: 0 250px;
-            padding: 0;
-            list-style-type: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-        }
-        &__item{
-            padding-left: 50px;
-            position: relative;
-            border-left: 2px dashed #ddd;
-            &__corner{
-                position: absolute;
-                top: 0;
-                left: 0;
-                transform: translate(-51%, 0);
-                font-size: 28px;
-            }
-            &__time{
-                font-size: 28px;
-                font-weight: bold;
-                display: inline-block;
-                transform: translateY(-4px);
-            }
-            &__activity{
-                position: relative;
-                padding-left: 20px;
-                &::after{
-                    position: absolute;
-                    content: "";
-                    left: 0;
-                    top: 9px;
-                    width: 7px;
-                    height: 7px;
-                    border-radius: 50%;
-                    background-color: $color-bg-dots;
-                    
-                }
-            }
-        }
+      }
     }
-    &__banxe{
-        background: url("/image0103.webp") no-repeat center center;
-        width: 100%;
-        background-size: cover;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 130px 0;
-        color: #fff;
-        &__title{
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        &__description{
-            font-weight: 400;
-            margin-bottom: 30px;
-        }
+  }
+  &__tamnhin {
+    background-color: $color-bg-tamnhin;
+    color: #fff;
+    padding: 80px 0;
+    &__title {
+      font-weight: bold;
+      font-size: 28px;
+      margin-bottom: 20px;
     }
-    &__buttons{
-        display: flex;
-        &__banxe{
-            color: $color-button;
-            background: #fff;
-            padding: 10px 40px;
-            border-radius: 6px;
-            margin-right: 20px;
-        }
-        &__muaxe{
-            color: #fff;
-            background: $color-button;
-            padding: 10px 40px;
-            border-radius: 6px;
-        }
+    &__description {
+      line-height: 1.9;
+      font-size: 18px;
+      text-align: justify;
     }
+  }
+  &__lichsu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 0;
+    &__title {
+      font-size: 30px;
+      margin-bottom: 40px;
+    }
+    &__list {
+      margin: 0 250px;
+      padding: 0;
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    &__item {
+      padding-left: 50px;
+      position: relative;
+      border-left: 2px dashed #ddd;
+      &__corner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(-51%, 0);
+        font-size: 28px;
+      }
+      &__time {
+        font-size: 28px;
+        font-weight: bold;
+        display: inline-block;
+        transform: translateY(-4px);
+      }
+      &__activity {
+        position: relative;
+        padding-left: 20px;
+        &::after {
+          position: absolute;
+          content: "";
+          left: 0;
+          top: 9px;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background-color: $color-bg-dots;
+        }
+      }
+    }
+  }
+  &__banxe {
+    background: url("/image0103.webp") no-repeat center center;
+    width: 100%;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 130px 0;
+    color: #fff;
+    &__title {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    &__description {
+      font-weight: 400;
+      margin-bottom: 30px;
+    }
+  }
+  &__buttons {
+    display: flex;
+    &__banxe {
+      color: $color-button;
+      background: #fff;
+      padding: 10px 40px;
+      border-radius: 6px;
+      margin-right: 20px;
+    }
+    &__muaxe {
+      color: #fff;
+      background: $color-button;
+      padding: 10px 40px;
+      border-radius: 6px;
+    }
+  }
 }

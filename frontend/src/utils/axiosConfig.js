@@ -1,8 +1,9 @@
 import axios from "axios";
 
 // Create axios instance with default configuration
+const baseServerUrl = import.meta.env.VITE_AUTH_SERVER_URL;
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL,
+  baseURL: baseServerUrl,
   withCredentials: true, // Always send cookies with requests
   timeout: 10000, // 10 second timeout
 });
@@ -91,8 +92,6 @@ apiClient.interceptors.response.use(
 
       try {
         const { data } = await apiClient.post("/auth/refresh-token");
-
-        // Ensure this path matches your backend response structure
         const newAccessToken = data.data.accessToken;
         setAccessToken(newAccessToken);
 
@@ -107,7 +106,8 @@ apiClient.interceptors.response.use(
         processQueue(refreshError, null);
         console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("user");
-        await apiClient.post("/auth/logout");
+
+        // Redirect to login - server sẽ tự động invalidate refresh token khi hết hạn
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {

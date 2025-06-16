@@ -8,6 +8,8 @@ import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
 import ForgotPassword from "../../pages/Auth/client/ForgotPassword";
+import ChangeEmail from "../../pages/Auth/client/ChangeEmail";
+import ChangePassword from "../../pages/Auth/client/ChangePassword";
 import OauthFillInfo from "../../pages/Auth/client/OauthFillInfo";
 import MyAccount from "../../pages/MyAccount";
 import DashBoard from "../../pages/MyAccount/child/DashBoard";
@@ -25,6 +27,13 @@ import RequestVerify from "../../pages/RequestForm/child/RequestVerify";
 import RequestDone from "../../pages/RequestForm/child/RequestDone";
 import Error404 from "../../pages/Error404";
 import EditCar from "../../pages/MyAccount/child/EditCar";
+
+// Footer Pages
+import DieuKhoanSuDung from "../../pages/FooterPages/DieuKhoanSuDung";
+import ChinhSachQuyenRiengTu from "../../pages/FooterPages/ChinhSachQuyenRiengTu";
+import CauHoiThuongGap from "../../pages/FooterPages/CauHoiThuongGap";
+import LienHe from "../../pages/FooterPages/LienHe";
+import CoHoiViecLam from "../../pages/FooterPages/CoHoiViecLam";
 
 export const routes = [
   {
@@ -62,6 +71,14 @@ export const routes = [
       {
         path: "forgot-password",
         element: <ForgotPassword />,
+      },
+      {
+        path: "change-email",
+        element: <ChangeEmail />,
+      },
+      {
+        path: "change-password",
+        element: <ChangePassword />,
       },
       {
         path: "chat",
@@ -139,6 +156,26 @@ export const routes = [
       {
         path: "chi-tiet-xe/:id",
         element: <ChiTietXe />,
+      },
+      {
+        path: "dieu-khoan-su-dung",
+        element: <DieuKhoanSuDung />,
+      },
+      {
+        path: "chinh-sach-quyen-rieng-tu",
+        element: <ChinhSachQuyenRiengTu />,
+      },
+      {
+        path: "cau-hoi-thuong-gap",
+        element: <CauHoiThuongGap />,
+      },
+      {
+        path: "lien-he",
+        element: <LienHe />,
+      },
+      {
+        path: "co-hoi-viec-lam",
+        element: <CoHoiViecLam />,
       },
       {
         path: "*",

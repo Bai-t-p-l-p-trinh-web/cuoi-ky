@@ -3,12 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import "./scss/ForgotPassword.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
 import apiClient from "../../../utils/axiosConfig";
 import OtpModal from "../../../components/OtpModal";
 
 function ForgotPassword() {
-  const { user, loading, error } = useFetchUserInfo();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -133,15 +131,6 @@ function ForgotPassword() {
   const closeOtpModal = () => {
     setShowOtpModal(false);
   };
-
-  useEffect(() => {
-    if (user) {
-      toast.error("Người dùng đã đăng nhập rồi");
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-  }, [user, navigate]);
 
   if (!showResetForm) {
     return (

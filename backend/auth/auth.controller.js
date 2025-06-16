@@ -163,13 +163,13 @@ exports.login = async (req, res) => {
     res
       .cookie("accessToken", tokens.accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 1000 * 60 * 15, // 15 phút
       })
       .cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
       })
@@ -186,6 +186,7 @@ exports.login = async (req, res) => {
             is2FAEnabled: user.is2FAEnabled,
             isVerified: user.isVerified,
           },
+          accessToken: tokens.accessToken,
         },
       });
   } catch (error) {
@@ -275,7 +276,7 @@ exports.verifyLoginOtp = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
   try {
-    const token = req.cookies?.refreshToken; // Read from HttpOnly cookie
+    const token = req.cookies?.refreshToken;
 
     if (!token) {
       return res.status(400).json({
@@ -286,10 +287,8 @@ exports.refreshToken = async (req, res) => {
       });
     }
 
-    const tokens = await refreshToken(token);
-    if (!tokens) {
-      // If the refresh token service returns null (e.g., token invalid, expired, or not found in DB)
-      // Clear the potentially invalid refreshToken cookie
+    const newTokens = await refreshToken(token);
+    if (!newTokens) {
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -303,13 +302,13 @@ exports.refreshToken = async (req, res) => {
     }
 
     res
-      .cookie("accessToken", tokens.accessToken, {
+      .cookie("accessToken", newTokens.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
         maxAge: 1000 * 60 * 15,
       })
-      .cookie("refreshToken", tokens.refreshToken, {
+      .cookie("refreshToken", newTokens.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
@@ -320,7 +319,7 @@ exports.refreshToken = async (req, res) => {
         success: true,
         message: "Làm mới token thành công.",
         data: {
-          accessToken: tokens.accessToken,
+          accessToken: newTokens.accessToken,
         },
       });
   } catch (error) {
@@ -335,7 +334,7 @@ exports.refreshToken = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies?.refreshToken;
     if (refreshToken) {
       await UserToken.findOneAndDelete({ token: refreshToken });
     }
@@ -351,7 +350,7 @@ exports.logout = async (req, res) => {
       secure: true,
       sameSite: "Strict",
     });
-
+    console.log("hello");
     res.status(200).json({ success: true, message: "Đăng xuất thành công." });
   } catch (error) {
     console.error("Logout error:", error);
@@ -531,7 +530,7 @@ exports.changeEmail = async (req, res) => {
     user.pendingEmail = newEmail;
     await user.save();
 
-    const otpResult = await sendOtp(user, "verify-new-email");
+    const otpResult = await sendOtp(user, "VERIFY_NEW_EMAIL");
 
     if (otpResult?.success) {
       return res.status(200).json({

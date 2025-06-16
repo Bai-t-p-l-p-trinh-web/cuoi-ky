@@ -158,7 +158,8 @@ exports.sendOtp = async (user, type) => {
       case "VERIFY_RESET_PASSWORD":
         mailSubject = "Xác nhận quên mật khẩu";
         break;
-      case "VERIFY_CHANGE_EMAIL" || "VERIFY_NEW_EMAIL":
+      case "VERIFY_CURRENT_EMAIL":
+      case "VERIFY_NEW_EMAIL":
         mailSubject = "Xác nhận thay đổi địa chỉ Email";
         break;
       case "VERIFY_2FA_LOGIN":

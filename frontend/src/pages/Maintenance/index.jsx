@@ -1,27 +1,29 @@
 import React from "react";
 import apiClient from "../../utils/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../../features/auth/authSlice";
 import { useMaintenanceContext } from "../../contexts/MaintenanceContext";
 import "./Maintenance.css"; // Import the CSS file
 
 function MaintenancePage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { recheckMaintenanceStatus } = useMaintenanceContext();
 
   const handleRefresh = () => {
     recheckMaintenanceStatus();
     window.location.reload();
   };
-
   const handleLogout = async () => {
     try {
       await apiClient.post("/auth/logout");
     } catch (error) {
       console.error("Logout failed:", error);
     }
-    localStorage.removeItem("user");
-    navigate("/login");
-    window.location.reload();
+    // Dispatch logout action để clear Redux state
+    dispatch(logout());
+    navigate("/");
   };
 
   return (
@@ -38,17 +40,10 @@ function MaintenancePage() {
           <button className="retry-button" onClick={handleRefresh}>
             Thử Lại
           </button>
-          <button
-            className="logout-button" // New class for logout button
-            onClick={handleLogout}
-          >
+          <button className="logout-button" onClick={handleLogout}>
             Đăng Xuất
           </button>
         </div>
-        {/* Optional: Footer from your CSS if needed */}
-        {/* <div className="maintenance-footer">
-          Liên hệ hỗ trợ nếu bạn cần gấp.
-        </div> */}
       </div>
     </div>
   );

@@ -91,6 +91,11 @@ const OtpModal = ({
             type: "VERIFY_2FA_LOGIN",
             customPayload: true,
           };
+        case "VERIFY_CURRENT_EMAIL":
+          return {
+            endpoint: "/auth/verify-otp",
+            type: "VERIFY_CURRENT_EMAIL",
+          };
         case "VERIFY_NEW_EMAIL":
           return {
             endpoint: "/auth/verify-otp",
@@ -100,6 +105,11 @@ const OtpModal = ({
           return {
             endpoint: "/auth/verify-otp",
             type: "REQUEST_OTP_AGAIN",
+          };
+        case "VERIFY_CHANGE_PASSWORD":
+          return {
+            endpoint: "/auth/verify-otp",
+            type: "VERIFY_CHANGE_PASSWORD",
           };
         case "VERIFY_RESET_PASSWORD":
           return {
@@ -118,12 +128,12 @@ const OtpModal = ({
     try {
       const config = getApiConfig(actionRequired);
       let payload;
-
       if (config.customPayload || customApiPayload) {
-        // For login OTP verification
+        // For login OTP verification or special cases
         payload = {
           email,
           otp: otpValue.trim(),
+          type: config.type,
           ...(customApiPayload || {}),
         };
       } else {
@@ -134,12 +144,13 @@ const OtpModal = ({
           type: config.type,
         };
       }
-
+      console.log(config.endpoint, payload);
       const response = await apiClient.post(config.endpoint, payload);
       const responseData = response.data;
 
       if (responseData.success) {
         toast.success(responseData.message || "Xác thực thành công!");
+        console.log("xac thuc thanh cong");
         setOtpValue("");
         onSuccess(responseData);
         onClose();
@@ -159,16 +170,34 @@ const OtpModal = ({
       setIsVerifyingOtp(false);
     }
   };
-
   const handleResendOtp = async () => {
     setIsResendingOtp(true);
     try {
-      const payload = {
-        email,
-        type: "REQUEST_OTP_AGAIN",
-      };
+      let response;
 
-      const response = await apiClient.post("/auth/send-otp", payload);
+      if (actionRequired === "VERIFY_NEW_EMAIL") {
+        if (
+          customApiPayload &&
+          customApiPayload.oldEmail &&
+          customApiPayload.newEmail
+        ) {
+          response = await apiClient.post("/auth/change-email", {
+            oldEmail: customApiPayload.oldEmail,
+            newEmail: customApiPayload.newEmail,
+          });
+        } else {
+          toast.error("Không thể gửi lại OTP. Vui lòng thử lại từ đầu.");
+          return;
+        }
+      } else {
+        // For other types, use send-otp endpoint
+        const payload = {
+          email,
+          type: actionRequired,
+        };
+        response = await apiClient.post("/auth/send-otp", payload);
+      }
+
       const responseData = response.data;
 
       if (responseData.success) {

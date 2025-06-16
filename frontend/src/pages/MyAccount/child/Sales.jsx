@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import axios from "axios";
+import apiClient from "../../../utils/axiosConfig";
 import { toast } from "react-toastify";
 import "../scss/Sales.scss";
 
@@ -13,13 +13,7 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 function Sales() {
   const [revenueData, setRevenueData] = useState({
@@ -50,13 +44,9 @@ function Sales() {
       },
     },
   };
-
   const getStatisticRevenue = async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/api/v1/statistic/revenues`,
-        { withCredentials: true }
-      );
+      const res = await apiClient.get("/statistic/revenues");
 
       const { date, revenues } = res.data;
 
@@ -72,7 +62,9 @@ function Sales() {
         ],
       });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Lỗi khi lấy dữ liệu doanh thu");
+      toast.error(
+        err.response?.data?.message || "Lỗi khi lấy dữ liệu doanh thu"
+      );
     }
   };
 
@@ -83,7 +75,9 @@ function Sales() {
   return (
     <div className="sales">
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        <h2 style={{ textAlign: "center", marginBottom: 20 }}>Biểu đồ doanh thu theo thời gian</h2>
+        <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+          Biểu đồ doanh thu theo thời gian
+        </h2>
         <Bar data={revenueData} options={options_revenue} />
       </div>
     </div>

@@ -23,7 +23,7 @@ exports.generateOtpEmailTemplate = (otp, type, userName) => {
       message = `Chúng tôi phát hiện một lần đăng nhập mới vào tài khoản của bạn.<br />
         Vui lòng nhập mã OTP bên dưới để xác minh và tiếp tục đăng nhập.`;
       break;
-    case "VERIFY_CHANGE_EMAIL":
+    case "VERIFY_CURRENT_EMAIL":
       title = "Xác nhận thay đổi địa chỉ Email";
       message = `Bạn đã yêu cầu thay đổi địa chỉ Email hiện tại sang địa chỉ Email mới.<br />
         Vui lòng sử dụng mã OTP dưới đây để xác nhận thao tác này và hoàn tất việc cập nhật địa chỉ Email.`;
@@ -32,6 +32,11 @@ exports.generateOtpEmailTemplate = (otp, type, userName) => {
       title = "Xác nhận địa chỉ Email mới";
       message = `Bạn đang thêm địa chỉ Email mới cho tài khoản của mình.<br />
         Vui lòng sử dụng mã OTP dưới đây để xác nhận địa chỉ Email này và kích hoạt tính năng bảo mật cho tài khoản.`;
+      break;
+    case "VERIFY_CHANGE_PASSWORD":
+      title = "Xác nhận đổi mật khẩu";
+      message = `Bạn đã yêu cầu đổi mật khẩu.<br />
+         Vui lòng sử dụng mã OTP dưới đây để xác nhận thao tác này.`;
       break;
     case "VERIFY_RESET_PASSWORD":
       title = "Xác nhận quên mật khẩu";

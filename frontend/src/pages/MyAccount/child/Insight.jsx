@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import axios from "axios";
+import apiClient from "../../../utils/axiosConfig";
 import { toast } from "react-toastify";
 
 import "../scss/Insight.scss";
@@ -24,9 +24,7 @@ ChartJS.register(
   Legend
 );
 
-
-
-function Insight(){
+function Insight() {
   const [viewData, setViewData] = useState({
     labels: [""],
     datasets: [
@@ -35,11 +33,11 @@ function Insight(){
         data: [0],
         borderColor: "#56DFCF",
         backgroundColor: "#0ABAB5",
-        tension: 0, 
-        fill: true,   
+        tension: 0,
+        fill: true,
         pointBackgroundColor: "#ADEED9",
-      }
-    ]
+      },
+    ],
   });
 
   const [contactData, setContactData] = useState({
@@ -50,11 +48,11 @@ function Insight(){
         data: [0],
         borderColor: "#A8F1FF",
         backgroundColor: "#4ED7F1",
-        tension: 0, 
-        fill: true,   
+        tension: 0,
+        fill: true,
         pointBackgroundColor: "#6FE6FC",
-      }
-    ]
+      },
+    ],
   });
 
   const options_views = {
@@ -92,87 +90,87 @@ function Insight(){
   };
 
   useEffect(() => {
-    const getStatisticView = async() => {
+    const getStatisticView = async () => {
       try {
-        const responseViews = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/statistic/views`, {
-          withCredentials : true
-        });
-  
+        const responseViews = await apiClient.get("/statistic/views");
+
         const { date, views } = responseViews.data;
 
         setViewData({
-          labels : date,
+          labels: date,
           datasets: [
             {
               label: "Lượt xem",
               data: views,
               borderColor: "#56DFCF",
               backgroundColor: "#0ABAB5",
-              tension: 0, 
-              fill: true,   
+              tension: 0,
+              fill: true,
               pointBackgroundColor: "#ADEED9",
-            }
-          ]
+            },
+          ],
         });
-      } catch(error) {
-        toast.error(error.response?.data?.message || 'Lỗi khi lấy dữ liệu lượt xem');
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Lỗi khi lấy dữ liệu lượt xem"
+        );
       }
-
-    }
+    };
 
     const getStatisticContact = async () => {
       try {
-        const responseViews = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/statistic/contacts`, {
-          withCredentials : true
-        });
-  
+        const responseViews = await apiClient.get("/statistic/contacts");
+
         const { date, contacts } = responseViews.data;
-  
+
         setContactData({
-          labels : date,
+          labels: date,
           datasets: [
             {
               label: "Số lượng kết nối",
               data: contacts,
               borderColor: "#A8F1FF",
               backgroundColor: "#4ED7F1",
-              tension: 0, 
-              fill: true,   
+              tension: 0,
+              fill: true,
               pointBackgroundColor: "#6FE6FC",
-            }
-          ]
+            },
+          ],
         });
-      } catch(error) {
-        toast.error( error.response?.data?.message || 'Lỗi khi lấy dữ liệu tương tác!');
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Lỗi khi lấy dữ liệu tương tác!"
+        );
       }
-    }
+    };
     getStatisticView();
     getStatisticContact();
-
   }, []);
 
   return (
     <>
-        <div className="insight">
-            <div className="insight__header">
-
-            </div>
-            <div className="insight__views">
-                <div style={{ maxWidth: 800, margin: "0 auto" }}>
-                    <h2 style={{ textAlign: "center", marginBottom: 20 }}>Biểu đồ lượt xem xe theo thời gian</h2>
-                    <Line data={viewData} options={options_views} />
-                </div>
-            </div>
-
-            <div className="insight__contact">
-                <div style={{ maxWidth: 800, margin: "0 auto" }}>
-                    <h2 style={{ textAlign: "center", marginBottom: 20 }}>Biểu đồ lượt tương tác theo thời gian</h2>
-                    <Line data={contactData} options={options_contacts} />
-                </div>
-            </div>
+      <div className="insight">
+        <div className="insight__header"></div>
+        <div className="insight__views">
+          <div style={{ maxWidth: 800, margin: "0 auto" }}>
+            <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+              Biểu đồ lượt xem xe theo thời gian
+            </h2>
+            <Line data={viewData} options={options_views} />
+          </div>
         </div>
+
+        <div className="insight__contact">
+          <div style={{ maxWidth: 800, margin: "0 auto" }}>
+            <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+              Biểu đồ lượt tương tác theo thời gian
+            </h2>
+            <Line data={contactData} options={options_contacts} />
+          </div>
+        </div>
+      </div>
     </>
   );
-};
+}
 
 export default Insight;

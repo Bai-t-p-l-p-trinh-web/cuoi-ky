@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import "./scss/ClientLogin.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
+import { setUser } from "../../../features/auth/authSlice";
 import apiClient from "../../../utils/axiosConfig";
 import OtpModal from "../../../components/OtpModal";
+
 function ClientAuth() {
-  const { user, loading, error } = useFetchUserInfo();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -63,10 +65,11 @@ function ClientAuth() {
       });
 
       const responseData = response.data;
-
       if (responseData.success) {
         if (responseData.data?.user) {
           localStorage.setItem("user", JSON.stringify(responseData.data.user));
+          // Cập nhật Redux state ngay lập tức
+          dispatch(setUser(responseData.data.user));
           toast.success(responseData.message || "Đăng nhập thành công!");
           setTimeout(() => {
             navigate("/");
@@ -103,6 +106,8 @@ function ClientAuth() {
   const handleOtpSuccess = (responseData) => {
     if (responseData.data?.user) {
       localStorage.setItem("user", JSON.stringify(responseData.data.user));
+      // Cập nhật Redux state ngay lập tức
+      dispatch(setUser(responseData.data.user));
       setTimeout(() => {
         navigate("/");
       }, 1500);
@@ -132,14 +137,6 @@ function ClientAuth() {
     return `${rootUrl}?${qs.toString()}`;
   };
 
-  useEffect(() => {
-    if (user) {
-      toast.error("Người dùng đã đăng nhập rồi");
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-  }, [user]);
   return (
     <>
       <div className="clientAuth">

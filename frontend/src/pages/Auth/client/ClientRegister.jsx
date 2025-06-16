@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./scss/ClientRegister.scss";
-import { useFetchUserInfo } from "../../../hooks/useFetchUserInfo";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import apiClient from "../../../utils/axiosConfig";
 import OtpModal from "../../../components/OtpModal";
 
 function ClientRegister() {
-  const { user, loading, error } = useFetchUserInfo();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,15 +64,6 @@ function ClientRegister() {
     }
     return true;
   };
-
-  useEffect(() => {
-    if (user) {
-      toast.error("Người dùng đã đăng nhập rồi !");
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-  }, [user]);
 
   const validateForm = () => {
     const { name, email, password, rePassword } = registerData;

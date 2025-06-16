@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaPhoneAlt, FaCar, FaAngleDown } from "react-icons/fa";
+import { FaPhoneAlt, FaCar, FaAngleDown, FaBell } from "react-icons/fa";
 import { CiChat1 } from "react-icons/ci";
 import { MdArrowDropDown, MdAccountBox } from "react-icons/md";
 import "./Header.scss";
@@ -12,8 +12,6 @@ import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
 
 function Header() {
   const { user, loading, error } = useFetchUserInfo();
-
-  // console.log(user, loading, error);
 
   const headerRef = useRef(null);
 
@@ -66,38 +64,86 @@ function Header() {
           </div>
           <div className="header__menuUser">
             <div className="header__menuUser__post">
-              <Link to="/">
+              <Link to="/ban-xe">
                 <FaCar />
                 <span>ĐĂNG TIN</span>
               </Link>
             </div>
             <div className="header__menuUser__contact">
               <FaPhoneAlt />
-              <span>0123456789</span>
+              <span>0123.456.789</span>
             </div>
-            {user ? (
-              <div className="header__menuUser__myAccount">
-                <Link
-                  className="header__menuUser__myAccount__link"
-                  to="/my_account"
+            {user && !loading ? (
+              <div className="header__menuUser__authenticated">
+                {" "}
+                {/* Notification Bell */}
+                <div
+                  className="header__menuUser__notification"
+                  title="Thông báo"
                 >
-                  <div className="header__menuUser__myAccount__link__img__contain">
-                    <img src={user.avatar} alt="avatar" />
-                  </div>
-                  <span>{user.name}</span>
-                </Link>
-                <Link className="header__menuUser__myAccount__chat" to="/chat">
+                  <FaBell />
+                  <span className="notification-badge">3</span>
+                </div>
+                {/* Chat Link */}
+                <Link
+                  className="header__menuUser__chat"
+                  to="/chat"
+                  title="Tin nhắn"
+                >
                   <CiChat1 />
                 </Link>
+                {/* User Account Dropdown */}
+                <div
+                  className="header__menuUser__myAccount"
+                  onMouseEnter={(e) =>
+                    MouseEnter(
+                      e.currentTarget,
+                      headerRef.current.getBoundingClientRect(),
+                      "right",
+                      30
+                    )
+                  }
+                  onMouseLeave={(e) => {
+                    MouseOut(e.currentTarget);
+                  }}
+                >
+                  <div className="header__menuUser__myAccount__trigger">
+                    <div className="user-avatar">
+                      <img
+                        src={
+                          user.avatar ||
+                          "https://ui-avatars.com/api/?name=" +
+                            encodeURIComponent(user.name || "U") +
+                            "&background=7967e8&color=fff&size=40"
+                        }
+                        alt="avatar"
+                      />
+                    </div>
+                    <div className="user-info">
+                      <span className="user-name">
+                        {user.name || "Người dùng"}
+                      </span>
+                      <span className="user-role">Thành viên</span>
+                    </div>
+                    <MdArrowDropDown className="dropdown-arrow" />
+                  </div>
+                  <div className="dropdown">
+                    <HeaderUser />
+                  </div>
+                </div>
+              </div>
+            ) : loading ? (
+              <div className="header__menuUser__loading">
+                <div className="loading-spinner"></div>
               </div>
             ) : (
               <div
-                className="header__menuUser__myAccount"
+                className="header__menuUser__myAccount header__menuUser__guest"
                 onMouseEnter={(e) =>
                   MouseEnter(
                     e.currentTarget,
                     headerRef.current.getBoundingClientRect(),
-                    "left",
+                    "right",
                     30
                   )
                 }
@@ -105,11 +151,11 @@ function Header() {
                   MouseOut(e.currentTarget);
                 }}
               >
-                <span>
+                <div className="guest-trigger">
                   <MdAccountBox />
                   <span>Tài khoản</span>
-                </span>
-                <MdArrowDropDown />
+                  <MdArrowDropDown />
+                </div>
                 <div className="dropdown">
                   <HeaderUser />
                 </div>

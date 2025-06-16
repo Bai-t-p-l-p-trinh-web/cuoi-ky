@@ -127,11 +127,11 @@ function PageFooter() {
                   >
                     Trả góp mua xe
                   </Link>
-                </li>
+                </li>{" "}
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/cau-hoi-thuong-gap"
                   >
                     Câu hỏi thường gặp
                   </Link>
@@ -139,7 +139,7 @@ function PageFooter() {
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/lien-he"
                   >
                     Liên hệ
                   </Link>
@@ -155,11 +155,11 @@ function PageFooter() {
                   >
                     Về FakeAuto
                   </Link>
-                </li>
+                </li>{" "}
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/gioi-thieu"
                   >
                     Giới thiệu công ty
                   </Link>
@@ -171,11 +171,11 @@ function PageFooter() {
                   >
                     Tin tức
                   </Link>
-                </li>
+                </li>{" "}
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/chinh-sach-quyen-rieng-tu"
                   >
                     Chính sách quyền riêng tư
                   </Link>
@@ -183,7 +183,7 @@ function PageFooter() {
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/dieu-khoan-su-dung"
                   >
                     Điều khoản sử dụng
                   </Link>
@@ -191,7 +191,7 @@ function PageFooter() {
                 <li className="footer__about__services--service__list--item">
                   <Link
                     className="footer__about__services--service__list--item-link"
-                    to="/"
+                    to="/co-hoi-viec-lam"
                   >
                     Cơ hội việc làm
                   </Link>
