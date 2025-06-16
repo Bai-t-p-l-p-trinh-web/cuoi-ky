@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import "./scss/OauthFillInfo.scss";
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -102,7 +103,7 @@ function OauthFillInfo(){
             <div className="fillInfo">
                 <ToastContainer />
                 <div className="fillInfo__avatar">
-
+                    <img src={user.avatar || "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"} alt="avatar" />
                 </div>
                 <form className="fillInfo__user">
                     <div className="fillInfo__box">
