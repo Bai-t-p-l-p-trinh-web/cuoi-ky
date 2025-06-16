@@ -51,8 +51,8 @@ jobs:
           curl -H "Content-Type: application/json" \
             -X POST \
             -d '{
-              "username": "CI/CD Bot 🤖",
-              "avatar_url": "https://i.imgur.com/AfFp7pu.png",
+              "username": "Peter Parker 🕸️",
+              "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFhtUfX2QPakxwIHOK4G1zf9ZIVi5FYhqyoQ&s",
               "embeds": [
                 {
                   "title": "✅ Deploy thành công!",
@@ -75,8 +75,8 @@ jobs:
           curl -H "Content-Type: application/json" \
             -X POST \
             -d '{
-              "username": "CI/CD Bot 🤖",
-              "avatar_url": "https://i.imgur.com/AfFp7pu.png",
+              "username": "Peter Parker 🕸️",
+              "avatar_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFhtUfX2QPakxwIHOK4G1zf9ZIVi5FYhqyoQ&s",
               "embeds": [
                 {
                   "title": "❌ Deploy thất bại!",
