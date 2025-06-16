@@ -131,8 +131,6 @@ const createPdf = async ({request}) => {
     drawTextBold((request.seat_capacity ?? '').toString(), 150, 400, 11);
     drawCheckbox('car.seat_capacity', '', 400, 400, 11, 11, request.examine.isCorrectSeat_Capacity);
 
-    
-
     drawText('Nhiên liệu : ', 50, 370, 11);
     drawCheckbox('car.fuel_gasoline', 'Xăng', 150, 370, 11, 11, request.examine.isFuel_Gasoline);
     drawCheckbox('car.fuel_oil', 'Dầu', 210, 370, 11, 11, request.examine.isFuel_Oil);
@@ -145,7 +143,7 @@ const createPdf = async ({request}) => {
     } else {
         drawText('Thông tin Ông/Bà đã điền là sai với thông tin xe', 120, 300, 11);
         drawText('Lý do : ', 20, 270, 11);
-        drawTextBold(request.message, 120, 270, 11);
+        drawTextBold((request.message || "Sai thông tin xe"), 120, 270, 11);
     }
 
     drawText('Chủ tịch công ty Fake Auto', 380, 180, 11);
@@ -162,7 +160,6 @@ const createPdf = async ({request}) => {
         height: imageDims.height,
     });
 
-    
 
     const pdfBytes = await pdfDoc.save();
     

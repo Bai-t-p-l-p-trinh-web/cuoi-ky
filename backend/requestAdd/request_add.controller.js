@@ -248,6 +248,13 @@ const rejectRequest = async(req, res) => {
             return res.status(404).json({ message : "Không tìm thấy request yêu cầu!" });
         }
 
+        const sellerId = request.sellerId;
+        const seller = await User.findById(sellerId);
+
+        if(!seller) {
+            return res.status(404).json({ message : "Không tìm thấy người bán !" });
+        }
+
         if(request.status !== "pending") {
             return res.status(403).json({ message : "Đã duyệt rồi không thể duyệt nữa!" });
         }
@@ -257,7 +264,7 @@ const rejectRequest = async(req, res) => {
         request.examine = req.body.examine;
 
         const dataSend = JSON.parse(JSON.stringify(request));
-        dataSend.seller = user;
+        dataSend.seller = seller;
         const secure_url = await createPdf({ request : dataSend});
         
 
