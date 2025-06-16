@@ -39,3 +39,17 @@ jobs:
             pm2 startOrRestart ecosystem.config.cjs --name ReactVite
 
             echo "Deploy Complete!"
+      - name: Notify Discord Success!
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\": \"✅ **Deploy thành công** trên branch \`${{ github.ref_name }}\` bởi \`${{ github.actor }}\`\"}" \
+            ${{ secrets.DISCORD_WEBHOOK }}
+      - name: ❌ Notify Discord Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\": \"❌ **Deploy thất bại** trên branch \`${{ github.ref_name }}\` bởi \`${{ github.actor }}\`\"}" \
+            ${{ secrets.DISCORD_WEBHOOK }}
