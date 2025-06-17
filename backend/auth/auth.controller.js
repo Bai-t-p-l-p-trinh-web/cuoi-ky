@@ -159,7 +159,7 @@ exports.login = async (req, res) => {
     }
 
     // Nếu không bật 2FA, đăng nhập bình thường
-    const tokens = await generateTokens(user);
+    const tokens = await generateTokens(user); 
     res
       .cookie("accessToken", tokens.accessToken, {
         httpOnly: true,

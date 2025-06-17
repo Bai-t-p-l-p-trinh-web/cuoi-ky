@@ -8,11 +8,6 @@ export function useFetchUserInfo() {
   const [hasAttempted, setHasAttempted] = useState(false);
 
   useEffect(() => {
-    // Chỉ fetch user một lần khi:
-    // 1. Chưa có user
-    // 2. Chưa từng thử fetch
-    // 3. Không đang loading
-    // 4. Có token trong localStorage
     const storedUser = localStorage.getItem("user");
 
     if (!user && !hasAttempted && !loading && storedUser) {

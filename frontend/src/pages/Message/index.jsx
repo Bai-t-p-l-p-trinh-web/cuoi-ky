@@ -254,7 +254,7 @@ function Message() {
                 <div className="chat__extend-vertical"></div>
                 <div className="chat__user">
                   <div className="chat__user-avatar">
-                    <img src={chats.avatar} alt="avatar" />
+                    <img src={chats.avatar || "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"} alt="avatar" />
                   </div>
                   <div className="chat__user__info">
                     <span className="chat__user__info-name">{chats.name}</span>
@@ -303,7 +303,7 @@ function Message() {
                       >
                         <img
                           className="chat__messages__users__user-avatar"
-                          src={otherUser.avatar}
+                          src={otherUser.avatar || "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"}
                           alt="avatar"
                         />
                       </div>
@@ -335,7 +335,7 @@ function Message() {
                             <div className="chat__chatting__header__info">
                               <img
                                 className="chat__chatting__header__info-img"
-                                src={otherUser.avatar}
+                                src={otherUser.avatar || "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"}
                                 alt="avatar"
                               />
                               <div className="chat__chatting__header__info__contain">
@@ -387,9 +387,9 @@ function Message() {
                                 <img
                                   className="chat__chatting__content__box-avatar"
                                   src={
-                                    chats.id === msg.senderId
+                                    (chats.id === msg.senderId
                                       ? chats.avatar
-                                      : otherUser.avatar
+                                      : otherUser.avatar) || "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"
                                   }
                                 />
                               </div>

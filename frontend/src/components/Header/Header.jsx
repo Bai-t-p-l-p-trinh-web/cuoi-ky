@@ -12,7 +12,7 @@ import { useFetchUserInfo } from "../../hooks/useFetchUserInfo";
 
 function Header() {
   const { user, loading, error } = useFetchUserInfo();
-
+  // console.log(user, loading, error);
   const headerRef = useRef(null);
 
   return (

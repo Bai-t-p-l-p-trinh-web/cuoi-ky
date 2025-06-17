@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../user/user.model');
 
 const { generateRandomString } = require('../utils/generate');
-const { hashPassword } = require('../auth/auth.services');
+const { hashPassword, generateTokens } = require('../auth/auth.services');
 
 // {code} => {id_token, access_token} 
 const getOauthGoogleToken = async (code) => {
@@ -70,7 +70,7 @@ const getRepondsByGoogle = async (req, res) => {
                 user = await User.create({
                     email : googleUser.email,
                     name : googleUser.name,
-                    avatar : googleUser.picture,
+                    avatar : googleUser.picture, 
                     password : generateRandomString(50),
                     isVerified : true
                 });
@@ -95,19 +95,21 @@ const getRepondsByGoogle = async (req, res) => {
             }
             
         } else { // Có rồi thì đăng nhập 
-            const accessToken = jwt.sign(
-                { userId: user._id },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" } 
-            );
-        
-            res.cookie("access_token", accessToken, {
+            const tokens = await generateTokens(user);
+            res.cookie("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                maxAge: 7 * 24 * 60 * 60 * 1000, 
-                sameSite: "Lax"
-            });
+                sameSite: "Strict",
+                maxAge: 1000 * 60 * 15, // 15 phút
+            })
 
+            res.cookie("refreshToken", tokens.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Strict",
+                maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
+            })
+            
             return res.redirect(`${process.env.CLIENT_URL}`);
         }
 
