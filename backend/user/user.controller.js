@@ -12,7 +12,7 @@ const getInfoMe = async (req, res) => {
     const user = await User.findOne({
       _id: userId,
     }).select(
-      "email name role avatar _id phone createdAt address city district contactFacebook contactEmail contactZalo contactLinkedin"
+      "email name role avatar _id phone createdAt address city district isVerified is2FAEnabled hasSetPassword isOAuthUser contactFacebook contactEmail contactZalo contactLinkedin"
     );
     if (!user) {
       return res.status(404).json({ message: "không tìm thấy user!" });

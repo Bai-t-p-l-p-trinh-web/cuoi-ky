@@ -3,14 +3,23 @@ import apiClient from "../../utils/axiosConfig";
 
 export const fetchUser = createAsyncThunk("auth/fetchUser", async () => {
   const response = await apiClient.get("/user/me");
-  console.log("fetchUser response:", response.data); // Debug log
   return response.data;
 });
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
+    user: (() => {
+      // Load user từ localStorage khi khởi tạo
+      try {
+        const storedUser = localStorage.getItem("user");
+        return storedUser ? JSON.parse(storedUser) : null;
+      } catch (error) {
+        console.error("Error loading user from localStorage:", error);
+        localStorage.removeItem("user");
+        return null;
+      }
+    })(),
     loading: false,
     error: null,
   },
@@ -18,13 +27,17 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.error = null;
+      try {
+        localStorage.setItem("user", JSON.stringify(action.payload));
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
     },
     logout: (state) => {
       state.user = null;
       state.loading = false;
       state.error = null;
-      // Xóa accessToken khỏi localStorage
-      localStorage.removeItem("user"); // Xóa toàn bộ user object chứa token
+      localStorage.removeItem("user");
     },
     clearError: (state) => {
       state.error = null;
@@ -38,6 +51,11 @@ const authSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        try {
+          localStorage.setItem("user", JSON.stringify(action.payload));
+        } catch (error) {
+          console.error("Error saving user to localStorage:", error);
+        }
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.loading = false;

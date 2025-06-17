@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "seller", "staff" , "admin"], 
+      enum: ["user", "seller", "staff", "admin"],
       default: "user",
     },
     address: {
@@ -51,9 +51,16 @@ const userSchema = new mongoose.Schema(
     // no longer used
     // telegramUserId: {
     //   type: String,
-    //   default: null,
-    // },
+    //   default: null,    // },
     is2FAEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    isOAuthUser: {
+      type: Boolean,
+      default: false,
+    },
+    hasSetPassword: {
       type: Boolean,
       default: false,
     },

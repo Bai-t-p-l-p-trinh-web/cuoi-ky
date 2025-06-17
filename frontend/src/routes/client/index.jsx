@@ -10,6 +10,7 @@ import ClientRegister from "../../pages/Auth/client/ClientRegister";
 import ForgotPassword from "../../pages/Auth/client/ForgotPassword";
 import ChangeEmail from "../../pages/Auth/client/ChangeEmail";
 import ChangePassword from "../../pages/Auth/client/ChangePassword";
+import SetupPassword from "../../pages/Auth/client/SetupPassword";
 import OauthFillInfo from "../../pages/Auth/client/OauthFillInfo";
 import MyAccount from "../../pages/MyAccount";
 import DashBoard from "../../pages/MyAccount/child/DashBoard";
@@ -79,6 +80,10 @@ export const routes = [
       {
         path: "change-password",
         element: <ChangePassword />,
+      },
+      {
+        path: "setup-password",
+        element: <SetupPassword />,
       },
       {
         path: "chat",

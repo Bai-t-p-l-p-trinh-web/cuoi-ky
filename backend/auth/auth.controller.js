@@ -159,7 +159,7 @@ exports.login = async (req, res) => {
     }
 
     // Nếu không bật 2FA, đăng nhập bình thường
-    const tokens = await generateTokens(user); 
+    const tokens = await generateTokens(user);
     res
       .cookie("accessToken", tokens.accessToken, {
         httpOnly: true,
@@ -623,5 +623,67 @@ exports.toggle2FA = async (req, res) => {
   } catch (error) {
     console.error("Toggle 2FA error:", error);
     res.status(500).json({ success: false, message: "Lỗi máy chủ nội bộ." });
+  }
+};
+
+exports.setOAuthPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+
+    if (!userId || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID và mật khẩu mới là bắt buộc.",
+      });
+    }
+
+    if (!validatePassword(newPassword)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 ký tự đặc biệt.",
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Người dùng không tồn tại.",
+      });
+    }
+
+    if (!user.isOAuthUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Chỉ user OAuth mới có thể sử dụng chức năng này.",
+      });
+    }
+
+    if (user.hasSetPassword) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Bạn đã thiết lập mật khẩu rồi. Vui lòng sử dụng chức năng đổi mật khẩu.",
+      });
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+    await User.findByIdAndUpdate(userId, {
+      password: hashedPassword,
+      hasSetPassword: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Thiết lập mật khẩu thành công. Bây giờ bạn có thể đăng nhập bằng email và mật khẩu.",
+    });
+  } catch (error) {
+    console.error("Set OAuth password error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ nội bộ.",
+    });
   }
 };

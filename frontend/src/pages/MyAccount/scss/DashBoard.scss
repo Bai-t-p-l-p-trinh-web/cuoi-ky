@@ -212,11 +212,41 @@ $color-text-field: #6a6868;
       &:hover {
         background-color: #0056b3;
       }
-
       &:disabled {
         background-color: #6c757d;
         border-color: #6c757d;
         cursor: not-allowed;
+      }
+
+      &.disabled {
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        cursor: not-allowed !important;
+        opacity: 0.6;
+
+        &:hover {
+          background-color: #6c757d !important;
+        }
+      }
+
+      &.danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+
+        &:hover {
+          background-color: #c82333;
+          border-color: #bd2130;
+        }
+      }
+
+      &.success {
+        background-color: #28a745;
+        border-color: #28a745;
+
+        &:hover {
+          background-color: #218838;
+          border-color: #1e7e34;
+        }
       }
     }
   }
