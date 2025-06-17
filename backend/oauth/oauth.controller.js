@@ -100,14 +100,14 @@ const getRepondsByGoogle = async (req, res) => {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
-                maxAge: 1000 * 60 * 15, // 15 phút
+                maxAge: 1000 * 60 * 15, 
             })
 
             res.cookie("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",
-                maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
+                maxAge: 1000 * 60 * 60 * 24 * 7, 
             })
             
             return res.redirect(`${process.env.CLIENT_URL}`);
@@ -170,18 +170,20 @@ const updateUser = async(req, res) => {
             return res.status(404).json({message : "Không tìm thấy người dùng "});
         }
         
-        const accessToken = jwt.sign(
-            { userId: payload.userId },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" } 
-        );
-    
-        res.cookie("access_token", accessToken, {
+        const tokens = await generateTokens(updateUser);
+        res.cookie("accessToken", tokens.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            maxAge: 7 * 24 * 60 * 60 * 1000, 
-            sameSite: "Lax"
-        });
+            sameSite: "Strict",
+            maxAge: 1000 * 60 * 15, 
+        })
+
+        res.cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 1000 * 60 * 60 * 24 * 7, 
+        })
 
         return res.send({message : "Cập nhật thông tin người dùng thành công!"});
     } catch (error) {
