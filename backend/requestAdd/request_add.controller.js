@@ -334,6 +334,41 @@ const PostTheCar = async(req, res) => {
     }
 }
 
+// [DELETE] /api/v1/requestAdd/:slugRequest 
+const deleteRequest = async(req, res) => {
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(404).json({ message: "Không tìm thấy người dùng!" });
+        }
+        const slug = req.params.slugRequest;
+        if(!slug) {
+            return res.status(400).json({ message : "Chưa có slug!" });
+        }
+        const DataFind = {
+            slug,
+            sellerId : userId 
+        }
+        if(user.role === "admin"){
+            delete DataFind.sellerId;
+        };
+
+        const request = await RequestAdd.findOne(DataFind);
+
+        if(!request){
+            return res.status(400).json({ message : "Không tìm thấy đơn! " });
+        }
+
+        await request.deleteOne();
+
+        return res.status(200).json({ message : "Xóa đơn thành công! " });
+    } catch(error) {
+        return res.status(500).json({ message : "Server Error!" });
+    }
+}
+
 // const createPdfFileTest = async(req, res) => {
 //     const request = {
 //         name: "Mercedes-Benz GLC 300 2019",
@@ -369,6 +404,7 @@ module.exports = {
     checkedTheRequest,
     rejectRequest,
     PostTheCar,
-    AddTheInspectors
+    AddTheInspectors,
+    deleteRequest
     // createPdfFileTest
 }

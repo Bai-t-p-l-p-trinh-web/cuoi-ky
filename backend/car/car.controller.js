@@ -48,9 +48,9 @@ module.exports.index = async (req, res) => {
         }
 
         if(req.query.fuel_type){
-            const fuel_types = req.query.fuel_type.split('+') || [];
+            const fuel_types = req.query.fuel_type.split('+').map(type => type.trim()).filter(Boolean);
             if (fuel_types.length > 0) {
-                find['fuel_use.fuel_types'] = { $in : fuel_types};
+                find["fuel_use.fuel_type"] = { $in : fuel_types};
             }
         }   
         
@@ -68,6 +68,8 @@ module.exports.index = async (req, res) => {
 
 
         const recordsCar = await Car.find(find).select('-__v -deleted -_id');
+        console.log(find);
+        console.log(recordsCar);
 
         let prices = recordsCar.map(car => car.price);
         const minPrice = Math.min(...prices);

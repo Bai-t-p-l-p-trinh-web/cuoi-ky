@@ -11,6 +11,11 @@ const {
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 
+//swagger ui 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 const connectDB = require("./shared/config/db");
 require("dotenv").config();
 
@@ -159,6 +164,9 @@ const UserRoutes = require("./user/user.routes");
 const threadRoutes = require("./thread/thread.routes");
 const RequestFormRoutes = require("./requestAdd/request_add.routes");
 const StatisticRoutes = require("./statistics/statistics.routes");
+
+// api docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));  
 
 // Auth routes - ALWAYS accessible (even during maintenance)
 app.use("/api/v1/auth", authRoutes);

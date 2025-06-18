@@ -4,7 +4,7 @@ const LocationEnum = require('../constants/locationEnum');
 const allowedLocations = Object.values(LocationEnum).map(l => l.query_location);
 
 mongoose.plugin(slugUpdater);
-
+ 
 const carSchema = new mongoose.Schema(
     {
         title: {

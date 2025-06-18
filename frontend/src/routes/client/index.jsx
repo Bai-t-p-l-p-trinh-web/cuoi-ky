@@ -34,6 +34,7 @@ import ChinhSachQuyenRiengTu from "../../pages/FooterPages/ChinhSachQuyenRiengTu
 import CauHoiThuongGap from "../../pages/FooterPages/CauHoiThuongGap";
 import LienHe from "../../pages/FooterPages/LienHe";
 import CoHoiViecLam from "../../pages/FooterPages/CoHoiViecLam";
+import SellerInfo from "../../pages/SellerInfo";
 
 export const routes = [
   {
@@ -176,6 +177,10 @@ export const routes = [
       {
         path: "co-hoi-viec-lam",
         element: <CoHoiViecLam />,
+      },
+      {
+        path: "nguoi-ban/:slugSeller",
+        element: <SellerInfo/>
       },
       {
         path: "*",

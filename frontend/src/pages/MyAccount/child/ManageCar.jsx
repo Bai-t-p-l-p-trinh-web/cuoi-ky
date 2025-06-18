@@ -337,7 +337,7 @@ function ManageCar() {
                     </td>
                     <td className="manageCar__table__td--functions">
                       <Link
-                        to={`/${car.slug}`}
+                        to={`/chi-tiet-xe/${car.slug}`}
                         className="manageCar__functions__link"
                       >
                         <CgDetailsMore className="manageCar__functions__svg" />
@@ -354,10 +354,15 @@ function ManageCar() {
                           Chỉnh sửa
                         </span>
                       </Link>
-                      <button className="manageCar__functions__delete">
-                        <RiDeleteBin5Line className="manageCar__functions__svg" />
-                        <span className="manageCar__functions__span">Xóa</span>
-                      </button>
+                      {
+                        car.status === "selling"
+                        &&
+                        <button className="manageCar__functions__delete">
+                          <RiDeleteBin5Line className="manageCar__functions__svg" />
+                          <span className="manageCar__functions__span">Xóa</span>
+                        </button>
+                      }
+                      
                     </td>
                   </tr>
                 ))

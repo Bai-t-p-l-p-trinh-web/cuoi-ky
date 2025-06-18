@@ -19,6 +19,6 @@ router.patch('/:slugRequest/employee', verifyToken, ValidateAddTheInspectors, co
 
 router.get('/:slugRequest', verifyToken, controller.getRequestBySlug);
 
-
+router.delete('/:slugRequest', verifyToken, controller.deleteRequest);
 
 module.exports = router;

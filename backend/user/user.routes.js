@@ -10,4 +10,8 @@ router.patch('/me', verifyToken, validateUpdateInfo, controller.updateInfoMe);
 
 router.post('/logout', verifyToken,controller.LogoutMe);
 
+router.patch('/seller', verifyToken, controller.handleBecomeSeller);
+
+router.get('/:slugSeller', controller.getSellerBySlug);
+
 module.exports = router;

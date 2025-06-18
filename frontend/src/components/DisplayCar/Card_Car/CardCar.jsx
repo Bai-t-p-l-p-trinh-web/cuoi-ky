@@ -6,6 +6,7 @@ import { SlCalender } from "react-icons/sl";
 import { LuFuel } from "react-icons/lu";
 import { PiArmchair } from "react-icons/pi";
 function CardCar({item}){
+    console.log(item);
     return (
         <>
         <div className="home__content__main__display__list-item--description">
@@ -14,7 +15,7 @@ function CardCar({item}){
             <div className="home__content__main__display__list-item--description-specific">
                 <div className="home__content__main__display__list-item--description-specific--year"><SlCalender/> <span>{item.year}</span> </div>
                 <div className="home__content__main__display__list-item--description-specific--km"><FaRoad/> <span>{convertNum(item.km)}</span></div>
-                <div className="home__content__main__display__list-item--description-specific--fuel"><LuFuel/> <span>{item.fuel}</span></div>
+                <div className="home__content__main__display__list-item--description-specific--fuel"><LuFuel/> <span>{item.fuel_use.fuel_name}</span></div>
                 <div className="home__content__main__display__list-item--description-specific--seat"><PiArmchair/> <span>{item.seat_capacity}</span></div>
             </div>
             <div className="home__content__main__display__list-item--description-price">{convertCurrency(item.price)}</div>

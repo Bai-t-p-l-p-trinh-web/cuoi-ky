@@ -4,6 +4,8 @@ $color-text-field: #6a6868;
   border: 1px solid #ddd;
   &__header {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     border: 1px solid #ddd;
     padding: 13px 20px;
     border-radius: 4px 4px 0 0;
@@ -172,7 +174,6 @@ $color-text-field: #6a6868;
     }
   }
 
-  // Styles cho security section
   &__security {
     margin-bottom: 20px;
 

@@ -84,6 +84,15 @@ const validateCheckedRequest = async (req, res, next) => {
             !examine.isFuel_Electric
         ) {
             return res.status(400).json({ message : "Phải là một loại nhiên liệu"});
+        } else {
+            let cnt = 0;
+            if(examine.isFuel_Gasoline) cnt += 1;
+            if(examine.isFuel_Oil) cnt += 1;
+            if(examine.isFuel_Electric) cnt += 1;
+
+            if(cnt !== 1) {
+                return res.status(400).json({ message : "Phải là một loại nhiên liệu!" });
+            }
         }
     }
 
