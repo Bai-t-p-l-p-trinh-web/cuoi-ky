@@ -3,6 +3,8 @@ import { HiUsers } from "react-icons/hi2";
 import { CiLink } from "react-icons/ci";
 import { getDate } from "../../../utils/formatDate";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, fetchUser } from "../../../features/auth/authSlice";
 import "../scss/DashBoard.scss";
 import { ToastContainer, toast } from "react-toastify";
 import apiClient from "../../../utils/axiosConfig";
@@ -11,6 +13,10 @@ import { Cloudinary } from "@cloudinary/url-gen";
 
 function DashBoard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const userFromRedux = useSelector((state) => state.auth.user);
+
   const [profile, setProfile] = useState({
     name: "",
     role: "user",
@@ -25,6 +31,9 @@ function DashBoard() {
     contactZalo: "",
     contactEmail: "",
     contactLinkedin: "",
+    isOAuthUser: false,
+    hasSetPassword: true,
+    is2FAEnabled: false,
   });
 
   // cloudinary
@@ -96,35 +105,58 @@ function DashBoard() {
   const handleDeleteImg = () => {
     setUploadImage("");
   };
-  useEffect(() => {
-    const getInfoMe = async () => {
-      try {
-        const RespondInfoOfMe = await apiClient.get("/user/me");
 
-        const user = RespondInfoOfMe.data;
-        setProfile((prev) => {
-          // Set default empty strings for optional fields
-          if (!user.phone) user.phone = "";
-          if (!user.address) user.address = "";
-          if (!user.city) user.city = "";
-          if (!user.district) user.district = "";
-          if (!user.contactFacebook) user.contactFacebook = "";
-          if (!user.contactEmail) user.contactEmail = "";
-          if (!user.contactZalo) user.contactZalo = "";
-          if (!user.contactLinkedin) user.contactLinkedin = "";
+  // Hàm toggle 2FA
+  const handleToggle2FA = async () => {
+    try {
+      const response = await apiClient.post("/auth/toggle-2FA", {
+        userId: profile.id || profile._id,
+      });
 
-          constProfile.current = { ...user };
-
-          return user;
-        });
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message || "Lỗi khi lấy thông tin user"
-        );
+      if (response.data.success) {
+        setProfile((prev) => ({
+          ...prev,
+          is2FAEnabled: !prev.is2FAEnabled,
+        }));
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
       }
-    };
-    getInfoMe();
-  }, []);
+    } catch (error) {
+      console.error("Toggle 2FA error:", error);
+      toast.error("Có lỗi xảy ra khi thay đổi thiết lập 2FA");
+    }
+  };
+
+  // Hàm điều hướng tới trang thiết lập mật khẩu cho OAuth users
+  const handleSetupPassword = () => {
+    navigate("/setup-password");
+  };
+  useEffect(() => {
+    if (userFromRedux) {
+      setProfile((prev) => {
+        const user = { ...userFromRedux };
+
+        // Set defaults cho các field optional
+        if (!user.phone) user.phone = "";
+        if (!user.address) user.address = "";
+        if (!user.city) user.city = "";
+        if (!user.district) user.district = "";
+        if (!user.contactFacebook) user.contactFacebook = "";
+        if (!user.contactEmail) user.contactEmail = "";
+        if (!user.contactZalo) user.contactZalo = "";
+        if (!user.contactLinkedin) user.contactLinkedin = "";
+
+        // Ensure boolean fields
+        user.isOAuthUser = Boolean(user.isOAuthUser);
+        user.hasSetPassword = Boolean(user.hasSetPassword);
+        user.is2FAEnabled = Boolean(user.is2FAEnabled);
+
+        constProfile.current = { ...user };
+        return user;
+      });
+    }
+  }, [userFromRedux]);
   const requestUpdate = (e) => {
     e.target.disabled = true;
 
@@ -189,10 +221,8 @@ function DashBoard() {
           type: "success",
           isLoading: false,
           autoClose: 3000,
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        }); // Refetch user data thay vì reload page
+        dispatch(fetchUser());
       } catch (error) {
         toast.update(isLoadingUpdate, {
           render: error.response?.data?.message || "Cập nhật thất bại!",
@@ -456,6 +486,7 @@ function DashBoard() {
             {/* Section riêng cho Email & Password */}
             <h3 className="dashboard__profile__title">Bảo mật tài khoản</h3>
             <div className="dashboard__security">
+              {" "}
               <div className="dashboard__security__item">
                 <div className="dashboard__security__info">
                   <label className="dashboard__profile__form__label">
@@ -466,27 +497,69 @@ function DashBoard() {
                   </div>
                 </div>
                 <button
-                  className="dashboard__security__button"
-                  onClick={() => navigate("/change-email")}
+                  className={`dashboard__security__button ${
+                    profile.isOAuthUser ? "disabled" : ""
+                  }`}
+                  onClick={() =>
+                    !profile.isOAuthUser && navigate("/change-email")
+                  }
+                  disabled={profile.isOAuthUser}
+                  title={
+                    profile.isOAuthUser
+                      ? "Không thể đổi email cho tài khoản OAuth"
+                      : ""
+                  }
                 >
-                  Đổi Email
+                  {profile.isOAuthUser ? "Email cố định" : "Đổi Email"}
                 </button>
               </div>
-
               <div className="dashboard__security__item">
                 <div className="dashboard__security__info">
                   <label className="dashboard__profile__form__label">
                     Mật khẩu
-                  </label>
-                  <div className="dashboard__security__value">••••••••</div>
+                  </label>{" "}
+                  <div className="dashboard__security__value">
+                    {profile.isOAuthUser && !profile.hasSetPassword
+                      ? "Chưa thiết lập"
+                      : "••••••••"}
+                  </div>
                 </div>
                 <button
                   className="dashboard__security__button"
-                  onClick={() => navigate("/change-password")}
+                  onClick={() => {
+                    if (profile.isOAuthUser && !profile.hasSetPassword) {
+                      handleSetupPassword();
+                    } else {
+                      navigate("/change-password");
+                    }
+                  }}
                 >
-                  Đổi mật khẩu
+                  {profile.isOAuthUser && !profile.hasSetPassword
+                    ? "Thiết lập mật khẩu"
+                    : "Đổi mật khẩu"}
                 </button>
               </div>
+              {/* 2FA chỉ cho users đăng nhập thường */}
+              {!profile.isOAuthUser && (
+                <div className="dashboard__security__item">
+                  <div className="dashboard__security__info">
+                    <label className="dashboard__profile__form__label">
+                      Đăng nhập 2 yếu tố
+                    </label>
+                    <div className="dashboard__security__value">
+                      {profile.is2FAEnabled ? "Đã bật" : "Đã tắt"}
+                    </div>
+                  </div>
+                  <button
+                    className={`dashboard__security__button ${
+                      profile.is2FAEnabled ? "danger" : "success"
+                    }`}
+                    onClick={handleToggle2FA}
+                  >
+                    {profile.is2FAEnabled ? "Tắt 2FA" : "Bật 2FA"}
+                  </button>
+                </div>
+              )}
             </div>
             <h3 className="dashboard__profile__title">Thông tin liên hệ</h3>
             <form className="dashboard__profile__form">

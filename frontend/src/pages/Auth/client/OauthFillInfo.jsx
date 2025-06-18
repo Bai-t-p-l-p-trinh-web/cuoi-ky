@@ -10,11 +10,10 @@ import "react-toastify/dist/ReactToastify.css";
 function OauthFillInfo() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [user, setUser] = useState({
+  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState({
     name: "",
     email: "",
-    password: "",
-    rePassword: "",
     phone: "",
     avatar: "",
   });
@@ -23,53 +22,61 @@ function OauthFillInfo() {
     const getTempUser = async () => {
       try {
         const res = await apiClient.get("/oauth/tempUser");
-        setUser(res.data);
+        // Đảm bảo tất cả fields đều có value, không undefined
+        const newUserData = {
+          name: res.data.name || "",
+          email: res.data.email || "",
+          phone: res.data.phone || "",
+          avatar: res.data.avatar || "",
+        };
+        setUserData(newUserData);
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        console.error("Error getting temp user:", error);
+        toast.error(
+          error.response?.data?.message || "Không thể lấy thông tin user"
+        );
+        // Redirect về trang login nếu không có temp token
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } finally {
+        setIsLoading(false);
       }
     };
     getTempUser();
-  }, []);
-
+  }, [navigate]);
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: value || "",
+      };
+      return newData;
+    });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user.name) {
+    if (!userData.name) {
       toast.error("Tên người dùng không được để trống!");
       return;
     }
-    if (!user.email) {
+    if (!userData.email) {
       toast.error("Email không được để trống!");
       return;
     }
-    if (!user.password) {
-      toast.error("Mật khẩu không được để trống!");
-      return;
-    }
-    if (!user.phone) {
+    if (!userData.phone) {
       toast.error("Số điện thoại không được để trống!");
       return;
     }
 
-    if (user.password !== user.rePassword) {
-      toast.error(
-        <span>
-          <strong>Mật khẩu xác nhận</strong> phải trùng với{" "}
-          <strong>Mật khẩu</strong>
-        </span>
-      );
-      return;
-    }
-
-    const { rePassword, ...submitUser } = user;
-
+    // OAuth users không cần password
+    const submitUser = {
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone,
+      avatar: userData.avatar,
+    };
     const loadingToastId = toast.loading("Đang cập nhật...");
     try {
       const updatingUser = await apiClient.post(
@@ -85,145 +92,113 @@ function OauthFillInfo() {
         isLoading: false,
         autoClose: 3000,
       });
-
-      // Cập nhật Redux state với user data
-      if (updatingUser.data.data?.user) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify(updatingUser.data.data.user)
-        );
-        dispatch(setUser(updatingUser.data.data.user));
+      // Cập nhật Redux state với user data từ response
+      if (updatingUser.data.success && updatingUser.data.data?.user) {
+        const userData = updatingUser.data.data.user;
+        localStorage.setItem("user", JSON.stringify(userData));
+        dispatch(setUser(userData));
       }
 
       navigate("/");
     } catch (error) {
+      console.error("Update user error:", error); // Debug log
+      console.error("Error response:", error.response?.data); // Debug log
       toast.update(loadingToastId, {
-        render: "Cập nhật thông tin thất bại!",
+        render: error.response?.data?.message || "Cập nhật thông tin thất bại!",
         type: "error",
         isLoading: false,
         autoClose: 3000,
       });
     }
   };
-
   return (
     <>
       <div className="fillInfo">
         <ToastContainer />
-        <div className="fillInfo__avatar">
-          <img
-            src={
-              user.avatar ||
-              "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"
-            }
-            alt="avatar"
-          />
-        </div>
-        <form className="fillInfo__user">
-          <div className="fillInfo__box">
-            <label
-              className="fillInfo__user__name__label"
-              htmlFor="oauth2_name"
-            >
-              Tên
-            </label>
-            <input
-              autoComplete="username"
-              required
-              type="text"
-              value={user.name}
-              className="fillInfo__user__name"
-              id="oauth2_name"
-              name="name"
-              onChange={handleChange}
-            />
+        {isLoading ? (
+          <div className="fillInfo__loading">
+            <p>Đang tải thông tin...</p>
           </div>
+        ) : (
+          <>
+            <div className="fillInfo__avatar">
+              <img
+                src={
+                  userData.avatar ||
+                  "https://static-00.iconduck.com/assets.00/avatar-default-icon-2048x2048-h6w375ur.png"
+                }
+                alt="avatar"
+              />
+            </div>
+            <form className="fillInfo__user">
+              <div className="fillInfo__box">
+                <label
+                  className="fillInfo__user__name__label"
+                  htmlFor="oauth2_name"
+                >
+                  Tên
+                </label>
+                <input
+                  autoComplete="username"
+                  required
+                  type="text"
+                  value={userData.name}
+                  className="fillInfo__user__name"
+                  id="oauth2_name"
+                  name="name"
+                  onChange={handleChange}
+                />
+              </div>
 
-          <div className="fillInfo__box">
-            <label
-              className="fillInfo__user__phone__label"
-              htmlFor="oauth2_phone"
-            >
-              Số điện thoại
-            </label>
-            <input
-              required
-              type="text"
-              value={user.phone}
-              className="fillInfo__user__phone"
-              id="oauth2_phone"
-              name="phone"
-              onChange={handleChange}
-            />
-          </div>
+              <div className="fillInfo__box">
+                <label
+                  className="fillInfo__user__phone__label"
+                  htmlFor="oauth2_phone"
+                >
+                  Số điện thoại
+                </label>
+                <input
+                  required
+                  type="text"
+                  value={userData.phone}
+                  className="fillInfo__user__phone"
+                  id="oauth2_phone"
+                  name="phone"
+                  onChange={handleChange}
+                />
+              </div>
 
-          <div className="fillInfo__box">
-            <label
-              className="fillInfo__user__email__label"
-              htmlFor="oauth2_email"
-            >
-              Email
-            </label>
-            <input
-              disabled
-              required
-              type="email"
-              value={user.email}
-              className="fillInfo__user__email"
-              id="oauth2_email"
-              name="email"
-              onChange={handleChange}
-            />
-          </div>
+              <div className="fillInfo__box">
+                <label
+                  className="fillInfo__user__email__label"
+                  htmlFor="oauth2_email"
+                >
+                  Email
+                </label>
+                <input
+                  disabled
+                  required
+                  type="email"
+                  value={userData.email}
+                  className="fillInfo__user__email"
+                  id="oauth2_email"
+                  name="email"
+                  onChange={handleChange}
+                />
+              </div>
 
-          <div className="fillInfo__box">
-            <label
-              className="fillInfo__user__password__label"
-              htmlFor="oauth2_password"
-            >
-              Mật khẩu
-            </label>
-            <input
-              autoComplete="new-password"
-              required
-              type="password"
-              value={user.password}
-              className="fillInfo__user__password"
-              id="oauth2_password"
-              name="password"
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="fillInfo__box">
-            <label
-              className="fillInfo__user__rePassword__label"
-              htmlFor="oauth2_rePassword"
-            >
-              Xác nhận mật khẩu
-            </label>
-            <input
-              autoComplete="new-password"
-              required
-              type="password"
-              value={user.rePassword}
-              className="fillInfo__user__rePassword"
-              id="oauth2_rePassword"
-              name="rePassword"
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="fillInfo__box">
-            <button
-              type="button"
-              className="fillInfo__user__button"
-              onClick={handleSubmit}
-            >
-              Xác nhận
-            </button>
-          </div>
-        </form>
+              <div className="fillInfo__box">
+                <button
+                  type="button"
+                  className="fillInfo__user__button"
+                  onClick={handleSubmit}
+                >
+                  Xác nhận
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </>
   );

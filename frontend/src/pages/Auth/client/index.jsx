@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import "./scss/ClientLogin.scss";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -11,6 +11,7 @@ import OtpModal from "../../../components/OtpModal";
 function ClientAuth() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -19,6 +20,25 @@ function ClientAuth() {
     email: "",
     password: "",
   });
+
+  // Xử lý OAuth error messages
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      const errorMessages = {
+        'oauth_cancelled': 'Đăng nhập Google đã bị hủy',
+        'email_not_verified': 'Email Google chưa được xác thực',
+        'user_creation_failed': 'Không thể tạo tài khoản mới',
+        'oauth_failed': 'Đã xảy ra lỗi trong quá trình đăng nhập Google'
+      };
+      
+      toast.error(errorMessages[error] || 'Đã xảy ra lỗi không xác định');
+      
+      // Clear error from URL
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchParams]);
 
   const handleChangeValue = (e) => {
     const { name, value } = e.target;

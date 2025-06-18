@@ -11,6 +11,7 @@ router.post("/send-otp", controller.sendOtp);
 router.post("/verify-otp", controller.verifyOtp);
 router.post("/change-password", controller.changePassword);
 router.post("/reset-password", controller.resetPassword);
+router.post("/set-oauth-password", controller.setOAuthPassword);
 router.post("/change-email", controller.changeEmail);
 router.post("/toggle-2FA", controller.toggle2FA);
 

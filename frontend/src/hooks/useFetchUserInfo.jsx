@@ -5,16 +5,18 @@ import { fetchUser } from "../features/auth/authSlice";
 export function useFetchUserInfo() {
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.auth);
-  const [hasAttempted, setHasAttempted] = useState(false);
-
+  const [hasInitialFetch, setHasInitialFetch] = useState(false);
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
-    if (!user && !hasAttempted && !loading && storedUser) {
-      setHasAttempted(true);
+    if (!user && !hasInitialFetch && !loading && storedUser) {
+      setHasInitialFetch(true);
       dispatch(fetchUser());
     }
-  }, [dispatch, user, loading, hasAttempted]);
+  }, [dispatch, user, loading, hasInitialFetch]);
+  const refetchUser = () => {
+    dispatch(fetchUser());
+  };
 
-  return { user, loading, error };
+  return { user, loading, error, refetchUser };
 }
