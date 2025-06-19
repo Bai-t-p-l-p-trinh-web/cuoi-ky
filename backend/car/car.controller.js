@@ -166,9 +166,6 @@ module.exports.getCarBySlug = async (req, res) => {
 
     await getInTouchView({ sellerId: seller._id });
 
-    console.log("resultFindingCar: ", resultFindingCar);
-    console.log("newResultFindingCar: ", newResultFindingCar);
-
     return res.send(newResultFindingCar);
   } catch (error) {
     console.error("Error In Finding Car By Slug ! ! ! : ", error);
@@ -254,7 +251,7 @@ module.exports.getCarsDisplay = async (req, res) => {
         slug: car.slug,
       };
     });
-
+    console.log(respondCars);
     return res.send(respondCars);
   } catch (error) {
     return res.status(500).json({ message: "Server Error!" });

@@ -12,17 +12,26 @@ const CreateOrderForm = ({ car, onOrderCreated, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [orderData, setOrderData] = useState(null);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      console.log("=== FRONTEND GỌI API ===");
+      console.log("Data gửi đi:", {
+        carId: car._id,
+        paymentMethod: formData.paymentMethod,
+        depositPercentage: formData.depositPercentage,
+      });
+
       const response = await orderAPI.create({
         carId: car._id,
         paymentMethod: formData.paymentMethod,
         depositPercentage: formData.depositPercentage,
       });
+
+      console.log("=== NHẬN ĐƯỢC RESPONSE ===");
+      console.log("response sau khi tạo đơn: ", response);
 
       toast.success("Đơn hàng đã được tạo thành công!");
       setOrderData(response.data);

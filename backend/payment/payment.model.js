@@ -19,7 +19,7 @@ const PaymentSchema = new mongoose.Schema(
     paymentCode: {
       type: String,
       unique: true,
-      required: true,
+      // required: true,
     },
     order: {
       type: mongoose.Schema.Types.ObjectId,
@@ -56,7 +56,11 @@ const PaymentSchema = new mongoose.Schema(
     },
     // Thông tin thanh toán thực tế
     transactionInfo: {
-      bankTransactionId: String,
+      bankTransactionId: {
+        type: String,
+        unique: true,
+        sparse: true,
+      },
       bankCode: String,
       transactionDate: Date,
       verifiedBy: {
