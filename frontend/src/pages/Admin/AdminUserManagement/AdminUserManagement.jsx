@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FaSearch,
   FaFilter,
@@ -9,7 +9,7 @@ import {
   FaUserPlus,
   FaEye,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { adminAPI } from "../../../utils/axiosConfig";
 import "./AdminUserManagement.scss";
 
@@ -27,13 +27,15 @@ const AdminUserManagement = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const [userSelectedRole, setUserSelectedRole] = useState("");
+
   useEffect(() => {
     fetchUsers();
   }, [currentPage, searchTerm, filterRole, filterStatus]);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const params = {
         page: currentPage,
@@ -99,6 +101,7 @@ const AdminUserManagement = () => {
       if (response.data.success) {
         setSelectedUser(response.data.data);
         setShowUserModal(true);
+        setUserSelectedRole(response.data.data.role);
       }
     } catch (error) {
       toast.error("Không thể tải thông tin người dùng");
@@ -205,8 +208,44 @@ const AdminUserManagement = () => {
     );
   }
 
+  const handleChangeRole = async () => {
+    if(!selectedUser) {
+      return toast.error('Chưa chọn người dùng!');
+    }
+    if(!userSelectedRole){
+      return toast.error('Chưa có vai trò người dùng muốn thay đổi!');
+    }
+    // console.log(selectedUser);
+    const isLoadingChangeRole = toast.loading('Đang cập nhật thông tin người dùng!');
+    try {
+      await adminAPI.changeRoleUser(selectedUser.slug, {
+        role : userSelectedRole
+      });
+
+      toast.update(isLoadingChangeRole, {
+        render : 'Cập nhật thông tin người dùng thành công!',
+        type : 'success',
+        isLoading : false,
+        autoClose: 3000
+      });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch(error) {
+      toast.update(isLoadingChangeRole, {
+        render : error.response?.data?.message || 'Cập nhật thông tin người dùng thất bại!',
+        type : 'error',
+        isLoading : false,
+        autoClose : 3000
+      })
+    }
+    
+  }
+
   return (
     <div className="admin-user-management">
+      <ToastContainer/>
       <div className="page-header">
         <h1>Quản lý người dùng</h1>
         <button className="btn-primary">
@@ -222,6 +261,9 @@ const AdminUserManagement = () => {
             type="text"
             placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             value={searchTerm}
+            // ref={refSearch}
+            // onBlur={() => {refIsFocus.current = false}}
+            // onFocus={() => {refIsFocus.current = true}}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
@@ -354,9 +396,6 @@ const AdminUserManagement = () => {
                       onClick={() => handleViewUser(user._id)}
                       title="Xem chi tiết"
                     >
-                      <FaEye />
-                    </button>
-                    <button className="btn-secondary" title="Chỉnh sửa">
                       <FaEdit />
                     </button>
                     {user.status === "active" ? (
@@ -466,7 +505,13 @@ const AdminUserManagement = () => {
                     <strong>Số điện thoại:</strong> {selectedUser.phone}
                   </p>
                   <p>
-                    <strong>Vai trò:</strong> {getRoleLabel(selectedUser.role)}
+                    {/* <strong>Vai trò:</strong> {getRoleLabel(selectedUser.role)} */}
+                    <select className="admin__user__role" onChange={(e) => {setUserSelectedRole(e.target.value)}} value={userSelectedRole}>
+                      <option value="admin">Quản trị viên</option>
+                      <option value="seller">Người bán</option>
+                      <option value="staff">Nhân viên</option>
+                      <option value="user">Người dùng</option>
+                    </select>
                   </p>
                   <p>
                     <strong>Trạng thái:</strong>{" "}
@@ -480,6 +525,13 @@ const AdminUserManagement = () => {
                     <strong>Hoạt động cuối:</strong>{" "}
                     {formatDate(selectedUser.lastActivity)}
                   </p>
+                  {
+                    userSelectedRole !== selectedUser.role
+                    &&
+                    <button className="btn-secondary" onClick={handleChangeRole}>
+                      Xác nhận
+                    </button>
+                  }
                 </div>
               </div>
             </div>

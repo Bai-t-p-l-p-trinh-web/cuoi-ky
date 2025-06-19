@@ -40,6 +40,8 @@ exports.requireAuth = async (req, res, next) => {
       role: user.role,
     };
 
+    req.userId = user._id;
+
     console.log("User set in req:", req.user);
     next();
   } catch (error) {
