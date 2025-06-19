@@ -1,91 +1,108 @@
 import { useEffect, useState } from "react";
-import { GrPrevious, GrNext  } from "react-icons/gr";
-import "./../scss/Pagination_Home.scss"
-function PaginationHome({max_page}){
-    const [curPage, setCurPage] = useState(() => {
-        const params = new URLSearchParams(window.location.search);
-        const page = Number(params.get("page")) || 1;
-        return page;
-    })
-    
-    const setPage = (num) => {
-        setCurPage(num);
-    }
-    const pageUp = () => {
-        setCurPage((prev) => {
-            if(prev < max_page) return prev + 1;
-            return max_page;
-        })
-    }
-    const pageDown = () => {
-        setCurPage((prev) => {
-            if(prev > 1) return prev - 1;
-            return 1;
-        })
-    }
-    
-    useEffect(() => {
-        const url = new URL(window.location.href);
-        url.searchParams.set("page", curPage);
-        window.history.replaceState({}, "", url);
-    }, [curPage]);
+import { GrPrevious, GrNext } from "react-icons/gr";
+import "./../scss/Pagination_Home.scss";
 
-    return (
-        <>
-            <div className="home__content__pagination">
-                <button className="home__content__pagination--page" onClick={pageDown}> <GrPrevious /> </button>
-                {
-                    curPage <= 6 ? 
-                    <>
-                        {
-                            Array(curPage - 1).fill().map((_, page_index) => (
-                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
-                            ))
-                        }
-                    </>
-                    :
-                    <>
-                    {
-                        Array(2).fill().map((_, page_index) => (
-                            <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(page_index+1)}}>{page_index + 1}</button>
-                        ))
-                    }
-                    <span className="home__content__pagination__dots">...</span>
-                    {
-                        Array(2).fill().map((_, page_index) => (
-                            <button key={page_index + 2} className="home__content__pagination--page" onClick={() => {setPage(curPage - 2 + page_index)}}>{curPage - 2 + page_index}</button>
-                        ))
-                    }
-                    </>
-                }
-                <button className="home__content__pagination--page current">{curPage}</button>
-                {
-                    (max_page - curPage <= 5) ?
-                    <>
-                        {
-                            Array(max_page - curPage).fill().map((_, page_index) => (
-                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
-                            ))
-                        }
-                    </>
-                    :
-                    <>
-                        {
-                            Array(2).fill().map((_, page_index) => (
-                                <button key={page_index} className="home__content__pagination--page" onClick={() => {setPage(curPage + 1 + page_index)}}>{curPage + 1 + page_index}</button>
-                            ))
-                        }
-                        <span className="home__content__pagination__dots">...</span>
-                        {
-                            Array(2).fill().map((_, page_index) => (
-                                <button key={page_index + 2} className="home__content__pagination--page" onClick={() => {setPage(max_page - 1 + page_index)}}>{max_page - 1 + page_index}</button>
-                            ))
-                        }
-                    </>
-                }
-                <button className="home__content__pagination--page" onClick={pageUp}> <GrNext /> </button>
-            </div>
-        </>
-    )
+function PaginationHome({ max_page }) {
+  const [curPage, setCurPage] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get("page")) || 1;
+    return Math.min(page, max_page);
+  });
+
+
+const updateUrlWithoutReload = (page) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("page", page);
+    window.history.replaceState({}, "", url);
 };
+
+useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pageInUrl = parseInt(params.get("page"));
+
+    if (!pageInUrl || pageInUrl !== curPage) {
+        updateUrlWithoutReload(curPage);
+    }
+}, [curPage]);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= max_page) setCurPage(page);
+  };
+
+  const renderPageButtons = () => {
+    const pages = [];
+
+    // Always show first 2 pages
+    if (curPage > 4) {
+      pages.push(1, 2, "...");
+    } else {
+      for (let i = 1; i < curPage; i++) {
+        pages.push(i);
+      }
+    }
+
+    // Show current - 2 to current + 2
+    for (let i = Math.max(1, curPage - 2); i <= Math.min(max_page, curPage + 2); i++) {
+      if (!pages.includes(i)) {
+        pages.push(i);
+      }
+    }
+
+    // Always show last 2 pages
+    if (curPage < max_page - 3) {
+      pages.push("...", max_page - 1, max_page);
+    } else {
+      for (let i = curPage + 1; i <= max_page; i++) {
+        if (!pages.includes(i)) {
+          pages.push(i);
+        }
+      }
+    }
+
+    return pages.map((page, index) => {
+      if (page === "...") {
+        return (
+          <span key={`dots-${index}`} className="home__content__pagination__dots">
+            ...
+          </span>
+        );
+      }
+
+      return (
+        <button
+          key={page}
+          className={`home__content__pagination--page ${
+            page === curPage ? "current" : ""
+          }`}
+          onClick={() => goToPage(page)}
+        >
+          {page}
+        </button>
+      );
+    });
+  };
+
+  return (
+    <div className="home__content__pagination">
+      <button
+        className="home__content__pagination--page"
+        onClick={() => goToPage(curPage - 1)}
+        disabled={curPage === 1}
+      >
+        <GrPrevious />
+      </button>
+
+      {renderPageButtons()}
+
+      <button
+        className="home__content__pagination--page"
+        onClick={() => goToPage(curPage + 1)}
+        disabled={curPage === max_page}
+      >
+        <GrNext />
+      </button>
+    </div>
+  );
+}
+
 export default PaginationHome;

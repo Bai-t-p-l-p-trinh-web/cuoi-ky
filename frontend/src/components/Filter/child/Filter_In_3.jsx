@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 function Filter_In_3(props) {
-  const {data, ReloadAllPage} = props;
+  const {data} = props;
   const { Types, query_name } = data;
 
   const [types_searched, setTypesSearched] = useState(() => {
@@ -36,7 +36,6 @@ function Filter_In_3(props) {
       return updated;
     });
 
-    ReloadAllPage();
   };
 
   const filteredTypes = Types.filter((type) =>

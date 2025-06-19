@@ -95,16 +95,13 @@ module.exports.index = async (req, res) => {
 
     const paginatedCars = recordsCar.slice(start, end);
 
+    console.log(start, end);
     const DataSend = {
       num: recordsCar.length,
       minPrice,
       maxPrice,
       cars: paginatedCars || [],
     };
-
-    console.log("pagi car", paginatedCars);
-    console.log("record data", recordsCar);
-    console.log("send data", DataSend);
 
     return res.send(DataSend);
   } catch (error) {

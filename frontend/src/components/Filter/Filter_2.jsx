@@ -3,7 +3,7 @@ import { FaChevronDown } from "react-icons/fa";
 import { useState } from "react";
 import Filter_In_2 from "./child/Filter_In_2";
 function Filter_2(props){
-    const { data,  ReloadAllPage } = props;
+    const { data } = props;
     const {title, icon, defaultMin, defaultMax, gapMin_Max, unit, query_name} = data;
     const [isOpenList, setIsOpenList] = useState(false);
     
@@ -20,7 +20,7 @@ function Filter_2(props){
                 </h2>
                 {
                     isOpenList && 
-                    <Filter_In_2 data={{defaultMin, defaultMax, gapMin_Max, unit, query_name}} ReloadAllPage={ReloadAllPage}/>
+                    <Filter_In_2 data={{defaultMin, defaultMax, gapMin_Max, unit, query_name}}/>
                 }
                 
             </div>

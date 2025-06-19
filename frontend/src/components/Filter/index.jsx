@@ -9,8 +9,7 @@ import "./scss/Filter.scss";
 import Filter_2 from "./Filter_2";
 import Filter_3 from "./Filter_3";
 
-function Filter(props) {
-  const { ReloadAllPage } = props;
+function Filter() {
   const getTypeLocation = () => {
     const result = [];
     for (const [key, value] of Object.entries(LocationEnum)) {
@@ -119,12 +118,12 @@ function Filter(props) {
     <>
       <div className="home__content__filters">
         <h2 className="home__content__filters-title">BỘ LỌC</h2>
-        <Filter_3 data={filter2_list} ReloadAllPage={ReloadAllPage} />
-        <Filter_2 data={filter3_list} ReloadAllPage={ReloadAllPage} />
-        <Filter_2 data={filter4_list} ReloadAllPage={ReloadAllPage} />
-        <Filter_2 data={filter5_list} ReloadAllPage={ReloadAllPage} />
-        <Filter_3 data={filter6_list} ReloadAllPage={ReloadAllPage} />
-        <Filter_3 data={filter7_list} ReloadAllPage={ReloadAllPage} />
+        <Filter_3 data={filter2_list}/>
+        <Filter_2 data={filter3_list}/>
+        <Filter_2 data={filter4_list}/>
+        <Filter_2 data={filter5_list}/>
+        <Filter_3 data={filter6_list}/>
+        <Filter_3 data={filter7_list}/>
       </div>
     </>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 function Filter_In_2(props) {
-    const { data, ReloadAllPage } = props;
+    const { data } = props;
     const { defaultMin, defaultMax, gapMin_Max, unit, query_name } = data;
 
     const inputMin = useRef(null);
@@ -58,7 +58,6 @@ function Filter_In_2(props) {
         url.searchParams.set(`${query_name}max`, maxValue);
 
         window.history.replaceState({}, '', url);
-        ReloadAllPage(); // gọi hàm cha để reload lại dữ liệu
     };
 
     return (

@@ -2,8 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 import "./scss/Car_Filter.scss";
 
-function CarFilter(props) {
-    const { ReloadAllPage } = props;
+function CarFilter() {
     const [keyword, setKeyword] = useState("");
     const debounceTimeout = useRef(null);
 
@@ -22,7 +21,6 @@ function CarFilter(props) {
         }
 
         window.history.replaceState({}, '', url);
-        ReloadAllPage();
     };
 
     const handleChange = (e) => {

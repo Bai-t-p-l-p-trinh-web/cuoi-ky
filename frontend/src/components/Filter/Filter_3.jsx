@@ -4,7 +4,7 @@ import { useState } from "react";
 import "./child/Filter_In_3";
 import Filter_In_3 from "./child/Filter_In_3";
 function Filter_3(props){
-    const { data, ReloadAllPage } = props; 
+    const { data } = props; 
     const {title, icon, Types, query_name} = data;
     const [isOpenList, setIsOpenList] = useState(false);
     
@@ -21,7 +21,7 @@ function Filter_3(props){
                 </h2>
                 {
                     isOpenList && 
-                    <Filter_In_3 data={{Types, query_name}} ReloadAllPage={ReloadAllPage}/>
+                    <Filter_In_3 data={{Types, query_name}} />
                 }
                 
             </div>
