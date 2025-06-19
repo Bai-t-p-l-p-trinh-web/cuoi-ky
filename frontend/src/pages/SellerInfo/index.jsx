@@ -20,8 +20,8 @@ function SellerInfo() {
         contactLinkedin: "",
         contactZalo: "",
         statistic: {
-            star: 4.3,
-            total_order: 120
+            star: 4.5,
+            total_order: 2
         }
     });
 

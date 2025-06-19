@@ -67,9 +67,43 @@ $radius: 16px;
     }
   }
 
-  @media (max-width: 768px) {
-    width: 100%;
+  // Tablet (<= 1024px)
+  @media (max-width: 1024px) {
+    max-width: 100%;
     margin-right: 0;
+  }
+
+  // Mobile (<= 768px)
+  @media (max-width: 768px) {
+    padding: 12px;
     margin-bottom: 20px;
+    box-shadow: none;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+  }
+
+  // Small mobile (<= 480px)
+  @media (max-width: 480px) {
+    .filter__item {
+      &-label {
+        font-size: 13px;
+        gap: 4px;
+      }
+
+      &-input,
+      &-select {
+        font-size: 13px;
+        padding: 6px 10px;
+      }
+
+      &-range {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    &-title {
+      font-size: 16px;
+    }
   }
 }

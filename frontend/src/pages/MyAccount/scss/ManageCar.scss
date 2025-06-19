@@ -115,10 +115,18 @@ $color-bg-manageCar: #F7F7F7;
     height: 36px;
 
     &__button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 100%;
+      width: 100%;
       border: 1px solid #ddd;
-      background: transparent;
-      padding: 4px 10px;
-      text-wrap: wrap;
+      background-color: #fff;
+      padding: 0 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
     }
   }
 

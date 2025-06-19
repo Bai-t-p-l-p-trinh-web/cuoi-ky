@@ -310,3 +310,131 @@ $color-bg-manageCar: #F7F7F7;
         }
     }
 }
+@media (max-width: 1024px) {
+    .history {
+        padding: 20px;
+
+        &__filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        &__search {
+            margin-right: 0;
+            margin-bottom: 10px;
+
+            &__input {
+                width: 100%;
+            }
+        }
+
+        &__sort {
+            margin-right: 0;
+            width: 100%;
+
+            &__button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .history {
+        &__status__list {
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        &__status {
+            width: auto;
+            margin: 5px 8px;
+            padding-bottom: 10px;
+        }
+
+        &__table {
+        &__th--title,
+        &__td--title {
+            max-width: 250px;
+            min-width: 250px;
+        }
+
+        &__td--functions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .history__functions__link,
+            .history__functions__delete {
+                margin: 5px 0;
+            }
+        }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+.history {
+    padding: 10px;
+
+    &__header {
+        padding: 10px;
+        &__title__span {
+            font-size: 16px;
+        }
+    }
+
+    &__title {
+        font-size: 18px;
+    }
+
+    &__filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    &__search,
+    &__sort {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    &__table {
+        font-size: 14px;
+
+        &__th,
+        &__td {
+            padding: 8px 5px;
+        }
+
+        &__td--title {
+            flex-direction: column;
+
+            .history__table__item__image__contain {
+            margin-bottom: 6px;
+            }
+
+            span {
+            display: block;
+            text-align: center;
+            }
+        }
+
+        &__td--functions {
+            flex-direction: column;
+        }
+    }
+
+    &__pagination {
+        flex-wrap: wrap;
+        padding: 10px;
+
+        &__button {
+            padding: 4px 8px;
+            margin: 3px;
+        }
+    }
+}
+}
