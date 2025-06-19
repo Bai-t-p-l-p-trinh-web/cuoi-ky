@@ -12,7 +12,7 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { adminAPI } from "../../../utils/axiosConfig";
 import "./AdminCarManagement.scss";
 
@@ -64,7 +64,7 @@ const AdminCarManagement = () => {
       };
 
       const response = await adminAPI.getRequests(params);
-      console.log(response);
+      // console.log(response);
       if (response.data.success) {
         setRequests(response.data.data.requests);
         setRequestsPagination(response.data.data.pagination);
@@ -113,6 +113,7 @@ const AdminCarManagement = () => {
   const fetchInspectors = async () => {
     try {
       const response = await adminAPI.getInspectors();
+      // console.log('nhân viên : ', response.data.data);
       if (response.data.success) {
         setInspectors(response.data.data);
       }
@@ -122,18 +123,16 @@ const AdminCarManagement = () => {
     }
   };
 
-  const handleAssignInspectors = async (requestId, inspectorIds) => {
+  const handleAssignInspectors = async (slug, inspectorIds) => {
     try {
-      const response = await adminAPI.assignInspectors(requestId, {
-        inspectorIds: inspectorIds,
+      const response = await adminAPI.assignInspectors(slug, {
+        userIds: inspectorIds,
       });
 
-      if (response.data.success) {
-        toast.success("Đã phân công inspector thành công");
-        setAssignModal(false);
-        setSelectedInspectors([]);
-        fetchRequests(requestsPagination.currentPage);
-      }
+      toast.success("Đã phân công inspector thành công");
+      setAssignModal(false);
+      setSelectedInspectors([]);
+      fetchRequests(requestsPagination.currentPage);
     } catch (error) {
       console.error("Error assigning inspectors:", error);
       toast.error(
@@ -291,6 +290,7 @@ const AdminCarManagement = () => {
 
   return (
     <div className="admin-car-management">
+      <ToastContainer/>
       <div className="page-header">
         <h1>Quản lý xe & Yêu cầu</h1>
         <p>Quản lý yêu cầu duyệt xe và danh sách xe đang bán</p>
@@ -1061,7 +1061,7 @@ const AdminCarManagement = () => {
                   onClick={() => {
                     if (selectedInspectors.length > 0) {
                       handleAssignInspectors(
-                        selectedRequest._id,
+                        selectedRequest.slug,
                         selectedInspectors
                       );
                     } else {

@@ -147,10 +147,90 @@ const getSellerBySlug = async(req, res) => {
   }
 }
 
+// [PATCH] /api/v1/user/:slugUser
+const adminChangeRoleUser = async(req, res) => {
+  try {
+    const slugOther = req.params.slugUser;
+    if(!slugOther) {
+      return res.status(400).json({
+        success : false,
+        message : "Không có slug user!"
+      });
+    }
+
+    const role = req.body.role;
+    if(!role || !["admin", "staff", "seller", "user"].includes(role)) {
+      return res.status(400).json({ 
+        success : false,
+        message : "Không có vai trò được truyền hoặc không hợp lệ!!"
+      });
+    }
+    const user = await User.findOne({
+      slug: slugOther
+    });
+
+    if(!user) {
+      return res.status(404).json({
+        success : false,
+        message : "Không tìm thấy người dùng!"
+      });
+    }
+
+    user.role = role;
+    await user.save();
+
+    return res.json({
+      success : true,
+      message : "Thay đổi trạng thái thành công!"
+    });
+
+  } catch(error) {
+    return res.status(500).json({
+      success : false,
+      message : "Server Error!"
+    });
+  }
+}
+
+// [GET] /api/v1/user/staffs
+const getStaff = async(req, res) => {
+  try {
+    const users = await User.find({
+      role : "staff"
+    });
+    if(!users) {
+      return res.status(200).json({
+        success : true,
+        data : []
+      });
+    }
+
+    
+    let dataSend = users.map(user => ({
+      slug : user.slug,
+      id : user._id,
+      _id : user._id,
+      name : user.name
+    }));
+
+    return res.status(200).json({
+      success : true,
+      data : dataSend
+    });
+  } catch(error){
+    return res.status(500).json({
+      success : false,
+      message : "Server Error!"
+    });
+  }
+}
+
 module.exports = {
   getInfoMe,
   LogoutMe,
   updateInfoMe,
   handleBecomeSeller,
-  getSellerBySlug
+  getSellerBySlug,
+  adminChangeRoleUser,
+  getStaff
 };

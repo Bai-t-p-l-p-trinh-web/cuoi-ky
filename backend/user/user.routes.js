@@ -61,6 +61,12 @@ router.put(
 
 router.patch("/seller", verifyToken, controller.handleBecomeSeller);
 
+router.get('/staffs', [authMiddleware.requireAuth, authMiddleware.requireAdmin], controller.getStaff);
+
 router.get("/:slugSeller", controller.getSellerBySlug);
+
+router.patch("/:slugUser", [authMiddleware.requireAuth, authMiddleware.requireAdmin], controller.adminChangeRoleUser);
+
+
 
 module.exports = router;

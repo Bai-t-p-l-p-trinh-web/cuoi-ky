@@ -296,6 +296,11 @@
             background: #10b981;
             color: white;
           }
+
+          &.btn-danger {
+            background: #ef4444;
+            color: white;
+          }
         }
       }
     }
@@ -429,6 +434,72 @@
 
               strong {
                 color: #374151;
+              }
+
+              // Styling for the select element
+              .admin__user__role {
+                width: 100%;
+                padding: 10px 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 14px;
+                background: white;
+                color: #374151;
+                cursor: pointer;
+                appearance: none; // Remove default browser styling
+                background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E'); // Custom dropdown arrow
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 12px;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+                &:focus {
+                  outline: none;
+                  border-color: #3b82f6;
+                  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+
+                &:hover {
+                  border-color: #cbd5e1;
+                }
+
+                option {
+                  padding: 10px;
+                  background: white;
+                  color: #374151;
+                }
+              }
+            }
+
+            // Styling for the confirmation button
+            .btn-secondary {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              margin-top: 16px;
+              padding: 10px 20px;
+              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 14px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+              &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+              }
+
+              &:active {
+                transform: translateY(0);
+                box-shadow: none;
+              }
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
               }
             }
           }

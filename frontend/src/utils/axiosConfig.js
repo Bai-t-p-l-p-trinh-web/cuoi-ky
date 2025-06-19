@@ -203,6 +203,7 @@ export const adminAPI = {
   deleteUser: (id) => apiClient.delete(`/admin/users/${id}`),
   updateUserStatus: (id, data) =>
     apiClient.put(`/admin/users/${id}/status`, data),
+  changeRoleUser: (slugUser, data) => apiClient.patch(`/user/${slugUser}`, data),
 
   // Car management
   getCars: (params) => apiClient.get("/admin/cars", { params }),
@@ -218,11 +219,11 @@ export const adminAPI = {
     apiClient.put(`/admin/requests/${id}/approve`, data),
   rejectRequest: (id, data) =>
     apiClient.put(`/admin/requests/${id}/reject`, data),
-  assignInspectors: (id, data) =>
-    apiClient.put(`/admin/requests/${id}/assign`, data),
+  assignInspectors: (slug, data) =>
+    apiClient.patch(`/requestAdd/${slug}/employee`, data),
 
   // Inspector management
-  getInspectors: () => apiClient.get("/admin/inspectors"),
+  getInspectors: () => apiClient.get("/user/staffs"),
   // Order management
   getOrders: (params) => apiClient.get("/admin/orders", { params }),
   getOrderDetail: (id) => apiClient.get(`/admin/orders/${id}`),
