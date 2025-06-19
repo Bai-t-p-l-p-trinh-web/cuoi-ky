@@ -9,7 +9,7 @@ import { IoCarSport } from "react-icons/io5";
 import SwiperDetail from "../../components/Swiper/CustomSwiper/Swiper_Detail";
 import CreateOrderForm from "../../components/order/CreateOrderForm";
 import "./scss/ChiTietXe.scss";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../../utils/axiosConfig";
 
 import { useEffect, useState } from "react";
@@ -64,6 +64,7 @@ function ChiTietXe() {
     };
     startMessage();
   };
+
   const handleBuyCar = () => {
     if (!user) {
       toast.error("Vui lòng đăng nhập để mua xe!");
@@ -89,6 +90,23 @@ function ChiTietXe() {
     setShowOrderForm(false);
     window.location.reload();
   };
+
+  const copyPhoneToClipboard = () => {
+    if (!xe || !xe.user?.phone) {
+      toast.error("Không có số điện thoại để sao chép");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(xe.user.phone)
+      .then(() => {
+        toast.success("Đã sao chép số điện thoại vào clipboard!");
+      })
+      .catch(() => {
+        toast.error("Không thể sao chép số điện thoại!");
+      });
+  };
+
   return (
     <>
       <div className="chitiet">
@@ -189,7 +207,7 @@ function ChiTietXe() {
                           Địa điểm
                         </span>
                         <span className="chitiet__xe__lienhe--detail-value">
-                          {xe.location.query_name}
+                          {xe.location.query_name || "Toàn quốc"}
                         </span>
                       </div>
                       <div className="chitiet__xe__lienhe--detail">
@@ -198,7 +216,9 @@ function ChiTietXe() {
                           Đăng bởi
                         </span>
                         <span className="chitiet__xe__lienhe--detail-value">
-                          {xe.user.name}
+                          <Link to={`/nguoi-ban/${xe.user.slug}`}>
+                            {xe.user.name}
+                          </Link>
                         </span>
                       </div>
                     </div>{" "}
@@ -214,7 +234,11 @@ function ChiTietXe() {
                           </span>
                         </button>
                       )}
-                      <button className="chitiet__xe__buttons__call">
+
+                      <button
+                        className="chitiet__xe__buttons__call"
+                        onClick={copyPhoneToClipboard}
+                      >
                         <FaPhoneAlt className="chitiet__xe__buttons__call-icon" />
                         <span className="chitiet__xe__buttons__call-span">
                           Gọi người bán

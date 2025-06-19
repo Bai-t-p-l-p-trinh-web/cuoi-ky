@@ -56,9 +56,7 @@ function Header() {
               <li className="header__menuPage__list-item">
                 <Link to="/gioi-thieu">Giới thiệu</Link>
               </li>
-              <li className="header__menuPage__list-item">
-                <Link to="/blog-xe-hoi">Tin tức</Link>
-              </li>
+
               <Dropdown />
             </ul>
           </div>

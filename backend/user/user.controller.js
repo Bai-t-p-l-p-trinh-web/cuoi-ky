@@ -66,21 +66,14 @@ const updateInfoMe = async (req, res) => {
     // Chỉ update những trường được gửi lên và không phải null/undefined/empty string
     if (name !== undefined && name !== null) updatedInfo.name = name;
     if (phone !== undefined && phone !== null) updatedInfo.phone = phone;
-    if (address !== undefined && address !== null)
-      updatedInfo.address = address;
+    if (address !== undefined && address !== null) updatedInfo.address = address;
     if (city !== undefined && city !== null) updatedInfo.city = city;
-    if (district !== undefined && district !== null)
-      updatedInfo.district = district;
-    if (avatar !== undefined && avatar !== null && avatar !== "")
-      updatedInfo.avatar = avatar;
-    if (contactFacebook !== undefined && contactFacebook !== null)
-      updatedInfo.contactFacebook = contactFacebook;
-    if (contactZalo !== undefined && contactZalo !== null)
-      updatedInfo.contactZalo = contactZalo;
-    if (contactEmail !== undefined && contactEmail !== null)
-      updatedInfo.contactEmail = contactEmail;
-    if (contactLinkedin !== undefined && contactLinkedin !== null)
-      updatedInfo.contactLinkedin = contactLinkedin;
+    if (district !== undefined && district !== null) updatedInfo.district = district;
+    if (avatar !== undefined && avatar !== null && avatar !== "") updatedInfo.avatar = avatar;
+    if (contactFacebook !== undefined && contactFacebook !== null) updatedInfo.contactFacebook = contactFacebook;
+    if (contactZalo !== undefined && contactZalo !== null) updatedInfo.contactZalo = contactZalo;
+    if (contactEmail !== undefined && contactEmail !== null) updatedInfo.contactEmail = contactEmail;
+    if (contactLinkedin !== undefined && contactLinkedin !== null) updatedInfo.contactLinkedin = contactLinkedin;
 
     await User.findByIdAndUpdate(userId, updatedInfo);
 
@@ -98,8 +91,66 @@ const updateInfoMe = async (req, res) => {
   }
 };
 
+// [PATCH] /api/v1/user/seller 
+const handleBecomeSeller = async(req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if(!user) {
+      return res.status(404).json({ message : "Không tìm thấy người dùng !"});
+    }
+
+    if(user.role !== "user") {
+      return res.status(403).json({ message : "User phải là người dùng để trở thành người bán! " });
+    }
+
+   
+    if(!user.name) return res.status(400).json({ message: "Vui lòng cập nhật họ tên." });
+    if(!user.avatar) return res.status(400).json({ message: "Vui lòng cập nhật ảnh đại diện." });
+    if(!user.email) return res.status(400).json({ message: "Vui lòng cập nhật email." });
+    if(!user.phone) return res.status(400).json({ message: "Vui lòng cập nhật số điện thoại." });
+    if(!user.address) return res.status(400).json({ message: "Vui lòng cập nhật địa chỉ." });
+    if(!user.city) return res.status(400).json({ message: "Vui lòng cập nhật tỉnh/thành phố." });
+    if(!user.district) return res.status(400).json({ message: "Vui lòng cập nhật quận/huyện." });
+    if(!user.contactEmail) return res.status(400).json({ message: "Vui lòng cập nhật email liên hệ." });
+    if(!user.contactFacebook) return res.status(400).json({ message: "Vui lòng cập nhật Facebook liên hệ." });
+    if(!user.contactLinkedin) return res.status(400).json({ message: "Vui lòng cập nhật LinkedIn liên hệ." });
+    if(!user.contactZalo) return res.status(400).json({ message: "Vui lòng cập nhật Zalo liên hệ." });
+    if(!user.isVerified) return res.status(403).json({ message : "Người dùng chưa xác thực!" });
+
+
+    user.role = "seller";
+    await user.save();
+    return res.status(200).json({ message : "Chuyển thành người bán thành công!" });
+  } catch(error) {
+    return res.status(500).json({ message : "Server Error!" });
+  }
+}
+
+// [GET] /api/v1/user/:slugSeller 
+const getSellerBySlug = async(req, res) => {
+  try {
+    const sellerSlug = req.params.slugSeller;
+    const seller = await User.findOne({
+      slug: sellerSlug,
+      role: "seller"
+    }).select("-_id -password -isVerified -is2FAEnabled -__v -updatedAt -pendingEmail");
+
+    if(!seller) {
+      return res.status(404).json({ message : "Không tìm thấy người bán!" });
+    }
+
+    return res.status(200).json(seller);
+  } catch(error) {
+    return res.status(500).json({ message : "Server Error!" });
+  }
+}
+
 module.exports = {
   getInfoMe,
   LogoutMe,
   updateInfoMe,
+  handleBecomeSeller,
+  getSellerBySlug
 };

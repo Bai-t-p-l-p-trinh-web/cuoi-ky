@@ -10,310 +10,585 @@ $color-button-delete: #362C63;
 $color-bg-manageCar: #F7F7F7;
 
 .manageCar {
-    padding: 30px;
+  padding: 30px;
+  border: 1px solid #ddd;
+  background-color: $color-bg-manageCar;
+
+  &__header {
+    display: flex;
     border: 1px solid #ddd;
-    background-color: $color-bg-manageCar;
-    
-    &__header {
-        display: flex;
-        border: 1px solid #ddd;
-        padding: 13px 20px;
-        border-radius: 4px 4px 0 0;
-        margin-bottom: 20px;
-        background-color: #fff;
-
-        &__title {
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-
-            &__contain {
-                display: flex;
-                align-items: center;
-                border: 1px solid #ddd;
-                padding: 7px;
-                border-radius: 4px;
-                margin-right: 12px;
-
-                svg {
-                    color: #979090;
-                }
-            }
-        }
-    }
+    padding: 13px 20px;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 20px;
+    background-color: #fff;
 
     &__title {
-        font-size: 23px;
-        margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+
+      &__contain {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        padding: 7px;
+        border-radius: 4px;
+        margin-right: 12px;
+
+        svg {
+          color: #979090;
+        }
+      }
+    }
+  }
+
+  &__title {
+    font-size: 23px;
+    margin-bottom: 20px;
+  }
+
+  &__contain {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
+  &__options {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 10px;
+    background-color: #fff;
+  }
+
+  &__status {
+    width: 100px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #ddd;
+    text-align: center;
+    cursor: pointer;
+
+    &.picked,
+    &:hover {
+      border-bottom: 3px solid #000;
     }
 
-    &__contain {
-        border: 1px solid #ddd;
-        border-radius: 4px;
+    &__svg {
+      font-size: 18px;
+      margin-right: 3px;
     }
+
+    &__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      align-items: flex-end;
+    }
+  }
+
+  &__filters {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  &__search {
+    margin-right: 20px;
+    display: flex;
+    position: relative;
+
+    &__svg {
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      transform: translate(0, -50%);
+    }
+
+    &__input {
+      padding: 4px 20px;
+      width: 200px;
+      height: 36px;
+      outline: none;
+    }
+  }
+
+  &__sort {
+    margin-right: 20px;
+    height: 36px;
+
+    &__button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 100%;
+      width: 100%;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      padding: 0 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+  }
+
+  &__add {
+    border: 1px solid #ddd;
+    height: 36px;
+    width: 130px;
+    padding: 4px 5px;
+    text-wrap: wrap;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    &__svg {
+      margin-right: 4px;
+      font-size: 20px;
+    }
+  }
+
+  &__table {
+    width: 100%;
+
+    td {
+      background-color: #fff;
+    }
+
+    &__item {
+      &__image {
+        &__contain {
+          img {
+            width: 50px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+          }
+        }
+      }
+    }
+
+    &__tr {
+      border-bottom: 1px solid #ddd;
+    }
+
+    &__th {
+      &--checkbox {
+        max-width: 50px;
+        padding: 10px 20px;
+      }
+
+      &--title {
+        min-width: 340px;
+        max-width: 450px;
+        padding: 10px 0;
+      }
+
+      &--createdAt {
+        min-width: 120px;
+        max-width: 150px;
+        text-align: center;
+        padding: 10px 0;
+      }
+
+      &--status {
+        width: 100px;
+        text-align: center;
+        padding: 10px 0;
+      }
+
+      &--functions {
+        text-align: center;
+        padding: 10px 0;
+      }
+    }
+
+    &__td {
+      background-color: #fff;
+
+      &--checkbox {
+        padding: 0 20px;
+      }
+
+      &--title {
+        padding: 15px 0;
+
+        div {
+          display: inline;
+          margin-right: 8px;
+        }
+      }
+
+      &--createdAt {
+        text-align: center;
+      }
+
+      &--status {
+        text-align: center;
+
+        span {
+          padding: 5px 12px;
+          border-radius: 32px;
+
+          &[data-type="selling"] {
+            color: $color-text-selling;
+            background-color: $color-bg-selling;
+          }
+
+          &[data-type="deposited"] {
+            color: $color-text-deposited;
+            background-color: $color-bg-deposited;
+          }
+
+          &[data-type="hidden"] {
+            color: $color-text-hidden;
+            background-color: $color-bg-hidden;
+          }
+
+          &[data-type="sold"] {
+            color: $color-text-sold;
+            background-color: $color-bg-sold;
+          }
+        }
+      }
+
+      &--functions {
+        text-align: center;
+        padding: 0 20px;
+        height: auto;
+      }
+    }
+  }
+
+  &__functions {
+    &__link {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 10px;
+
+      &.edit {
+        color: orange;
+      }
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    &__svg {
+      margin-right: 5px;
+    }
+
+    &__delete {
+      background-color: $color-button-delete;
+      outline: none;
+      border: 0;
+      color: #fff;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 10px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+
+    &__button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+
+      &:hover:not(:disabled) {
+        background-color: #f0f0f0;
+      }
+
+      &.active {
+        background-color: $color-button-delete;
+        color: #fff;
+        border-color: $color-button-delete;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 1024px) {
+    padding: 20px;
 
     &__options {
-        display: flex;
-        justify-content: space-between;
-        padding: 14px 10px;
-        background-color: #fff;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
     }
-    
+
     &__status {
-        width: 100px;
-        padding-bottom: 20px;
-        border-bottom: 3px solid #ddd;
-        text-align: center;
-        cursor: pointer;
+      & {
+        width: auto;
+        padding: 8px 16px;
+      }
 
-        &.picked, &:hover {
-            border-bottom: 3px solid #000;
-        }
-
-        &__svg {
-            font-size: 18px;
-            margin-right: 3px;
-        }
-
-        &__list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: flex;
-            align-items: flex-end;
-        }
+      &__list {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
     }
 
     &__filters {
-        display: flex;
-        align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+      width: 100%;
     }
 
     &__search {
-        margin-right: 20px;
-        display: flex;
-        position: relative;
-        
-        &__svg {
-            position: absolute;
-            top: 50%;
-            left: 5px;
-            transform: translate(0, -50%);
-        }
-        
-        &__input {
-            padding: 4px 20px;
-            width: 200px;
-            height: 36px;
-            outline: none;
-        }
-    }
+      flex: 1;
+      min-width: 200px;
 
-    &__sort {
-        margin-right: 20px;
-        height: 36px;
-
-        &__button {
-            border: 1px solid #ddd;
-            background: transparent;
-            padding: 4px 10px;
-            text-wrap: wrap;
-        }
-    }
-
-    &__add {
-        border: 1px solid #ddd;
-        height: 36px;
-        width: 130px;
-        padding: 4px 5px;
-        text-wrap: wrap;
-    }
-
-    &__link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      &__input {
         width: 100%;
+      }
+    }
 
-        &__svg {
-            margin-right: 4px;
-            font-size: 20px;
-        }
+    &__sort,
+    &__add {
+      flex: 1;
+      min-width: 120px;
+      width: 100%;
+
+      &__button,
+      .manageCar__link {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     &__table {
-        width: 100%;
-        
-        td {
-            background-color: #fff;
-        }
-        
-        &__item {
-            &__image {
-                &__contain {
-                    img {
-                        width: 50px;
-                        aspect-ratio: 1;
-                        object-fit: cover;
-                        border-radius: 4px;
-                    }
-                }
-            }
+      &__th,
+      &__td {
+        &--title {
+          min-width: 250px;
+          max-width: 300px;
         }
 
-        &__tr {
-            border-bottom: 1px solid #ddd;
+        &--createdAt {
+          min-width: 100px;
         }
+      }
+    }
+  }
 
-        &__th {
-            &--checkbox {
-                max-width: 50px;
-                padding: 10px 20px;
-            }
+  @media (max-width: 768px) {
+    padding: 16px;
 
-            &--title {
-                min-width: 340px;
-                max-width: 450px;
-                padding: 10px 0;
-            }
-
-            &--createdAt {
-                min-width: 120px;
-                max-width: 150px;
-                text-align: center;
-                padding: 10px 0;
-            }
-
-            &--status {
-                width: 100px;
-                text-align: center;
-                padding: 10px 0;
-            }
-
-            &--functions {
-                text-align: center;
-                padding: 10px 0;
-            }
-        }
-
-        &__td {
-            background-color: #fff;
-
-            &--checkbox {
-                padding: 0 20px;
-            }
-
-            &--title {
-                padding: 15px 0;
-
-                div {
-                    display: inline;
-                    margin-right: 8px;
-                }
-            }
-
-            &--createdAt {
-                text-align: center;
-            }
-
-            &--status {
-                text-align: center;
-
-                span {
-                    padding: 5px 12px;
-                    border-radius: 32px;
-
-                    &[data-type="selling"] {
-                        color: $color-text-selling;
-                        background-color: $color-bg-selling;
-                    }
-
-                    &[data-type="deposited"] {
-                        color: $color-text-deposited;
-                        background-color: $color-bg-deposited;
-                    }
-
-                    &[data-type="hidden"] {
-                        color: $color-text-hidden;
-                        background-color: $color-bg-hidden;
-                    }
-
-                    &[data-type="sold"] {
-                        color: $color-text-sold;
-                        background-color: $color-bg-sold;
-                    }
-                }
-            }
-
-            &--functions {
-                text-align: center;
-                padding: 0 20px;
-                height: auto;
-            }
-        }
+    &__title {
+      font-size: 20px;
     }
 
-    &__functions {
-        &__link {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 10px;
+    &__header {
+      padding: 10px 16px;
 
-            &.edit {
-                color: orange;
+      &__title {
+        font-size: 16px;
+
+        &__contain {
+          padding: 5px;
+        }
+      }
+    }
+
+    &__table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+
+      &__thead,
+      &__tbody,
+      &__tr {
+        display: block;
+      }
+
+      &__th,
+      &__td {
+        display: inline-block;
+        padding: 8px 12px;
+        text-align: left;
+
+        &--checkbox {
+          display: none;
+        }
+
+        &--title {
+          width: 40%;
+          min-width: 200px;
+        }
+
+        &--createdAt {
+          width: 20%;
+          min-width: 100px;
+        }
+
+        &--status {
+          width: 15%;
+          min-width: 80px;
+        }
+
+        &--functions {
+          width: 25%;
+          min-width: 150px;
+          text-align: right;
+        }
+      }
+
+      &__td {
+        &--title {
+          display: flex;
+          align-items: center;
+
+          .manageCar__table__item__image__contain {
+            img {
+              width: 40px;
             }
-            
-            &:hover {
-                text-decoration: none;
-            }
+          }
         }
 
-        &__svg {
-            margin-right: 5px;
+        &--functions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
         }
-
-        &__delete {
-            background-color: $color-button-delete;
-            outline: none;
-            border: 0;
-            color: #fff;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-        }
+      }
     }
 
     &__pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px 10px;
-        background-color: #fff;
-        border-top: 1px solid #ddd;
+      padding: 16px;
 
-        &__button {
-            margin: 0 5px;
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-
-            &:hover:not(:disabled) {
-                background-color: #f0f0f0;
-            }
-
-            &.active {
-                background-color: $color-button-delete;
-                color: #fff;
-                border-color: $color-button-delete;
-            }
-
-            &:disabled {
-                cursor: not-allowed;
-                opacity: 0.5;
-            }
-        }
+      &__button {
+        padding: 6px 10px;
+        font-size: 14px;
+      }
     }
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px;
+
+    &__title {
+      font-size: 18px;
+    }
+
+    &__status {
+      padding: 6px 12px;
+
+      &__span {
+        font-size: 13px;
+      }
+
+      &__svg {
+        font-size: 16px;
+      }
+    }
+
+    &__search {
+      min-width: 100%;
+
+      &__input {
+        width: 100%;
+        height: 32px;
+        padding: 4px 16px;
+        font-size: 13px;
+      }
+
+      &__svg {
+        left: 8px;
+      }
+    }
+
+    &__sort,
+    &__add {
+      min-width: 100%;
+      height: 32px;
+
+      &__button,
+      .manageCar__link {
+        padding: 4px 12px;
+        font-size: 13px;
+
+        svg {
+          font-size: 18px;
+        }
+      }
+    }
+
+    &__table {
+      &__th,
+      &__td {
+        font-size: 13px;
+
+        &--title {
+          width: 50%;
+          min-width: 150px;
+        }
+
+        &--createdAt {
+          width: 25%;
+          min-width: 80px;
+        }
+
+        &--status {
+          width: 25%;
+          min-width: 70px;
+        }
+
+        &--functions {
+          width: 100%;
+          min-width: 100%;
+          padding: 8px 12px;
+          display: block;
+          text-align: left;
+        }
+      }
+
+      &__td {
+        &--functions {
+          flex-direction: column;
+          gap: 8px;
+
+          .manageCar__functions__link,
+          .manageCar__functions__delete {
+            width: fit-content;
+            padding: 6px 10px;
+            font-size: 12px;
+
+            .manageCar__functions__svg {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+
+    &__pagination {
+      flex-wrap: wrap;
+      gap: 8px;
+
+      &__button {
+        padding: 5px 8px;
+        font-size: 13px;
+      }
+    }
+  }
 }

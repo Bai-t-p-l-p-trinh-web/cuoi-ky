@@ -197,6 +197,20 @@ function History() {
     return pageNumbers;
   };
 
+  const handleDeleteRequest = async (slug) => {
+    const confirm = window.confirm("Bạn có chắc chắn muốn xóa yêu cầu này?");
+    if (!confirm) return;
+  
+    try {
+      await apiClient.delete(`/requestAdd/${slug}`);
+      toast.success("Xóa yêu cầu thành công!");
+      setRequests((prev) => prev.filter((r) => r.slug !== slug));
+      setOriginRequests((prev) => prev.filter((r) => r.slug !== slug));
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Xóa yêu cầu thất bại!");
+    }
+  };
+
   return (
     <>
       <div className="history">
@@ -350,7 +364,10 @@ function History() {
                         </span>
                       </Link>
                       {request.status === "pending" && (
-                        <button className="history__functions__delete">
+                        <button 
+                          className="history__functions__delete"
+                          onClick={() => {handleDeleteRequest(request.slug)}}
+                        >
                           <RiDeleteBin5Line className="history__functions__svg" />
                           <span className="history__functions__span">Xóa</span>
                         </button>

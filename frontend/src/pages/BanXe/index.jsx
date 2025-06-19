@@ -66,13 +66,6 @@ function BanXe(){
         <>
             
             <div className="banxe">
-                {/* Form  */}
-                <div className="banxe__head">
-                    <form className="banxe__head__form">
-                        Form
-                    </form>
-                </div>
-
                 {/* Huong dan  */}
                 <div className="banxe__guide__contain">
                     <div className="banxe__guide container">

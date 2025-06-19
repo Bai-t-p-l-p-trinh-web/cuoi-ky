@@ -1,0 +1,1896 @@
+openapi: 3.0.0
+info:
+  title: FakeAuto API
+  version: 1.0.0
+  description: Tài liệu API cho hệ thống FakeAuto - Hệ thống quản lý mua bán xe ô tô
+
+servers:
+  - url: https://fakeauto.id.vn
+    description: Development server
+
+paths:
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Đăng ký tài khoản
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Địa chỉ email của người dùng
+                name:
+                  type: string
+                  description: Tên người dùng
+                password:
+                  type: string
+                  description: Mật khẩu (ít nhất 8 ký tự, 1 chữ hoa, 1 ký tự đặc biệt)
+              required:
+                - email
+                - name
+                - password
+      responses:
+        '201':
+          description: Tài khoản được tạo thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      actionRequired:
+                        type: string
+                        enum: [VERIFY_REGISTER, REQUEST_OTP_AGAIN]
+                      userId:
+                        type: string
+                        description: ID của người dùng (nếu gửi OTP thất bại)
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Đăng nhập
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Đăng nhập thành công hoặc yêu cầu xác thực OTP
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      accessToken:
+                        type: string
+                        description: JWT Access Token
+                      actionRequired:
+                        type: string
+                        enum: [VERIFY_2FA_LOGIN, VERIFY_FIRST_TIME]
+                        description: Hành động cần thực hiện nếu cần xác thực
+        '400':
+          description: Lỗi thông tin đăng nhập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/send-otp:
+    post:
+      tags: [Auth]
+      summary: Gửi mã OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                type:
+                  type: string
+                  enum: [VERIFY_REGISTER, VERIFY_ACCOUNT, VERIFY_2FA_LOGIN, VERIFY_CURRENT_EMAIL, VERIFY_NEW_EMAIL, VERIFY_CHANGE_PASSWORD, VERIFY_RESET_PASSWORD, REQUEST_OTP_AGAIN]
+              required:
+                - email
+                - type
+      responses:
+        '200':
+          description: OTP đã được gửi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: Xác minh mã OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                otp:
+                  type: string
+                  description: Mã OTP 6 chữ số
+                type:
+                  type: string
+                  enum: [VERIFY_REGISTER, VERIFY_ACCOUNT, VERIFY_2FA_LOGIN, VERIFY_CURRENT_EMAIL, VERIFY_NEW_EMAIL, VERIFY_CHANGE_PASSWORD, VERIFY_RESET_PASSWORD, REQUEST_OTP_AGAIN]
+              required:
+                - email
+                - otp
+                - type
+      responses:
+        '200':
+          description: Xác minh OTP thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                      verificationType:
+                        type: string
+                      accessToken:
+                        type: string
+                        description: JWT Access Token (nếu type là VERIFY_FIRST_TIME)
+                      refreshToken:
+                        type: string
+                        description: JWT Refresh Token (nếu type là VERIFY_FIRST_TIME)
+        '400':
+          description: Lỗi OTP không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/change-password:
+    post:
+      tags: [Auth]
+      summary: Đổi mật khẩu
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+              required:
+                - userId
+                - oldPassword
+                - newPassword
+      responses:
+        '200':
+          description: Đổi mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/change-email:
+    post:
+      tags: [Auth]
+      summary: Thay đổi email
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldEmail:
+                  type: string
+                  format: email
+                newEmail:
+                  type: string
+                  format: email
+              required:
+                - oldEmail
+                - newEmail
+      responses:
+        '200':
+          description: Yêu cầu thay đổi email thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      actionRequired:
+                        type: string
+                        enum: [VERIFY_NEW_EMAIL]
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Đặt lại mật khẩu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                newPassword:
+                  type: string
+              required:
+                - userId
+                - newPassword
+      responses:
+        '200':
+          description: Đặt lại mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/toggle-2fa:
+    post:
+      tags: [Auth]
+      summary: Bật/tắt xác thực hai yếu tố
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+              required:
+                - userId
+      responses:
+        '200':
+          description: Bật/tắt 2FA thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      is2FAEnabled:
+                        type: boolean
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/refresh-token:
+    post:
+      tags: [Auth]
+      summary: Làm mới token
+      responses:
+        '200':
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+        '400':
+          description: Thiếu refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Refresh token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/oauth/google:
+    get:
+      tags: [OAuth]
+      summary: Đăng nhập bằng Google
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          required: true
+          description: Mã code từ Google OAuth
+      responses:
+        '200':
+          description: Chuyển hướng sau khi đăng nhập
+        '403':
+          description: Email Google chưa được xác minh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/oauth/tempUser:
+    get:
+      tags: [OAuth]
+      summary: Lấy thông tin user tạm thời sau khi đăng nhập Google
+      responses:
+        '200':
+          description: Thông tin user tạm thời
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  avatar:
+                    type: string
+        '401':
+          description: Chưa xác thực Google
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/oauth/updateUser:
+    post:
+      tags: [OAuth]
+      summary: Cập nhật thông tin người dùng sau OAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                avatar:
+                  type: string
+              required:
+                - name
+                - phone
+                - password
+                - email
+      responses:
+        '200':
+          description: Cập nhật thông tin thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Chưa xác thực Google
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/car:
+    get:
+      tags: [Car]
+      summary: Lấy danh sách xe
+      parameters:
+        - in: query
+          name: pricemin
+          schema:
+            type: integer
+          description: Giá tối thiểu
+        - in: query
+          name: pricemax
+          schema:
+            type: integer
+          description: Giá tối đa
+        - in: query
+          name: yearmin
+          schema:
+            type: integer
+          description: Năm sản xuất tối thiểu
+        - in: query
+          name: yearmax
+          schema:
+            type: integer
+          description: Năm sản xuất tối đa
+        - in: query
+          name: kmmin
+          schema:
+            type: integer
+          description: Số km tối thiểu
+        - in: query
+          name: kmmax
+          schema:
+            type: integer
+          description: Số km tối đa
+        - in: query
+          name: fuel_type
+          schema:
+            type: string
+          description: Loại nhiên liệu (cách nhau bởi dấu +)
+        - in: query
+          name: seat_capacity
+          schema:
+            type: string
+          description: Số chỗ ngồi (cách nhau bởi dấu +)
+        - in: query
+          name: keyword
+          schema:
+            type: string
+          description: Từ khóa tìm kiếm
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Trang hiện tại
+      responses:
+        '200':
+          description: Danh sách xe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  num:
+                    type: integer
+                    description: Tổng số xe
+                  minPrice:
+                    type: integer
+                    description: Giá thấp nhất
+                  maxPrice:
+                    type: integer
+                    description: Giá cao nhất
+                  cars:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Car'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags: [Car]
+      summary: Thêm xe mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CarInput'
+      responses:
+        '201':
+          description: Tạo xe thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/car/display:
+    get:
+      tags: [Car]
+      summary: Lấy danh sách xe của người bán
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách xe
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    price:
+                      type: integer
+                    img_src:
+                      type: string
+                    status:
+                      type: string
+                      enum: [selling, sold]
+                    slug:
+                      type: string
+        '401':
+          description: Không có quyền truy cập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/car/{slugCar}:
+    get:
+      tags: [Car]
+      summary: Lấy thông tin xe theo slug
+      parameters:
+        - in: path
+          name: slugCar
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thông tin xe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Car'
+        '404':
+          description: Không tìm thấy xe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags: [Car]
+      summary: Cập nhật thông tin xe
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugCar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: integer
+                comment:
+                  type: string
+                status:
+                  type: string
+                  enum: [selling, sold]
+      responses:
+        '200':
+          description: Cập nhật xe thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Car'
+        '400':
+          description: Lỗi dữ liệu đầu vào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền cập nhật
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/category:
+    get:
+      tags: [Category]
+      summary: Lấy tất cả danh mục
+      responses:
+        '200':
+          description: Danh sách danh mục
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags: [Category]
+      summary: Thêm danh mục mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                position:
+                  type: integer
+                  description: Vị trí hiển thị
+              required:
+                - name
+      responses:
+        '201':
+          description: Tạo danh mục thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd:
+    post:
+      tags: [Request]
+      summary: Gửi yêu cầu thêm xe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestAddInput'
+      responses:
+        '201':
+          description: Tạo yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags: [Request]
+      summary: Lấy danh sách yêu cầu của người dùng
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách yêu cầu
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    status:
+                      type: string
+                      enum: [pending, checked, reject, done]
+                    img_demo:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    slug:
+                      type: string
+        '401':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd/{slugRequest}:
+    get:
+      tags: [Request]
+      summary: Lấy chi tiết yêu cầu theo slug
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugRequest
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chi tiết yêu cầu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestAdd'
+        '404':
+          description: Không tìm thấy yêu cầu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd/{slugRequest}/checked:
+    patch:
+      tags: [Request]
+      summary: Duyệt yêu cầu
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugRequest
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                img_src:
+                  type: array
+                  items:
+                    type: string
+                examine:
+                  type: object
+                  description: Thông tin kiểm tra xe
+                price_recommend_low:
+                  type: integer
+                price_recommend_high:
+                  type: integer
+      responses:
+        '200':
+          description: Duyệt yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd/{slugRequest}/reject:
+    patch:
+      tags: [Request]
+      summary: Từ chối yêu cầu
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugRequest
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                examine:
+                  type: object
+                  description: Thông tin kiểm tra xe
+      responses:
+        '200':
+          description: Từ chối yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd/{slugRequest}/done:
+    patch:
+      tags: [Request]
+      summary: Đăng xe từ yêu cầu
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugRequest
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                price:
+                  type: integer
+                category_id:
+                  type: string
+                location:
+                  type: string
+              required:
+                - price
+      responses:
+        '200':
+          description: Đăng xe thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/requestAdd/{slugRequest}/employee:
+    patch:
+      tags: [Request]
+      summary: Phân công kiểm định viên
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slugRequest
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: string
+                  description: Danh sách ID của kiểm định viên
+              required:
+                - userIds
+      responses:
+        '200':
+          description: Phân công thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Không tìm thấy yêu cầu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/thread/threads:
+    get:
+      tags: [Thread]
+      summary: Lấy danh sách đoạn chat
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách đoạn chat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  avatar:
+                    type: string
+                  threads:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Thread'
+        '404':
+          description: Không tìm thấy người dùng hoặc thread
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/thread/start:
+    post:
+      tags: [Thread]
+      summary: Bắt đầu đoạn chat mới
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sellerId:
+                  type: string
+              required:
+                - sellerId
+      responses:
+        '200':
+          description: Thread đã sẵn sàng
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  threadId:
+                    type: string
+        '401':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/user/me:
+    get:
+      tags: [User]
+      summary: Lấy thông tin người dùng hiện tại
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Thông tin người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags: [User]
+      summary: Cập nhật thông tin người dùng
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                district:
+                  type: string
+                avatar:
+                  type: string
+                contactFacebook:
+                  type: string
+                contactZalo:
+                  type: string
+                contactEmail:
+                  type: string
+                  format: email
+                contactLinkedin:
+                  type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/user/logout:
+    post:
+      tags: [User]
+      summary: Đăng xuất
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/user/seller:
+    patch:
+      tags: [User]
+      summary: Trở thành người bán
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Chuyển thành người bán thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Thiếu thông tin bắt buộc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/user/{slugSeller}:
+    get:
+      tags: [User]
+      summary: Lấy thông tin người bán theo slug
+      parameters:
+        - in: path
+          name: slugSeller
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thông tin người bán
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Seller'
+        '404':
+          description: Không tìm thấy người bán
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/statistic/views:
+    get:
+      tags: [Statistic]
+      summary: Thống kê lượt xem
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Thống kê lượt xem
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: array
+                    items:
+                      type: string
+                      format: date
+                  views:
+                    type: array
+                    items:
+                      type: integer
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/statistic/contacts:
+    get:
+      tags: [Statistic]
+      summary: Thống kê liên hệ
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Thống kê liên hệ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: array
+                    items:
+                      type: string
+                      format: date
+                  contacts:
+                    type: array
+                    items:
+                      type: integer
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/statistic/revenues:
+    get:
+      tags: [Statistic]
+      summary: Thống kê doanh thu
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Thống kê doanh thu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: array
+                    items:
+                      type: string
+                      format: date
+                  revenues:
+                    type: array
+                    items:
+                      type: integer
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Lỗi máy chủ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [user, seller, admin]
+        avatar:
+          type: string
+        phone:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        address:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        contactFacebook:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+        contactZalo:
+          type: string
+        contactLinkedin:
+          type: string
+      required:
+        - _id
+        - email
+        - name
+        - role
+
+    Seller:
+      type: object
+      properties:
+        name:
+          type: string
+        avatar:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        address:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        contactFacebook:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+        contactZalo:
+          type: string
+        contactLinkedin:
+          type: string
+      required:
+        - name
+        - email
+
+    Car:
+      type: object
+      properties:
+        title:
+          type: string
+        price:
+          type: integer
+        year:
+          type: integer
+        km:
+          type: integer
+        fuel_use:
+          type: object
+          properties:
+            fuel_type:
+              type: string
+            fuel_name:
+              type: string
+        seat_capacity:
+          type: integer
+        comment:
+          type: string
+        img_src:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [selling, sold]
+        slug:
+          type: string
+        location:
+          type: object
+          properties:
+            query_location:
+              type: string
+            query_name:
+              type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            phone:
+              type: string
+            email:
+              type: string
+              format: email
+      required:
+        - title
+        - price
+        - year
+        - km
+        - fuel_use
+        - seat_capacity
+        - status
+        - slug
+
+    CarInput:
+      type: object
+      properties:
+        title:
+          type: string
+        price:
+          type: integer
+        year:
+          type: integer
+        km:
+          type: integer
+        fuel_use:
+          type: object
+          properties:
+            fuel_type:
+              type: string
+            fuel_name:
+              type: string
+        seat_capacity:
+          type: integer
+        comment:
+          type: string
+        img_src:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+      required:
+        - title
+        - price
+        - year
+        - km
+        - fuel_use
+        - seat_capacity
+
+    RequestAdd:
+      type: object
+      properties:
+        name:
+          type: string
+        year:
+          type: integer
+        km:
+          type: integer
+        fuel:
+          type: string
+        seat_capacity:
+          type: integer
+        location:
+          type: string
+        img_demo:
+          type: string
+        status:
+          type: string
+          enum: [pending, checked, reject, done]
+        slug:
+          type: string
+        secure_url:
+          type: string
+        examine:
+          type: object
+          description: Thông tin kiểm tra xe
+        price_recommend_low:
+          type: integer
+        price_recommend_high:
+          type: integer
+        staffs:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+                format: email
+              phone:
+                type: string
+              avatar:
+                type: string
+      required:
+        - name
+        - year
+        - km
+        - fuel
+        - seat_capacity
+        - status
+        - slug
+
+    RequestAddInput:
+      type: object
+      properties:
+        name:
+          type: string
+        year:
+          type: integer
+        km:
+          type: integer
+        fuel:
+          type: string
+        seat_capacity:
+          type: integer
+        location:
+          type: string
+        img_demo:
+          type: string
+      required:
+        - name
+        - year
+        - km
+        - fuel
+        - seat_capacity
+
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: integer
+        parent_id:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      required:
+        - name
+        - position
+
+    Thread:
+      type: object
+      properties:
+        threadId:
+          type: string
+        user1Id:
+          type: string
+        user2Id:
+          type: string
+        user1:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            avatar:
+              type: string
+        user2:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            avatar:
+              type: string
+        lastMessage:
+          type: object
+          properties:
+            id:
+              type: string
+            senderId:
+              type: string
+            text:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+            seen:
+              type: boolean
+        messages:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              senderId:
+                type: string
+              text:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              seen:
+                type: boolean
+      required:
+        - threadId
+        - user1Id
+        - user2Id
+        - user1
+        - user2
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        message:
+          type: string
+        error_code:
+          type: string
+      required:
+        - success
+        - message

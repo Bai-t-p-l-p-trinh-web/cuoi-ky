@@ -59,4 +59,8 @@ router.put(
   bankController.verifyBankInfo
 );
 
+router.patch("/seller", verifyToken, controller.handleBecomeSeller);
+
+router.get("/:slugSeller", controller.getSellerBySlug);
+
 module.exports = router;

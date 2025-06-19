@@ -236,6 +236,59 @@ function DashBoard() {
     e.target.disabled = false;
   };
 
+  const isFullRequire = () => {
+    const isFullProfile =  profile.name &&
+      profile.role==="user" &&
+      profile.email && 
+      profile.phone && 
+      profile.address && 
+      profile.city && 
+      profile.district && 
+      profile.contactEmail && 
+      profile.contactFacebook && 
+      profile.contactLinkedin &&
+      profile.contactZalo;
+
+      return isFullProfile;
+  };
+
+  const handleBecomingSeller = async (e) => {
+    e.target.disabled = true;
+
+    if(hasChangeInfo()) {
+      toast.error('Bạn đang chỉnh sửa thứ gì đó. Hãy hoàn tất nó trước!');
+      return;
+    }
+
+    const loadingBecome = toast.loading('Đang xử lý ... ');
+
+    try {
+      const reponseSeller = await apiClient.patch(
+        "/user/seller",
+        {}
+      )
+      console.log(reponseSeller.data);
+      toast.update(loadingBecome, {
+        render : 'Cập nhật thông tin thành công!',
+        type : 'success',
+        isLoading : false,
+        autoClose : 3000
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch(error) {
+      toast.update(loadingBecome, {
+        render : error.response?.data?.message || "Lỗi khi chuyển quyền người bán!",
+        autoClose : 3000,
+        isLoading : false,
+        type : 'error'
+      })
+    }
+
+    e.target.disabled = false;
+  }
+
   return (
     <>
       <div className="dashboard">
@@ -247,6 +300,15 @@ function DashBoard() {
             </div>
             <span className="dashboard__header__title__span">Users</span>
           </div>
+          {
+            profile.role === "user"
+            &&
+            <div className="dashboard__header__becomeSeller">
+              <button disabled={!isFullRequire()} className="dashboard__header__becomeSeller__button" onClick={handleBecomingSeller}>
+                Trở thành người bán
+              </button>
+            </div>
+          }
         </div>
         <div className="dashboard__header__contain">
           <div className="dashboard__header__settings">

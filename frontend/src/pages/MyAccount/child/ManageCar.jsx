@@ -345,19 +345,28 @@ function ManageCar() {
                           Chi tiết
                         </span>
                       </Link>
-                      <Link
-                        to={`/my_account/edit-car/${car.slug}`}
-                        className="manageCar__functions__link edit"
-                      >
-                        <FaRegEdit className="manageCar__functions__svg" />
-                        <span className="manageCar__functions__span">
-                          Chỉnh sửa
-                        </span>
-                      </Link>
-                      <button className="manageCar__functions__delete">
-                        <RiDeleteBin5Line className="manageCar__functions__svg" />
-                        <span className="manageCar__functions__span">Xóa</span>
-                      </button>
+                      {
+                        car.status !== "sold"
+                        &&
+                        <Link
+                          to={`/my_account/edit-car/${car.slug}`}
+                          className="manageCar__functions__link edit"
+                        >
+                          <FaRegEdit className="manageCar__functions__svg" />
+                          <span className="manageCar__functions__span">
+                            Chỉnh sửa
+                          </span>
+                        </Link>
+                      }
+                      {
+                        car.status === "selling"
+                        &&
+                        <button className="manageCar__functions__delete">
+                          <RiDeleteBin5Line className="manageCar__functions__svg" />
+                          <span className="manageCar__functions__span">Xóa</span>
+                        </button>
+                      }
+                      
                     </td>
                   </tr>
                 ))

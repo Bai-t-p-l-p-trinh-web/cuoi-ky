@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const slugUpdater = require("mongoose-slug-updater");
+
+mongoose.plugin(slugUpdater);
 
 const userSchema = new mongoose.Schema(
   {
@@ -110,6 +113,12 @@ const userSchema = new mongoose.Schema(
         type: Date,
         default: null,
       },
+    },
+
+    slug: {
+      type: String,
+      slug: "name",
+      unique: true,
     },
   },
   { timestamps: true }

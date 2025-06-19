@@ -21,7 +21,7 @@ function CardCar({ item }) {
             <FaRoad /> <span>{convertNum(item.km)}</span>
           </div>
           <div className="home__content__main__display__list-item--description-specific--fuel">
-            <LuFuel /> <span>{item.fuel}</span>
+            <LuFuel /> <span>{item.fuel_use.fuel_name}</span>
           </div>
           <div className="home__content__main__display__list-item--description-specific--seat">
             <PiArmchair /> <span>{item.seat_capacity}</span>
@@ -33,6 +33,12 @@ function CardCar({ item }) {
         <div className="home__content__main__display__list-item--description-location">
           <FaLocationDot /> <span>{item.location.query_name}</span>
         </div>
+      </div>
+      <div className="home__content__main__display__list-item--description-price">
+        {convertCurrency(item.price)}
+      </div>
+      <div className="home__content__main__display__list-item--description-location">
+        <FaLocationDot /> <span>{item.location.query_name}</span>
       </div>
     </>
   );

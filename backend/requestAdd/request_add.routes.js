@@ -45,4 +45,6 @@ router.patch(
 
 router.get("/:slugRequest", verifyToken, controller.getRequestBySlug);
 
+router.delete("/:slugRequest", verifyToken, controller.deleteRequest);
+
 module.exports = router;

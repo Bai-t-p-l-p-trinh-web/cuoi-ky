@@ -3,6 +3,7 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
+import './scss/Swiper.scss';
 function HomeSwiper(){
     const listSwiper = [
         {

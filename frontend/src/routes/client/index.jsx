@@ -3,7 +3,6 @@ import BanXe from "../../pages/BanXe";
 import ChiTietXe from "../../pages/ChiTietXe";
 import GioiThieu from "../../pages/GioiThieu";
 import Home from "../../pages/Home";
-import BlogXeHoi from "../../pages/BlogXeHoi";
 import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
@@ -42,15 +41,12 @@ import ChinhSachQuyenRiengTu from "../../pages/FooterPages/ChinhSachQuyenRiengTu
 import CauHoiThuongGap from "../../pages/FooterPages/CauHoiThuongGap";
 import LienHe from "../../pages/FooterPages/LienHe";
 import CoHoiViecLam from "../../pages/FooterPages/CoHoiViecLam";
+import SellerInfo from "../../pages/SellerInfo";
 
 export const routes = [
   {
     path: "/maintenance",
     element: <MaintenancePage />,
-  },
-  {
-    path: "/blog-xe-hoi",
-    element: <BlogXeHoi />,
   },
   {
     path: "/",
@@ -204,6 +200,10 @@ export const routes = [
       {
         path: "co-hoi-viec-lam",
         element: <CoHoiViecLam />,
+      },
+      {
+        path: "nguoi-ban/:slugSeller",
+        element: <SellerInfo/>
       },
       {
         path: "*",

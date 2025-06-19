@@ -134,3 +134,125 @@ $color-text-contact: #A5B7C6;
         }
     }
 }
+
+@media (max-width: 1024px) {
+    .footer {
+      flex-direction: column;
+      padding: 40px 30px;
+      gap: 30px;
+  
+      &__contact {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+  
+        &__list {
+          justify-content: center;
+          gap: 10px;
+        }
+      }
+  
+      &__about {
+        padding-left: 0;
+  
+        &__email {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+  
+          &--input,
+          &--submit {
+            width: 100%;
+            border-radius: 5px;
+          }
+        }
+  
+        &__services {
+          flex-wrap: wrap;
+          gap: 20px;
+  
+          &--service {
+            width: calc(50% - 10px); // 2 columns
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .footer {
+      padding: 30px 20px;
+  
+      &__about {
+        &__services {
+          flex-direction: column;
+  
+          &--service {
+            width: 100%;
+          }
+        }
+  
+        &__email {
+          &--input,
+          &--submit {
+            font-size: 14px;
+            height: 44px;
+          }
+        }
+  
+        &-title {
+          font-size: 16px;
+        }
+  
+        &-description {
+          font-size: 13px;
+        }
+      }
+  
+      &__contact {
+        &__description {
+          font-size: 13px;
+        }
+  
+        &__list {
+          &-item {
+            width: 30px;
+            height: 30px;
+            svg {
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .footer {
+      &__about {
+        &__email {
+          &--input,
+          &--submit {
+            font-size: 13px;
+          }
+        }
+  
+        &__services {
+          &--service {
+            &__list {
+              &--item-link {
+                font-size: 13px;
+              }
+  
+              &--item--head-link {
+                font-size: 16px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }

@@ -6,7 +6,7 @@ const allowedLocations = Object.values(LocationEnum).map(
 );
 
 mongoose.plugin(slugUpdater);
-
+ 
 const carSchema = new mongoose.Schema(
   {
     title: {
