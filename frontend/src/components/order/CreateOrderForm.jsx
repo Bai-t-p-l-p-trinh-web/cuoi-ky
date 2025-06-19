@@ -35,6 +35,18 @@ const CreateOrderForm = ({ car, onOrderCreated, onClose }) => {
       }
     } catch (error) {
       console.error("Error creating order:", error);
+
+      // Kiểm tra lỗi seller chưa có thông tin ngân hàng
+      if (error.response?.data?.sellerBankNotConfigured) {
+        toast.error(
+          "Người bán chưa cập nhật thông tin ngân hàng. Vui lòng chọn phương thức 'Giao dịch trực tiếp' hoặc liên hệ người bán.",
+          { autoClose: 5000 }
+        );
+        // Tự động chuyển sang giao dịch trực tiếp
+        setFormData({ ...formData, paymentMethod: "direct_transaction" });
+      } else {
+        toast.error(error.response?.data?.message || "Không thể tạo đơn hàng");
+      }
     }
 
     setLoading(false);

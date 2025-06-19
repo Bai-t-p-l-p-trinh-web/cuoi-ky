@@ -155,12 +155,28 @@ function RequestForm() {
         navigate("/my_account/inspection-history");
       }, 3000);
     } catch (error) {
-      toast.update(creatingRequest, {
-        render: error.response?.data?.message || "Lỗi khi yêu cầu tạo đơn !",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      console.error("Error creating request:", error);
+
+      // Kiểm tra lỗi cần thông tin ngân hàng
+      if (error.response?.data?.needBankInfo) {
+        toast.update(creatingRequest, {
+          render: "Bạn cần cập nhật thông tin ngân hàng trước khi đăng xe",
+          type: "warning",
+          isLoading: false,
+          autoClose: 5000,
+        });
+
+        setTimeout(() => {
+          navigate("/my_account/bank-info");
+        }, 2000);
+      } else {
+        toast.update(creatingRequest, {
+          render: error.response?.data?.message || "Lỗi khi yêu cầu tạo đơn !",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      }
     }
   };
 
@@ -181,6 +197,25 @@ function RequestForm() {
         </div>
 
         <h3 className="requestform__title">Đăng ký bán xe</h3>
+
+        <div className="requestform__notice">
+          <div className="notice-card">
+            <h4>📋 Lưu ý quan trọng</h4>
+            <p>
+              Trước khi đăng xe, bạn cần cập nhật thông tin ngân hàng để có thể
+              nhận thanh toán từ người mua.
+            </p>
+            <p>
+              <a
+                href="/my_account/bank-info"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                👉 Cập nhật thông tin ngân hàng tại đây
+              </a>
+            </p>
+          </div>
+        </div>
 
         <div className="requestform__contain">
           <div className="requestform__box">

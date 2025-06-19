@@ -31,6 +31,13 @@ router.put(
   requireAdmin,
   controller.updateUserStatus
 );
+// Bank verification route
+router.patch(
+  "/users/:userId/verify-bank",
+  verifyToken,
+  requireAdmin,
+  controller.verifyUserBankInfo
+);
 
 // Car management routes
 router.get("/cars", verifyToken, requireAdmin, controller.getCars);

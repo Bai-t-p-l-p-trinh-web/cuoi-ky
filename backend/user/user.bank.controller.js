@@ -71,12 +71,9 @@ class UserBankController {
           message: "Không tìm thấy user",
         });
       }
-
       res.json({
         success: true,
-        data: {
-          bankInfo: user.bankInfo,
-        },
+        bankInfo: user.bankInfo,
       });
     } catch (error) {
       console.error("Get bank info error:", error);

@@ -8,6 +8,8 @@ const { Log, LogType } = require("../log/log.model");
 const vietQRService = require("../payment/vietqr.service");
 const contractService = require("../contract/contract.service");
 const notificationService = require("../utils/notificationService");
+const Car = require("../car/car.model");
+const User = require("../user/user.model");
 
 class OrderController {
   /**
@@ -19,36 +21,43 @@ class OrderController {
 
       console.log("Create order - buyerId:", buyerId);
       console.log("Create order - carId:", carId);
-      console.log("Create order - req.user:", req.user);
-
-      // Kiểm tra xe tồn tại và chưa bán
-      const Car = require("../car/car.model");
+      console.log("Create order - req.user:", req.user); // Kiểm tra xe tồn tại và chưa bán
       const car = await Car.findOne({
         _id: carId,
-        status: "approved",
-        sold: false,
-      }).populate("seller");
+        status: { $ne: "sold" },
+      });
+
+      console.log(car);
 
       if (!car) {
         return res.status(404).json({
           success: false,
           message: "Xe không tồn tại hoặc đã được bán",
         });
-      }
+      } // Lấy thông tin seller riêng
+      const seller = await User.findById(car.sellerId);
 
-      // Kiểm tra thông tin ngân hàng của seller nếu không phải giao dịch trực tiếp
+      if (!seller) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy thông tin người bán",
+        });
+      } // Kiểm tra thông tin ngân hàng của seller nếu không phải giao dịch trực tiếp
       if (paymentMethod !== PaymentMethod.DIRECT_TRANSACTION) {
-        if (!car.sellerBankInfo || !car.sellerBankInfo.accountNumber) {
+        if (
+          !seller.bankInfo ||
+          !seller.bankInfo.accountNumber ||
+          !seller.bankInfo.isVerified
+        ) {
           return res.status(400).json({
             success: false,
             message:
-              "Seller chưa cập nhật thông tin ngân hàng. Vui lòng liên hệ người bán.",
+              "Người bán chưa cập nhật hoặc chưa xác minh thông tin ngân hàng. Vui lòng liên hệ người bán hoặc chọn phương thức giao dịch trực tiếp.",
+            sellerBankNotConfigured: true,
           });
         }
-      }
-
-      // Không cho phép tự mua xe của mình
-      if (car.seller._id.toString() === buyerId) {
+      } // Không cho phép tự mua xe của mình
+      if (seller._id.toString() === buyerId) {
         return res.status(400).json({
           success: false,
           message: "Bạn không thể mua xe của chính mình",
@@ -63,12 +72,10 @@ class OrderController {
       if (paymentMethod === PaymentMethod.DEPOSIT) {
         depositAmount = Math.round(totalAmount * (depositPercentage / 100));
         remainingAmount = totalAmount - depositAmount;
-      }
-
-      // Tạo đơn hàng
+      } // Tạo đơn hàng
       const order = new Order({
         buyer: buyerId,
-        seller: car.seller._id,
+        seller: seller._id,
         car: carId,
         paymentMethod: paymentMethod,
         totalAmount: totalAmount,
