@@ -16,7 +16,7 @@ const BankInfoManagement = () => {
     try {
       setLoading(true);
       const response = await userBankAPI.get();
-      setBankInfo(response.data);
+      setBankInfo(response.data.bankInfo);
     } catch (error) {
       console.error("Error fetching bank info:", error);
       // Bank info không tồn tại là bình thường
@@ -25,7 +25,6 @@ const BankInfoManagement = () => {
       setLoading(false);
     }
   };
-
   const handleSaveBankInfo = async (newBankInfo) => {
     try {
       await userBankAPI.update(newBankInfo);
@@ -35,6 +34,7 @@ const BankInfoManagement = () => {
     } catch (error) {
       toast.error("Không thể cập nhật thông tin ngân hàng");
       console.error("Error updating bank info:", error);
+      // Không throw error để tránh hiển thị 2 toast
     }
   };
 
@@ -129,7 +129,7 @@ const BankInfoManagement = () => {
 
                   <div className="info-item">
                     <label>Tên chủ tài khoản:</label>
-                    <span>{bankInfo.accountHolderName}</span>
+                    <span>{bankInfo.accountHolder}</span>
                   </div>
 
                   <div className="info-item">

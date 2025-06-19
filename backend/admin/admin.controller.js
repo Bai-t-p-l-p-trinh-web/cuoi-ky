@@ -1306,7 +1306,7 @@ const getRequests = async (req, res) => {
         if (request.sellerId) {
           try {
             seller = await User.findById(request.sellerId).select(
-              "name email phone"
+              "name email phone bankInfo"
             );
           } catch (error) {
             console.error(`Error finding seller ${request.sellerId}:`, error);
@@ -1349,6 +1349,12 @@ const getRequests = async (req, res) => {
                 name: seller.name,
                 email: seller.email,
                 phone: seller.phone,
+                bankInfo: {
+                  hasBankInfo: !!seller.bankInfo?.accountNumber,
+                  isVerified: seller.bankInfo?.isVerified || false,
+                  bankName: seller.bankInfo?.bankName || null,
+                  verifiedAt: seller.bankInfo?.verifiedAt || null,
+                },
               }
             : null,
           inspectors: inspectors || [],
@@ -1393,14 +1399,12 @@ const getRequestDetail = async (req, res) => {
         success: false,
         message: "Không tìm thấy yêu cầu",
       });
-    }
-
-    // Manually populate seller data
+    } // Manually populate seller data
     let seller = null;
     if (request.sellerId) {
       try {
         seller = await User.findById(request.sellerId).select(
-          "name email phone createdAt"
+          "name email phone createdAt bankInfo"
         );
       } catch (error) {
         console.error(`Error finding seller ${request.sellerId}:`, error);
@@ -1418,7 +1422,6 @@ const getRequestDetail = async (req, res) => {
         console.error(`Error finding inspectors:`, error);
       }
     }
-
     res.json({
       success: true,
       data: {
@@ -1430,6 +1433,16 @@ const getRequestDetail = async (req, res) => {
               email: seller.email,
               phone: seller.phone,
               joinedAt: seller.createdAt,
+              bankInfo: {
+                hasBankInfo: !!seller.bankInfo?.accountNumber,
+                isVerified: seller.bankInfo?.isVerified || false,
+                bankName: seller.bankInfo?.bankName || null,
+                accountNumber: seller.bankInfo?.accountNumber
+                  ? `****${seller.bankInfo.accountNumber.slice(-4)}`
+                  : null,
+                accountHolder: seller.bankInfo?.accountHolder || null,
+                verifiedAt: seller.bankInfo?.verifiedAt || null,
+              },
             }
           : null,
         inspectors: inspectors || [],
@@ -2112,6 +2125,69 @@ const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// [PATCH] /api/v1/admin/users/:userId/verify-bank
+const verifyUserBankInfo = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { isVerified } = req.body;
+    const adminId = req.userId;
+
+    // Kiểm tra quyền admin/inspector
+    const admin = await User.findById(adminId);
+    if (!admin || !["admin", "inspector"].includes(admin.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Không có quyền thực hiện thao tác này",
+      });
+    }
+
+    // Tìm user cần verify
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy người dùng",
+      });
+    }
+
+    if (!user.bankInfo || !user.bankInfo.accountNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "User chưa có thông tin ngân hàng",
+      });
+    }
+
+    // Cập nhật trạng thái verification
+    user.bankInfo.isVerified = isVerified;
+    user.bankInfo.verifiedAt = isVerified ? new Date() : null;
+    user.bankInfo.verifiedBy = adminId;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: isVerified
+        ? "Đã xác thực thông tin ngân hàng thành công"
+        : "Đã từ chối xác thực thông tin ngân hàng",
+      data: {
+        userId: user._id,
+        bankInfo: {
+          isVerified: user.bankInfo.isVerified,
+          verifiedAt: user.bankInfo.verifiedAt,
+          verifiedBy: admin.name,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Verify bank info error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi xác thực thông tin ngân hàng",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAnalytics,
@@ -2120,6 +2196,7 @@ module.exports = {
   updateUser,
   deleteUser,
   updateUserStatus,
+  verifyUserBankInfo,
   // Car management APIs
   getCars,
   getCarDetail,
@@ -2141,4 +2218,5 @@ module.exports = {
   getPayments,
   getPaymentDetail,
   updatePaymentStatus,
+  verifyUserBankInfo,
 };

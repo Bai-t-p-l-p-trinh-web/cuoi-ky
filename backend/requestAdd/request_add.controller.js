@@ -21,6 +21,15 @@ const createRequest = async (req, res) => {
         .json({ message: "Bạn không có quyền tạo yêu cầu! " });
     }
 
+    // Kiểm tra thông tin ngân hàng
+    if (!user.bankInfo || !user.bankInfo.accountNumber) {
+      return res.status(400).json({
+        message:
+          "Bạn cần cập nhật thông tin ngân hàng trước khi đăng xe để có thể nhận thanh toán từ người mua.",
+        needBankInfo: true,
+      });
+    }
+
     let { name, year, km, fuel, seat_capacity, location, img_demo } = req.body;
 
     year = parseInt(year);
@@ -212,12 +221,26 @@ const checkedTheRequest = async (req, res) => {
         .status(403)
         .json({ message: "Đã duyệt rồi không thể duyệt nữa!" });
     }
-
     request.status = "checked";
     request.img_src = req.body.img_src || [];
     request.examine = req.body.examine;
     request.price_recommend_low = req.body.price_recommend_low;
     request.price_recommend_high = req.body.price_recommend_high;
+
+    // Xác thực tài khoản ngân hàng của seller khi inspector duyệt OK
+    if (
+      seller.bankInfo &&
+      seller.bankInfo.accountNumber &&
+      !seller.bankInfo.isVerified
+    ) {
+      seller.bankInfo.isVerified = true;
+      seller.bankInfo.verifiedAt = new Date();
+      await seller.save();
+
+      console.log(
+        `Đã xác thực tài khoản ngân hàng cho seller ${seller.name} (${seller.email})`
+      );
+    }
 
     const dataSend = JSON.parse(JSON.stringify(request));
     dataSend.seller = seller;
@@ -225,9 +248,24 @@ const checkedTheRequest = async (req, res) => {
     const secure_url = await createPdf({ request: dataSend });
 
     request.secure_url = secure_url;
-
     await request.save();
-    return res.send("Đã chuyển trạng thái sang kiểm tra xong thành công! ");
+
+    let responseMessage = "Đã chuyển trạng thái sang kiểm tra xong thành công!";
+
+    // Thêm thông tin về bank verification vào response
+    if (seller.bankInfo && seller.bankInfo.accountNumber) {
+      if (seller.bankInfo.isVerified) {
+        responseMessage += " Tài khoản ngân hàng của seller đã được xác thực.";
+      }
+    } else {
+      responseMessage += " Lưu ý: Seller chưa có thông tin ngân hàng.";
+    }
+
+    return res.status(200).json({
+      message: responseMessage,
+      bankVerified: seller.bankInfo?.isVerified || false,
+      hasBankInfo: !!seller.bankInfo?.accountNumber,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Server Error!" });
   }

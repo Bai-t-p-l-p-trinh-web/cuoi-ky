@@ -30,6 +30,7 @@ function ChiTietXe() {
   useEffect(() => {
     const getDataCar = async () => {
       try {
+        console.log("get car by slug");
         const resDataCar = await apiClient.get(`/car/${slugCar}`);
         setXe(resDataCar.data);
       } catch (error) {

@@ -15,165 +15,202 @@ module.exports.index = async (req, res) => {
     const pricemin = parseInt(req.query.pricemin);
     const pricemax = parseInt(req.query.pricemax);
 
-        if (!isNaN(pricemin) && !isNaN(pricemax)){
-            find.price = { $gte : pricemin, $lte : pricemax};
-        } else if (!isNaN(pricemin)) {
-            find.price = { $gte : pricemin };
-        } else if (!isNaN(pricemax)) {
-            find.price = { $lte : pricemax }
-        }
-
-        // Filter By Year 
-        const yearmin = parseInt(req.query.yearmin);
-        const yearmax = parseInt(req.query.yearmax);
-
-        if (!isNaN(yearmin) && !isNaN(yearmax)){
-            find.year = { $gte : yearmin, $lte : yearmax};
-        } else if (!isNaN(yearmin)) {
-            find.year = { $gte : yearmin };
-        } else if (!isNaN(yearmax)) {
-            find.year = { $lte : yearmax }
-        }
-
-        // Filter By Km 
-        const kmmin = parseInt(req.query.kmmin);
-        const kmmax = parseInt(req.query.kmmax);
-
-        if (!isNaN(kmmin) && !isNaN(kmmax)){
-            find.km = { $gte : kmmin, $lte : kmmax};
-        } else if (!isNaN(kmmin)) {
-            find.km = { $gte : kmmin };
-        } else if (!isNaN(kmmax)) {
-            find.km = { $lte : kmmax }
-        }
-
-        if(req.query.fuel_type){
-            const fuel_types = req.query.fuel_type.split('+').map(type => type.trim()).filter(Boolean);
-            if (fuel_types.length > 0) {
-                find["fuel_use.fuel_type"] = { $in : fuel_types};
-            }
-        }   
-        
-        if(req.query.seat_capacity){
-            const seat_capacities = req.query.seat_capacity.split('+');
-            if (seat_capacities.length > 0) {
-                find.seat_capacity = { $in : seat_capacities};
-            }
-        }
-
-        if (req.query.keyword && req.query.keyword.trim() !== "") {
-            const keyword = req.query.keyword.trim();
-            find.title = { $regex: keyword, $options: "i" }; 
-        }
-
-
-        const recordsCar = await Car.find(find).select('-__v -deleted -_id');
-
-        let prices = recordsCar.map(car => car.price);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-
-        recordsCar.forEach(car => {
-            if(!car.location) {
-                car.location = {
-                    query_location : "",
-                    query_name : "Toàn Quốc"
-                }
-            }
-            else if (!car.location.query_location || car.location.query_location.trim() === "") {
-                car.location.query_name = "Toàn Quốc";
-            }
-        });
-
-        const page = parseInt(req.query.page) || 1;
-        const limit = 6;
-        const start = (page - 1) * limit;
-        const end = page * limit;
-
-        const paginatedCars = recordsCar.slice(start, end);
-
-        const DataSend = {
-            num : recordsCar.length,
-            minPrice,
-            maxPrice,
-            cars : paginatedCars || []
-        }
-
-
-        return res.send(DataSend);
-    } catch (error) {
-        console.error("Error In Finding Car ! ! ! : ", error);
-        return res.status(500).json({message : "Server Error!!!"});
+    if (!isNaN(pricemin) && !isNaN(pricemax)) {
+      find.price = { $gte: pricemin, $lte: pricemax };
+    } else if (!isNaN(pricemin)) {
+      find.price = { $gte: pricemin };
+    } else if (!isNaN(pricemax)) {
+      find.price = { $lte: pricemax };
     }
+
+    // Filter By Year
+    const yearmin = parseInt(req.query.yearmin);
+    const yearmax = parseInt(req.query.yearmax);
+
+    if (!isNaN(yearmin) && !isNaN(yearmax)) {
+      find.year = { $gte: yearmin, $lte: yearmax };
+    } else if (!isNaN(yearmin)) {
+      find.year = { $gte: yearmin };
+    } else if (!isNaN(yearmax)) {
+      find.year = { $lte: yearmax };
+    }
+
+    // Filter By Km
+    const kmmin = parseInt(req.query.kmmin);
+    const kmmax = parseInt(req.query.kmmax);
+
+    if (!isNaN(kmmin) && !isNaN(kmmax)) {
+      find.km = { $gte: kmmin, $lte: kmmax };
+    } else if (!isNaN(kmmin)) {
+      find.km = { $gte: kmmin };
+    } else if (!isNaN(kmmax)) {
+      find.km = { $lte: kmmax };
+    }
+
+    if (req.query.fuel_type) {
+      const fuel_types = req.query.fuel_type
+        .split("+")
+        .map((type) => type.trim())
+        .filter(Boolean);
+      if (fuel_types.length > 0) {
+        find["fuel_use.fuel_type"] = { $in: fuel_types };
+      }
+    }
+
+    if (req.query.seat_capacity) {
+      const seat_capacities = req.query.seat_capacity.split("+");
+      if (seat_capacities.length > 0) {
+        find.seat_capacity = { $in: seat_capacities };
+      }
+    }
+
+    if (req.query.keyword && req.query.keyword.trim() !== "") {
+      const keyword = req.query.keyword.trim();
+      find.title = { $regex: keyword, $options: "i" };
+    }
+
+    const recordsCar = await Car.find(find).select("-__v -deleted");
+    let prices = recordsCar.map((car) => car.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    recordsCar.forEach((car) => {
+      if (!car.location) {
+        car.location = {
+          query_location: "",
+          query_name: "Toàn Quốc",
+        };
+      } else if (
+        !car.location.query_location ||
+        car.location.query_location.trim() === ""
+      ) {
+        car.location.query_name = "Toàn Quốc";
+      }
+    });
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const start = (page - 1) * limit;
+    const end = page * limit;
+
+    const paginatedCars = recordsCar.slice(start, end);
+
+    const DataSend = {
+      num: recordsCar.length,
+      minPrice,
+      maxPrice,
+      cars: paginatedCars || [],
+    };
+
+    console.log("pagi car", paginatedCars);
+    console.log("record data", recordsCar);
+    console.log("send data", DataSend);
+
+    return res.send(DataSend);
+  } catch (error) {
+    console.error("Error In Finding Car ! ! ! : ", error);
+    return res.status(500).json({ message: "Server Error!!!" });
+  }
 };
 
 // [GET] /api/v1/car/:slugCar
 module.exports.getCarBySlug = async (req, res) => {
-    try {
-
-        const slugCar = req.params.slugCar;
-        if(!slugCar) {
-            return res.status(404).json({ message : "Không có slug Car" });
-        }
-
-        let find = {
-            deleted: false,
-            status : "selling",
-            slug: slugCar
-        };
-
-        if(req.userId) {
-            let find2 = {
-                deleted : false,
-                slug : slugCar,
-                sellerId : req.userId
-            };
-            find = {$or : [find, find2]};
-            
-        }
-        
-
-        const resultFindingCar = await Car.findOne(find).select('-__v -deleted -_id');
-
-        if(!resultFindingCar){
-            return res.status(404).json({message : "Car not found!!!"});
-        }
-        
-        const newResultFindingCar = JSON.parse(JSON.stringify(resultFindingCar));
-
-        // Define result 
-        newResultFindingCar.fuel = newResultFindingCar.fuel_use.fuel_name;
-
-        // find user 
-        const seller = await User.findById(resultFindingCar.sellerId);
-
-        if(!seller) {
-            return res.status(404).json ( { message : "Không tìm thấy thông tin người bán!" } );
-        }
-
-        newResultFindingCar.user = {
-            id : seller._id,
-            name: seller.name,
-            phone: seller.phone,
-            email: seller.email,
-            slug : seller.slug
-        };
-
-        await getInTouchView({sellerId : seller._id});
-
-        return res.send(newResultFindingCar);
-    } catch (error) {
-        console.error("Error In Finding Car By Slug ! ! ! : ", error);
-        return res.status(500).json({message : "Server Error!!!"});
+  try {
+    const slugCar = req.params.slugCar;
+    if (!slugCar) {
+      return res.status(404).json({ message: "Không có slug Car" });
     }
+
+    let find = {
+      deleted: false,
+      status: "selling",
+      slug: slugCar,
+    };
+
+    if (req.userId) {
+      let find2 = {
+        deleted: false,
+        slug: slugCar,
+        sellerId: req.userId,
+      };
+      find = { $or: [find, find2] };
+    }
+
+    const resultFindingCar = await Car.findOne(find).select("-__v -deleted");
+
+    if (!resultFindingCar) {
+      return res.status(404).json({ message: "Car not found!!!" });
+    }
+
+    const newResultFindingCar = JSON.parse(JSON.stringify(resultFindingCar));
+
+    // Define result
+    newResultFindingCar.fuel = newResultFindingCar.fuel_use.fuel_name;
+
+    // find user
+    const seller = await User.findById(resultFindingCar.sellerId);
+
+    if (!seller) {
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy thông tin người bán!" });
+    }
+
+    newResultFindingCar.user = {
+      id: seller._id,
+      name: seller.name,
+      phone: seller.phone,
+      email: seller.email,
+      slug: seller.slug,
+    };
+
+    await getInTouchView({ sellerId: seller._id });
+
+    console.log("resultFindingCar: ", resultFindingCar);
+    console.log("newResultFindingCar: ", newResultFindingCar);
+
+    return res.send(newResultFindingCar);
+  } catch (error) {
+    console.error("Error In Finding Car By Slug ! ! ! : ", error);
+    return res.status(500).json({ message: "Server Error!!!" });
+  }
 };
 
 // [POST] /api/v1/car
 module.exports.createCar = async (req, res) => {
   try {
+    const userId = req.userId;
+
+    // Lấy thông tin user và kiểm tra thông tin ngân hàng
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    // Kiểm tra user đã có thông tin ngân hàng chưa
+    if (
+      !user.bankInfo ||
+      !user.bankInfo.accountNumber ||
+      !user.bankInfo.isVerified
+    ) {
+      return res.status(400).json({
+        message:
+          "Bạn cần cập nhật và xác minh thông tin ngân hàng trước khi đăng xe",
+        needBankInfo: true,
+      });
+    }
+
     req.body.price = parseInt(req.body.price);
     req.body.year = parseInt(req.body.year);
     req.body.seat_capacity = parseInt(req.body.seat_capacity);
+
+    // Thêm thông tin ngân hàng từ user vào car
+    req.body.sellerBankInfo = {
+      bankName: user.bankInfo.bankName,
+      bankCode: user.bankInfo.bankCode,
+      accountNumber: user.bankInfo.accountNumber,
+      accountHolder: user.bankInfo.accountHolder,
+    };
 
     const recordCar = new Car(req.body);
     await recordCar.save();

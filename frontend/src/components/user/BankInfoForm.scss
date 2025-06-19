@@ -1,379 +1,679 @@
-.bank-info-form {
-  background: white;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+// BankInfoForm.scss
+.bank-info-form-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
 
-  .form-header {
-    background: #f8f9fa;
-    padding: 20px 25px;
-    border-bottom: 1px solid #e1e5e9;
-    border-radius: 12px 12px 0 0;
+  .bank-info-form {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
 
-    h2 {
-      margin: 0;
-      color: #333;
-      font-size: 1.5rem;
-      font-weight: 600;
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+
+      &:hover {
+        background: #a8a8a8;
+      }
+    }
+
+    .form-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 20px 20px 0 0;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
 
       &::before {
-        content: "🏦";
-        font-size: 1.3rem;
-      }
-    }
-
-    p {
-      margin: 8px 0 0 0;
-      color: #666;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-  }
-
-  .form-body {
-    padding: 25px;
-
-    .form-group {
-      margin-bottom: 20px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      label {
-        display: block;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-        font-size: 14px;
-
-        .required {
-          color: #e74c3c;
-          margin-left: 3px;
-        }
-      }
-
-      input,
-      select {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
         width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e1e5e9;
-        border-radius: 8px;
-        font-size: 14px;
-        font-family: inherit;
-        transition: border-color 0.2s ease;
-        background: white;
-
-        &:focus {
-          outline: none;
-          border-color: #007bff;
-          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        &.error {
-          border-color: #e74c3c;
-          box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
-        }
-
-        &:disabled {
-          background: #f8f9fa;
-          color: #6c757d;
-          cursor: not-allowed;
-        }
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: rotate(45deg);
       }
 
-      .error-message {
-        color: #e74c3c;
-        font-size: 12px;
-        margin-top: 5px;
+      .header-content {
         display: flex;
         align-items: center;
-        gap: 5px;
-      }
+        gap: 20px;
+        z-index: 1;
 
-      .help-text {
-        color: #666;
-        font-size: 12px;
-        margin-top: 5px;
-        line-height: 1.4;
-      }
-    }
+        .header-icon {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 15px;
+          padding: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
 
-    .bank-selection {
-      .bank-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 10px;
-        margin-top: 10px;
-
-        .bank-option {
-          padding: 12px 15px;
-          border: 2px solid #e1e5e9;
-          border-radius: 8px;
-          background: white;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: center;
-
-          &:hover {
-            border-color: #007bff;
-            background: #f8f9fa;
+          i {
+            font-size: 28px;
+            color: white;
           }
+        }
 
-          &.selected {
-            border-color: #007bff;
-            background: #e3f2fd;
-            color: #1565c0;
-          }
-
-          .bank-name {
+        .header-text {
+          h3 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
             font-weight: 600;
-            font-size: 13px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           }
 
-          .bank-code {
-            font-size: 11px;
-            color: #666;
-            margin-top: 3px;
+          p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 300;
           }
+        }
+      }
+
+      .close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        padding: 10px;
+        transition: all 0.3s ease;
+        z-index: 2;
+
+        i {
+          font-size: 18px;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: scale(1.1);
         }
       }
     }
 
-    .verification-status {
-      background: #f8f9fa;
-      border: 1px solid #e1e5e9;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
+    .current-info-card {
+      margin: 20px 30px;
+      background: #f8faff;
+      border: 2px solid #e3f2fd;
+      border-radius: 15px;
+      overflow: hidden;
 
-      .status-header {
+      .card-header {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%);
+        padding: 20px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
+        border-bottom: 1px solid #e1f5fe;
 
-        .status-icon {
-          font-size: 1.2rem;
-        }
-
-        .status-text {
+        h4 {
+          margin: 0;
+          color: #1976d2;
+          font-size: 18px;
           font-weight: 600;
-          color: #333;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          i {
+            color: #42a5f5;
+          }
         }
 
         .status-badge {
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 11px;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 12px;
           font-weight: 600;
           text-transform: uppercase;
-
-          &.pending {
-            background: #fff3cd;
-            color: #856404;
-          }
+          letter-spacing: 0.5px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
 
           &.verified {
-            background: #d4edda;
-            color: #155724;
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+
+            i {
+              color: #4caf50;
+            }
           }
 
-          &.rejected {
-            background: #f8d7da;
-            color: #721c24;
+          &.pending {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+
+            i {
+              color: #ff9800;
+            }
           }
         }
       }
 
-      .rejection-reason {
-        background: #f8d7da;
-        border: 1px solid #f5c6cb;
-        border-radius: 6px;
-        padding: 10px;
-        margin-top: 10px;
+      .info-grid {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
 
-        .reason-title {
+        .info-item {
+          background: white;
+          padding: 15px;
+          border-radius: 10px;
+          border: 1px solid #e0e0e0;
+          transition: all 0.3s ease;
+
+          &:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+          }
+
+          .info-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            i {
+              color: #1976d2;
+              font-size: 14px;
+            }
+          }
+
+          .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            word-break: break-word;
+          }
+        }
+      }
+    }
+
+    .form-content {
+      padding: 30px;
+
+      .form-group {
+        margin-bottom: 25px;
+
+        label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           font-weight: 600;
-          color: #721c24;
+          color: #333;
+          margin-bottom: 10px;
+          font-size: 14px;
+
+          i {
+            color: #1976d2;
+            font-size: 16px;
+          }
+
+          .required {
+            color: #f44336;
+            font-weight: 700;
+          }
+        }
+
+        .select-wrapper {
+          position: relative;
+
+          .styled-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+            appearance: none;
+            cursor: pointer;
+
+            &:focus {
+              outline: none;
+              border-color: #1976d2;
+              box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+            }
+
+            &:hover {
+              border-color: #1976d2;
+            }
+          }
+
+          .select-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+            transition: all 0.3s ease;
+          }
+
+          &:hover .select-arrow {
+            color: #1976d2;
+          }
+        }
+
+        .input-wrapper {
+          position: relative;
+
+          input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+
+            &:focus {
+              outline: none;
+              border-color: #1976d2;
+              box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+            }
+
+            &:hover {
+              border-color: #1976d2;
+            }
+
+            &.error {
+              border-color: #f44336;
+              box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+            }
+
+            &::placeholder {
+              color: #999;
+              font-style: italic;
+            }
+          }
+
+          .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 16px;
+            transition: all 0.3s ease;
+          }
+
+          &:focus-within .input-icon {
+            color: #1976d2;
+          }
+        }
+
+        .error-text {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: #f44336;
           font-size: 12px;
-          margin-bottom: 5px;
-        }
+          margin-top: 6px;
+          font-weight: 500;
 
-        .reason-text {
-          color: #721c24;
-          font-size: 12px;
-          line-height: 1.4;
-        }
-      }
-    }
-
-    .loading-state {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: #666;
-
-      .spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #f3f3f3;
-        border-top: 2px solid #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-right: 10px;
-      }
-    }
-  }
-
-  .form-footer {
-    padding: 20px 25px;
-    border-top: 1px solid #e1e5e9;
-    background: #f8f9fa;
-    border-radius: 0 0 12px 12px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 100px;
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      &.btn-secondary {
-        background: #6c757d;
-        color: white;
-
-        &:hover:not(:disabled) {
-          background: #5a6268;
+          i {
+            font-size: 12px;
+          }
         }
       }
 
-      &.btn-primary {
-        background: #007bff;
-        color: white;
+      .important-notice {
+        background: linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%);
+        border: 2px solid #ffcc02;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 30px 0;
 
-        &:hover:not(:disabled) {
-          background: #0056b3;
+        .notice-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 15px;
+
+          i {
+            color: #f57c00;
+            font-size: 20px;
+          }
+
+          h4 {
+            margin: 0;
+            color: #f57c00;
+            font-size: 16px;
+            font-weight: 600;
+          }
+        }
+
+        .notice-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+
+          li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            i {
+              color: #4caf50;
+              font-size: 12px;
+              margin-top: 2px;
+              flex-shrink: 0;
+            }
+          }
         }
       }
-    }
 
-    .footer-note {
-      flex: 1;
-      color: #666;
-      font-size: 12px;
-      line-height: 1.4;
-      display: flex;
-      align-items: center;
+      .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
 
-      &::before {
-        content: "ℹ️";
-        margin-right: 5px;
-      }
-    }
-  }
-
-  // Modal overlay styles (if used as modal)
-  &.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 768px) {
-  .bank-info-form {
-    margin: 10px;
-    max-width: none;
-
-    .form-header,
-    .form-body,
-    .form-footer {
-      padding: 15px 20px;
-    }
-
-    .form-body {
-      .bank-selection {
-        .bank-options {
-          grid-template-columns: 1fr;
+        .btn-secondary {
+          padding: 12px 24px;
+          border: 2px solid #e0e0e0;
+          background: white;
+          color: #666;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
           gap: 8px;
 
-          .bank-option {
-            padding: 10px 12px;
+          &:hover:not(:disabled) {
+            border-color: #666;
+            color: #333;
+            transform: translateY(-1px);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn-primary {
+          padding: 12px 24px;
+          background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 160px;
+          justify-content: center;
+
+          &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+          }
+
+          .fa-spin {
+            animation: spin 1s linear infinite;
+          }
+        }
+      }
+    }
+
+    .verification-notice {
+      background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+      border: 2px solid #c8e6c9;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 30px 30px 30px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+
+      .notice-icon {
+        background: rgba(76, 175, 80, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+          font-size: 24px;
+          color: #4caf50;
+        }
+      }
+
+      .notice-content {
+        h4 {
+          margin: 0 0 10px 0;
+          color: #2e7d32;
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 0 0 8px 0;
+          color: #333;
+          font-size: 14px;
+          line-height: 1.5;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .bank-info-form-container {
+    padding: 10px;
+
+    .bank-info-form {
+      border-radius: 15px;
+      max-height: 95vh;
+
+      .form-header {
+        padding: 20px;
+        border-radius: 15px 15px 0 0;
+
+        .header-content {
+          gap: 15px;
+
+          .header-icon {
+            padding: 12px;
+
+            i {
+              font-size: 24px;
+            }
+          }
+
+          .header-text {
+            h3 {
+              font-size: 20px;
+            }
+
+            p {
+              font-size: 13px;
+            }
           }
         }
       }
 
-      .verification-status {
-        padding: 12px;
-      }
-    }
+      .current-info-card {
+        margin: 15px 20px;
 
-    .form-footer {
-      flex-direction: column;
-      gap: 15px;
-
-      .btn {
-        width: 100%;
+        .info-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
       }
 
-      .footer-note {
-        order: -1;
+      .form-content {
+        padding: 20px;
+
+        .form-group {
+          margin-bottom: 20px;
+
+          .input-wrapper input {
+            padding: 12px 15px 12px 45px;
+            font-size: 14px;
+          }
+
+          .select-wrapper .styled-select {
+            padding: 12px 15px;
+            font-size: 14px;
+          }
+        }
+
+        .form-actions {
+          flex-direction: column;
+
+          .btn-secondary,
+          .btn-primary {
+            width: 100%;
+            justify-content: center;
+            padding: 15px 20px;
+            font-size: 16px;
+          }
+        }
+      }
+
+      .verification-notice {
+        margin: 15px 20px 20px 20px;
+        padding: 20px;
+        flex-direction: column;
         text-align: center;
+
+        .notice-icon {
+          align-self: center;
+        }
       }
     }
   }
 }
 
 @media (max-width: 480px) {
-  .bank-info-form {
-    .form-header {
-      h2 {
-        font-size: 1.3rem;
-      }
-    }
+  .bank-info-form-container {
+    padding: 5px;
 
-    .form-body {
-      .form-group {
-        input,
-        select {
-          padding: 10px 12px;
-          font-size: 13px;
+    .bank-info-form {
+      .form-header {
+        .header-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+        }
+      }
+
+      .form-content {
+        padding: 15px;
+
+        .important-notice {
+          padding: 15px;
+
+          .notice-list li {
+            font-size: 13px;
+          }
         }
       }
     }
   }
+}
+
+// Animation keyframes
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bank-info-form {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+// Smooth transitions for all interactive elements
+* {
+  transition: all 0.3s ease;
 }
