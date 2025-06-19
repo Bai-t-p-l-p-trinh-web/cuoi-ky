@@ -5,7 +5,9 @@ import { FaRoad, FaPhoneAlt } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import { FaRegComment } from "react-icons/fa6";
 import { MdEventSeat } from "react-icons/md";
+import { IoCarSport } from "react-icons/io5";
 import SwiperDetail from "../../components/Swiper/CustomSwiper/Swiper_Detail";
+import CreateOrderForm from "../../components/order/CreateOrderForm";
 import "./scss/ChiTietXe.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import apiClient from "../../utils/axiosConfig";
@@ -23,7 +25,8 @@ function ChiTietXe() {
   const { slugCar } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [xe, setXe] = useState(null);
-
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const { user, loading, error } = useFetchUserInfo();
   useEffect(() => {
     const getDataCar = async () => {
       try {
@@ -39,7 +42,7 @@ function ChiTietXe() {
       getDataCar();
     }
   }, [slugCar]);
-
+  console.log(xe);
   const contactSeller = () => {
     const dataSend = {
       sellerId: xe.user.id,
@@ -60,6 +63,31 @@ function ChiTietXe() {
       }
     };
     startMessage();
+  };
+  const handleBuyCar = () => {
+    if (!user) {
+      toast.error("Vui lòng đăng nhập để mua xe!");
+      navigate("/auth");
+      return;
+    }
+
+    if (xe.user.id === user._id) {
+      toast.error("Bạn không thể mua xe của chính mình!");
+      return;
+    }
+
+    if (xe.status !== "selling") {
+      toast.error("Xe này hiện không còn bán!");
+      return;
+    }
+
+    setShowOrderForm(true);
+  };
+
+  const handleOrderSuccess = () => {
+    // Reload trang để cập nhật trạng thái xe
+    setShowOrderForm(false);
+    window.location.reload();
   };
   return (
     <>
@@ -173,8 +201,19 @@ function ChiTietXe() {
                           {xe.user.name}
                         </span>
                       </div>
-                    </div>
+                    </div>{" "}
                     <div className="chitiet__xe__buttons">
+                      {xe.status === "selling" && (
+                        <button
+                          className="chitiet__xe__buttons__buy"
+                          onClick={handleBuyCar}
+                        >
+                          <IoCarSport className="chitiet__xe__buttons__buy-icon" />
+                          <span className="chitiet__xe__buttons__buy-span">
+                            Mua xe
+                          </span>
+                        </button>
+                      )}
                       <button className="chitiet__xe__buttons__call">
                         <FaPhoneAlt className="chitiet__xe__buttons__call-icon" />
                         <span className="chitiet__xe__buttons__call-span">
@@ -195,9 +234,17 @@ function ChiTietXe() {
                 </div>
               )}
             </>
-          )}
+          )}{" "}
         </div>
-      </div>
+      </div>{" "}
+      {/* Order Form Modal */}{" "}
+      {showOrderForm && xe && (
+        <CreateOrderForm
+          car={xe}
+          onClose={() => setShowOrderForm(false)}
+          onOrderCreated={handleOrderSuccess}
+        />
+      )}
     </>
   );
 }

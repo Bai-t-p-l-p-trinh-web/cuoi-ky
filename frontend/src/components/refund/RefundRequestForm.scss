@@ -1,0 +1,471 @@
+.refund-request-form {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+
+  .form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 25px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      margin: 0;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  .order-info {
+    background: #f8f9fa;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e1e5e9;
+
+    h4 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &::before {
+        content: "📋";
+        font-size: 1.2rem;
+      }
+    }
+
+    .order-details {
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e9ecef;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        span:first-child {
+          color: #666;
+          font-weight: 500;
+        }
+
+        span:last-child {
+          color: #333;
+          font-weight: 600;
+
+          &.refund-amount {
+            color: #28a745;
+            font-size: 1.1rem;
+          }
+
+          &.status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+
+            &.pending {
+              background: #ffc107;
+              color: #856404;
+            }
+
+            &.paid_partial {
+              background: #17a2b8;
+              color: white;
+            }
+
+            &.paid_full {
+              background: #28a745;
+              color: white;
+            }
+
+            &.cancelled {
+              background: #dc3545;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+  form {
+    padding: 25px;
+
+    .form-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #fdfdfd;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h4 {
+        margin: 0 0 20px 0;
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+
+        &::before {
+          content: "💬";
+          font-size: 1.2rem;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        label {
+          display: block;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 8px;
+          font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+          width: 100%;
+          padding: 12px 15px;
+          border: 2px solid #e1e5e9;
+          border-radius: 8px;
+          font-size: 14px;
+          font-family: inherit;
+          transition: border-color 0.2s ease;
+          background: white;
+          box-sizing: border-box;
+
+          &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          }
+
+          &::placeholder {
+            color: #999;
+          }
+        }
+
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+          line-height: 1.5;
+        }
+
+        small {
+          color: #666;
+          font-size: 12px;
+          margin-top: 5px;
+          display: block;
+          line-height: 1.4;
+        }
+
+        .evidence-field {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          margin-bottom: 10px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          input {
+            flex: 1;
+          }
+
+          .remove-evidence {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background: #c82333;
+            }
+          }
+        }
+
+        .add-evidence {
+          background: #28a745;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          margin-top: 10px;
+
+          &:hover {
+            background: #218838;
+          }
+        }
+      }
+    }
+
+    .warning-section {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+
+      h4 {
+        margin: 0 0 15px 0;
+        color: #856404;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #856404;
+
+        li {
+          margin-bottom: 8px;
+          line-height: 1.4;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+      padding-top: 20px;
+      border-top: 1px solid #e9ecef;
+
+      button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 120px;
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        &[type="button"] {
+          background: #6c757d;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background: #5a6268;
+          }
+        }
+
+        &[type="submit"] {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          }
+        }
+      }
+    }
+  }
+  // Modal overlay styles (if used as modal)
+  &.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .refund-request-form {
+    margin: 10px;
+    max-width: none;
+    max-height: 95vh;
+
+    .form-header,
+    .order-info {
+      padding: 15px 20px;
+    }
+
+    form {
+      padding: 20px;
+
+      .form-section {
+        padding: 15px;
+        margin-bottom: 20px;
+
+        h4 {
+          font-size: 1rem;
+          margin-bottom: 15px;
+        }
+
+        .form-group {
+          margin-bottom: 15px;
+
+          .evidence-field {
+            flex-direction: column;
+            gap: 8px;
+
+            .remove-evidence {
+              align-self: flex-start;
+              width: auto;
+              padding: 6px 12px;
+              height: auto;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+
+        button {
+          width: 100%;
+          min-width: auto;
+        }
+      }
+    }
+
+    .order-info {
+      .order-details {
+        .detail-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+
+          span:last-child {
+            &.refund-amount {
+              font-size: 1.2rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .refund-request-form {
+    .form-header {
+      h3 {
+        font-size: 1.3rem;
+      }
+
+      .close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 20px;
+      }
+    }
+
+    form {
+      .form-section {
+        .form-group {
+          input,
+          select,
+          textarea {
+            padding: 10px 12px;
+            font-size: 13px;
+          }
+        }
+      }
+
+      .warning-section {
+        padding: 15px;
+
+        h4 {
+          font-size: 0.9rem;
+        }
+
+        ul {
+          padding-left: 15px;
+
+          li {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+}

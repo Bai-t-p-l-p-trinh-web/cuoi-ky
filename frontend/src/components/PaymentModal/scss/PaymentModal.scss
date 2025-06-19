@@ -1,0 +1,223 @@
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.payment-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e5e5;
+
+    h2 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #7f8c8d;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: #e74c3c;
+    }
+  }
+
+  &__content {
+    padding: 24px;
+  }
+
+  &__car-info {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 24px;
+
+    img {
+      width: 100px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+
+    .price {
+      margin: 0;
+      color: #e74c3c;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+  }
+
+  &__step {
+    h4 {
+      color: #27ae60;
+      margin: 0 0 20px 0;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.payment-info {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+    padding-top: 12px;
+    border-top: 1px solid #dee2e6;
+  }
+
+  span {
+    color: #6c757d;
+  }
+
+  strong {
+    color: #2c3e50;
+    font-size: 1.1rem;
+
+    &.success {
+      color: #27ae60;
+    }
+  }
+}
+
+.payment-note {
+  background: #e8f4f8;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #3498db;
+
+  p {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      color: #5a6c7d;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.payment-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    background: #27ae60;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #219a52;
+    }
+  }
+
+  &.secondary {
+    background: #95a5a6;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #7f8c8d;
+    }
+  }
+}
+
+.payment-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .payment-btn {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .payment-modal {
+    width: 95%;
+    margin: 20px;
+
+    &__car-info {
+      flex-direction: column;
+      text-align: center;
+
+      img {
+        width: 100%;
+        height: 200px;
+      }
+    }
+  }
+
+  .payment-actions {
+    flex-direction: column;
+
+    .payment-btn {
+      width: 100%;
+    }
+  }
+}

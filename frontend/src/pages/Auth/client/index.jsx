@@ -23,20 +23,20 @@ function ClientAuth() {
 
   // Xử lý OAuth error messages
   useEffect(() => {
-    const error = searchParams.get('error');
+    const error = searchParams.get("error");
     if (error) {
       const errorMessages = {
-        'oauth_cancelled': 'Đăng nhập Google đã bị hủy',
-        'email_not_verified': 'Email Google chưa được xác thực',
-        'user_creation_failed': 'Không thể tạo tài khoản mới',
-        'oauth_failed': 'Đã xảy ra lỗi trong quá trình đăng nhập Google'
+        oauth_cancelled: "Đăng nhập Google đã bị hủy",
+        email_not_verified: "Email Google chưa được xác thực",
+        user_creation_failed: "Không thể tạo tài khoản mới",
+        oauth_failed: "Đã xảy ra lỗi trong quá trình đăng nhập Google",
       };
-      
-      toast.error(errorMessages[error] || 'Đã xảy ra lỗi không xác định');
-      
+
+      toast.error(errorMessages[error] || "Đã xảy ra lỗi không xác định");
+
       // Clear error from URL
       const newUrl = window.location.pathname;
-      window.history.replaceState({}, '', newUrl);
+      window.history.replaceState({}, "", newUrl);
     }
   }, [searchParams]);
 
@@ -87,12 +87,17 @@ function ClientAuth() {
       const responseData = response.data;
       if (responseData.success) {
         if (responseData.data?.user) {
+          // Lưu user info vào localStorage và Redux
           localStorage.setItem("user", JSON.stringify(responseData.data.user));
-          // Cập nhật Redux state ngay lập tức
           dispatch(setUser(responseData.data.user));
           toast.success(responseData.message || "Đăng nhập thành công!");
           setTimeout(() => {
-            navigate("/");
+            // Redirect based on user role
+            if (responseData.data.user.role === "admin") {
+              navigate("/admin/dashboard");
+            } else {
+              navigate("/");
+            }
           }, 1500);
         } else {
           if (responseData.data?.actionRequired === "VERIFY_2FA_LOGIN") {
@@ -125,11 +130,16 @@ function ClientAuth() {
   };
   const handleOtpSuccess = (responseData) => {
     if (responseData.data?.user) {
+      // Lưu user info vào localStorage và Redux
       localStorage.setItem("user", JSON.stringify(responseData.data.user));
-      // Cập nhật Redux state ngay lập tức
       dispatch(setUser(responseData.data.user));
       setTimeout(() => {
-        navigate("/");
+        // Redirect based on user role
+        if (responseData.data.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
       }, 1500);
     }
   };

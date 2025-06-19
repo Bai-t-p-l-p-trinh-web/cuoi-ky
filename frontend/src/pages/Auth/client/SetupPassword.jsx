@@ -27,7 +27,7 @@ const SetupPassword = () => {
       !currentUser.isOAuthUser ||
       currentUser.hasSetPassword
     ) {
-      navigate("/my-account");
+      navigate("/my_account");
       toast.error("Bạn không có quyền truy cập trang này");
     }
   }, [currentUser, navigate]);
@@ -81,7 +81,7 @@ const SetupPassword = () => {
         localStorage.setItem("user", JSON.stringify(updatedUser));
         dispatch(setUser(updatedUser));
 
-        navigate("/my-account");
+        navigate("/my_account");
       } else {
         toast.error(response.data.message || "Có lỗi xảy ra");
       }
@@ -169,7 +169,7 @@ const SetupPassword = () => {
             <button
               type="button"
               className="btn btn-cancel"
-              onClick={() => navigate("/my-account")}
+              onClick={() => navigate("/my_account")}
               disabled={isLoading}
             >
               Hủy

@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { convertNum } from "../../utils/ConvertNumber";
+import { convertNum, convertCurrency } from "../../utils/ConvertNumber";
 import CardCar from "./Card_Car/CardCar";
 import "./scss/DisplayCar.scss";
 import { useEffect, useState } from "react";
@@ -39,12 +39,11 @@ function DisplayCar(props) {
         <ToastContainer />
         <h1 className="home__content__main__display--title">
           Mua bán oto - Xe ô tô cũ - Xe hơi mới toàn quốc
-        </h1>
+        </h1>{" "}
         <p className="home__content__main__display--description">
-          Có {convertNum(list.num)} tin bán xe giá từ {list.minPrice} triệu đến{" "}
-          {Math.floor(Number(list.maxPrice) / 1000)} tỷ{" "}
-          {Number(list.maxPrice) % 1000} triệu cập nhập mới nhất{" "}
-          {getMonthYear()}
+          Có {convertNum(list.num)} tin bán xe giá từ{" "}
+          {convertCurrency(list.minPrice)} đến {convertCurrency(list.maxPrice)}{" "}
+          cập nhật mới nhất {getMonthYear()}
         </p>
         <div className="home__content__main__display__list">
           {list?.cars.length > 0 &&

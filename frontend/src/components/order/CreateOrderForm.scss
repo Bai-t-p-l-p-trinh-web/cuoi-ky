@@ -1,0 +1,226 @@
+// CreateOrderForm.scss
+.create-order-form {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  max-width: 600px;
+  margin: 0 auto;
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+
+    h3 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+
+      &:hover {
+        color: #333;
+      }
+    }
+  }
+
+  .car-info {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+
+    img {
+      width: 80px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .car-details {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 8px;
+        color: #2c3e50;
+        font-size: 1.1rem;
+      }
+
+      .price {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin: 4px 0;
+      }
+
+      .location {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 6px;
+      background: #ddd;
+      border: none;
+      border-radius: 3px;
+
+      &::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #3498db;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+
+    .percentage-display {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e74c3c;
+    }
+  }
+
+  .payment-info {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+
+    h4 {
+      margin: 0 0 16px;
+      color: #2c3e50;
+    }
+
+    .payment-details {
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+          border-top: 1px solid #ddd;
+          padding-top: 8px;
+          margin-top: 8px;
+        }
+
+        .highlight {
+          color: #e74c3c;
+          font-weight: bold;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  .direct-transaction-note {
+    background: #e8f5e8;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #27ae60;
+    margin-bottom: 20px;
+
+    p {
+      margin: 8px 0;
+      color: #27ae60;
+      font-weight: 500;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+
+    button {
+      padding: 12px 24px;
+      border: 2px solid;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+
+      &[type="button"] {
+        background: white;
+        color: #7f8c8d;
+        border-color: #ddd;
+
+        &:hover:not(:disabled) {
+          background: #f8f9fa;
+          border-color: #bdc3c7;
+        }
+      }
+
+      &[type="submit"] {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+
+        &:hover:not(:disabled) {
+          background: #2980b9;
+          border-color: #2980b9;
+        }
+
+        &:disabled {
+          background: #bdc3c7;
+          border-color: #bdc3c7;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

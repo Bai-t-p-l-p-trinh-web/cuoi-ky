@@ -20,6 +20,7 @@ import Notify from "../../pages/MyAccount/child/Notify";
 import Insight from "../../pages/MyAccount/child/Insight";
 import History from "../../pages/MyAccount/child/History";
 import Faq from "../../pages/MyAccount/child/Faq";
+import PaymentHistory from "../../pages/MyAccount/child/PaymentHistory";
 import MaintenancePage from "../../pages/Maintenance";
 import RequestForm from "../../pages/RequestForm/child/RequestForm";
 import RequestDetail from "../../pages/RequestForm";
@@ -28,6 +29,12 @@ import RequestVerify from "../../pages/RequestForm/child/RequestVerify";
 import RequestDone from "../../pages/RequestForm/child/RequestDone";
 import Error404 from "../../pages/Error404";
 import EditCar from "../../pages/MyAccount/child/EditCar";
+import TransactionHistory from "../../pages/TransactionHistory";
+
+// New pages for order management system
+import OrderManagement from "../../pages/OrderManagement/OrderManagement";
+import BankInfoManagement from "../../pages/BankInfoManagement/BankInfoManagement";
+import RefundPage from "../../pages/RefundPage/RefundPage";
 
 // Footer Pages
 import DieuKhoanSuDung from "../../pages/FooterPages/DieuKhoanSuDung";
@@ -129,6 +136,14 @@ export const routes = [
             path: "edit-car/:slugCar",
             element: <EditCar />,
           },
+          {
+            path: "orders",
+            element: <OrderManagement />,
+          },
+          {
+            path: "bank-info",
+            element: <BankInfoManagement />,
+          },
         ],
       },
       {
@@ -161,6 +176,14 @@ export const routes = [
       {
         path: "chi-tiet-xe/:slugCar",
         element: <ChiTietXe />,
+      },
+      {
+        path: "refund/:orderId",
+        element: <RefundPage />,
+      },
+      {
+        path: "transaction-history",
+        element: <TransactionHistory />,
       },
       {
         path: "dieu-khoan-su-dung",

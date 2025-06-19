@@ -91,15 +91,21 @@ function OauthFillInfo() {
         type: "success",
         isLoading: false,
         autoClose: 3000,
-      });
-      // Cập nhật Redux state với user data từ response
+      }); // Cập nhật Redux state với user data từ response
       if (updatingUser.data.success && updatingUser.data.data?.user) {
         const userData = updatingUser.data.data.user;
         localStorage.setItem("user", JSON.stringify(userData));
         dispatch(setUser(userData));
-      }
 
-      navigate("/");
+        // Redirect based on user role
+        if (userData.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Update user error:", error); // Debug log
       console.error("Error response:", error.response?.data); // Debug log

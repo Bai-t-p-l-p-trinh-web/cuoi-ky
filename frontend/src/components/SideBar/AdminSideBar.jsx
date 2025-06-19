@@ -1,48 +1,78 @@
-import React from 'react';
-import { 
-  User, 
-  Car, 
-  CircleDollarSign, 
-  CreditCard, 
-  MessageSquareWarning, 
-  LayoutList, 
-  MailQuestion 
-} from "lucide-react";
-import SideBarItem from './SideBarItem';
-import "./Sidebar.scss"
-import SideBarAccount from './SideBarAccount';
-
-const sideBarItems = [
-  { to: '/admin/users', label: "Users", icon: User },
-  { to: '/admin/listings', label: "Listings", icon: Car },
-  { to: '/admin/sales', label: "Sales", icon: CircleDollarSign },
-  { to: '/admin/payments', label: "Payments", icon: CreditCard },
-  { to: '/admin/reports', label: "Reports", icon: MessageSquareWarning },
-  { to: '/admin/categories', label: "Categories", icon: LayoutList },
-  { to: '/admin/support', label: "Support", icon: MailQuestion }
-];
+import React, { useState } from "react";
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaCar,
+  FaShoppingCart,
+  FaMoneyBillWave,
+  FaChartLine,
+  FaCog,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
+import "./AdminSideBar.scss";
 
 const AdminSideBar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
+  const sideBarItems = [
+    { to: "/admin/dashboard", label: "Dashboard", icon: FaTachometerAlt },
+    { to: "/admin/users", label: "Quản lý Users", icon: FaUsers },
+    { to: "/admin/cars", label: "Quản lý Xe", icon: FaCar },
+    { to: "/admin/orders", label: "Quản lý Orders", icon: FaShoppingCart },
+    { to: "/admin/payments", label: "Thanh toán", icon: FaMoneyBillWave },
+    { to: "/my_account", label: "Cài đặt", icon: FaCog },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <div className='bg-[#181818] min-h-screen px-2 pb-6 w-64 flex flex-col justify-between'>
-      <div>
-        <div class="wave-container flex justify-center pt-2 font-extrabold">
-          <h1 class="wave-text">
-              <span>A</span><span>D</span><span>M</span><span>I</span><span>N</span>
-              
-          </h1>
-        </div>
-        <div className="flex flex-col">
-          {sideBarItems.map((item) => (
-            <SideBarItem key={item.to} {...item} />
-          ))}
-        </div>
+    <div className={`admin-sidebar ${isCollapsed ? "collapsed" : ""}`}>
+      <div className="sidebar-header">
+        <div className="logo">{!isCollapsed && <span>ADMIN PANEL</span>}</div>
+        <button
+          className="collapse-btn"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+        </button>
       </div>
-      <div className='flex justify-center'>
-        <SideBarAccount />
+
+      <nav className="sidebar-nav">
+        {sideBarItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`nav-item ${isActive(item.to) ? "active" : ""}`}
+              title={isCollapsed ? item.label : ""}
+            >
+              <div className="nav-icon">
+                <Icon />
+              </div>
+              {!isCollapsed && <span className="nav-label">{item.label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="sidebar-footer">
+        <div className="admin-info">
+          <div className="admin-avatar">
+            <FaUsers />
+          </div>
+          {!isCollapsed && (
+            <div className="admin-details">
+              <div className="admin-name">Admin User</div>
+              <div className="admin-role">Quản trị viên</div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default AdminSideBar;

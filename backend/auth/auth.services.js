@@ -225,6 +225,8 @@ exports.verifyOtp = async (user, inputOtp, type) => {
           const { accessToken, refreshToken } = await exports.generateTokens(
             user
           );
+          // Get updated user to ensure isVerified: true
+          const updatedUser = await User.findById(user._id);
           return {
             accessToken,
             refreshToken,
@@ -232,12 +234,24 @@ exports.verifyOtp = async (user, inputOtp, type) => {
             message: "Xác minh OTP thành công. Đăng nhập hoàn tất.",
             data: {
               user: {
-                id: user._id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                is2FAEnabled: user.is2FAEnabled,
-                isVerified: user.isVerified,
+                id: updatedUser._id,
+                email: updatedUser.email,
+                name: updatedUser.name,
+                role: updatedUser.role || "user",
+                phone: updatedUser.phone || "",
+                address: updatedUser.address || "",
+                city: updatedUser.city || "",
+                district: updatedUser.district || "",
+                avatar: updatedUser.avatar || "",
+                createdAt: updatedUser.createdAt,
+                contactFacebook: updatedUser.contactFacebook || "",
+                contactZalo: updatedUser.contactZalo || "",
+                contactEmail: updatedUser.contactEmail || "",
+                contactLinkedin: updatedUser.contactLinkedin || "",
+                is2FAEnabled: updatedUser.is2FAEnabled || false,
+                isVerified: updatedUser.isVerified || false,
+                isOAuthUser: updatedUser.isOAuthUser || false,
+                hasSetPassword: updatedUser.hasSetPassword || true,
               },
             },
           };

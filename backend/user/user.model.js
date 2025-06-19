@@ -84,6 +84,33 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // Thông tin ngân hàng cho giao dịch
+    bankInfo: {
+      bankName: {
+        type: String,
+        default: null,
+      },
+      bankCode: {
+        type: String,
+        default: null,
+      },
+      accountNumber: {
+        type: String,
+        default: null,
+      },
+      accountHolder: {
+        type: String,
+        default: null,
+      },
+      isVerified: {
+        type: Boolean,
+        default: false,
+      },
+      verifiedAt: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   { timestamps: true }
 );

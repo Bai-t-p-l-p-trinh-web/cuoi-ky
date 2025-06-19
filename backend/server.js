@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const cleanupUnverifiedUsers = require("./shared/utils/unverifiedCleanup");
 const cookieParser = require("cookie-parser");
+const orderReminderService = require("./utils/orderReminderService");
+const socketUtils = require("./shared/utils/socket");
 const {
   maintenanceMiddleware,
   healthCheckHandler,
@@ -44,8 +46,17 @@ const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
+  // Set io instance when first connection is made
+  if (!socketUtils.getIo()) {
+    socketUtils.setIo(io);
+  }
+
   socket.on("user-online", (userId) => {
     onlineUsers.set(userId, socket.id);
+
+    // Join user to their notification room
+    socket.join(`user_${userId}`);
+
     console.log(`✅ ${userId} đã online với socket ${socket.id}`);
 
     const onlineUserIds = Array.from(onlineUsers.keys());
@@ -159,6 +170,11 @@ const UserRoutes = require("./user/user.routes");
 const threadRoutes = require("./thread/thread.routes");
 const RequestFormRoutes = require("./requestAdd/request_add.routes");
 const StatisticRoutes = require("./statistics/statistics.routes");
+const PaymentRoutes = require("./payment/payment.routes");
+const OrderRoutes = require("./order/order.routes");
+const RefundRoutes = require("./refund/refund.routes");
+const NotificationRoutes = require("./notification/notification.routes");
+const AdminRoutes = require("./admin/admin.routes");
 
 // Auth routes - ALWAYS accessible (even during maintenance)
 app.use("/api/v1/auth", authRoutes);
@@ -170,12 +186,15 @@ app.use(maintenanceMiddleware);
 // Other routes - protected by maintenance middleware
 app.use("/api/v1/thread", threadRoutes);
 app.use("/api/v1/requestAdd", RequestFormRoutes);
-// app.use("/api/v1/admin", require("./admin/routes"));
+app.use("/api/v1/admin", AdminRoutes);
 app.use("/api/v1/car", CarRoutes);
 app.use("/api/v1/user", UserRoutes);
 app.use("/api/v1/statistic", StatisticRoutes);
-// app.use("/api/v1/payment", require("./payment/routes"));
+app.use("/api/v1/payment", PaymentRoutes);
 app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/orders", OrderRoutes);
+app.use("/api/v1/refunds", RefundRoutes);
+app.use("/api/v1/notifications", NotificationRoutes);
 
 //  global error handler
 app.use((err, req, res, next) => {

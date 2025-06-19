@@ -11,7 +11,22 @@ function verifyToken(req, res, next) {
     token = req.headers.authorization.split(" ")[1];
   }
 
-  console.log("Token from header:", token);
+  // Nếu không có token trong header, thử đọc từ cookies
+  if (!token && req.cookies && req.cookies.accessToken) {
+    token = req.cookies.accessToken;
+  }
+
+  console.log(
+    "Token from header:",
+    req.headers.authorization
+      ? req.headers.authorization.split(" ")[1]
+      : "undefined"
+  );
+  console.log(
+    "Token from cookies:",
+    req.cookies ? req.cookies.accessToken : "undefined"
+  );
+  console.log("Final token used:", token);
 
   if (!token) {
     return res.status(401).json({ message: "không có token" });
@@ -53,6 +68,11 @@ function verifyTokenButDontRequired(req, res, next) {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
+  }
+
+  // Nếu không có token trong header, thử đọc từ cookies
+  if (!token && req.cookies && req.cookies.accessToken) {
+    token = req.cookies.accessToken;
   }
 
   if (!token) {

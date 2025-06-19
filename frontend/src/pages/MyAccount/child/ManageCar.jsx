@@ -337,7 +337,7 @@ function ManageCar() {
                     </td>
                     <td className="manageCar__table__td--functions">
                       <Link
-                        to={`/${car.slug}`}
+                        to={`/chi-tiet-xe/${car.slug}`}
                         className="manageCar__functions__link"
                       >
                         <CgDetailsMore className="manageCar__functions__svg" />

@@ -3,8 +3,10 @@ import { MdDashboard, MdManageAccounts } from "react-icons/md";
 import { FcStatistics, FcInspection } from "react-icons/fc";
 import { TbEyeShare } from "react-icons/tb";
 import { IoIosNotificationsOutline } from "react-icons/io";
-import { FaQuestion } from "react-icons/fa6";
+import { FaQuestion, FaCreditCard } from "react-icons/fa6";
+import { FaShoppingCart, FaUniversity } from "react-icons/fa";
 import { PiCarLight } from "react-icons/pi";
+import { MdPayment } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
@@ -115,7 +117,6 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
-
             <li className="myAccount__pages__item">
               <Link className="myAccount__pages__item__link" to="manage-car">
                 <FcStatistics className="myAccount__pages__item__link__svg" />
@@ -124,7 +125,6 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
-
             <li className="myAccount__pages__item">
               <Link
                 className="myAccount__pages__item__link"
@@ -136,7 +136,6 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
-
             <li className="myAccount__pages__item">
               <Link
                 className="myAccount__pages__item__link"
@@ -147,8 +146,7 @@ function MyAccount() {
                   Thống kê lượt xem / tương tác
                 </span>
               </Link>
-            </li>
-
+            </li>{" "}
             <li className="myAccount__pages__item">
               <Link
                 className="myAccount__pages__item__link"
@@ -160,14 +158,23 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
-
+            <li className="myAccount__pages__item">
+              <Link
+                className="myAccount__pages__item__link"
+                to="payment-history"
+              >
+                <MdPayment className="myAccount__pages__item__link__svg" />
+                <span className="myAccount__pages__item__span">
+                  Lịch sử giao dịch
+                </span>
+              </Link>
+            </li>
             <li className="myAccount__pages__item">
               <Link className="myAccount__pages__item__link" to="notifications">
                 <IoIosNotificationsOutline className="myAccount__pages__item__link__svg" />
                 <span className="myAccount__pages__item__span">Thông báo</span>
               </Link>
             </li>
-
             <li className="myAccount__pages__item">
               <Link className="myAccount__pages__item__link" to="faq">
                 <FaQuestion className="myAccount__pages__item__link__svg" />
@@ -175,8 +182,23 @@ function MyAccount() {
                   Hướng dẫn / FAQ
                 </span>
               </Link>
+            </li>{" "}
+            <li className="myAccount__pages__item">
+              <Link className="myAccount__pages__item__link" to="orders">
+                <FaShoppingCart className="myAccount__pages__item__link__svg" />
+                <span className="myAccount__pages__item__span">
+                  Quản lý đơn hàng
+                </span>
+              </Link>
             </li>
-
+            <li className="myAccount__pages__item">
+              <Link className="myAccount__pages__item__link" to="bank-info">
+                <FaUniversity className="myAccount__pages__item__link__svg" />
+                <span className="myAccount__pages__item__span">
+                  Thông tin ngân hàng
+                </span>
+              </Link>
+            </li>
             <li className="myAccount__pages__item logout">
               <button
                 className="myAccount__pages__logout"

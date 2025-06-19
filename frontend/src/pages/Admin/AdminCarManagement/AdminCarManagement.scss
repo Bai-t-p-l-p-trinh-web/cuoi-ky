@@ -1,0 +1,1833 @@
+.admin-car-management {
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: 100vh;
+
+  .page-header {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0 0 8px 0;
+      color: #1a1a1a;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  // Loading styles
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 16px;
+
+    .spinning {
+      animation: spin 1s linear infinite;
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #667eea;
+    }
+  }
+
+  .filters-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #f8f9fa;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      padding: 0 12px;
+      flex: 1;
+      min-width: 300px;
+
+      svg {
+        color: #666;
+        margin-right: 8px;
+      }
+
+      input {
+        border: none;
+        background: none;
+        padding: 12px 0;
+        font-size: 14px;
+        flex: 1;
+        outline: none;
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+
+      .search-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-left: 8px;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #5a6fd8;
+        }
+      }
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+
+      select {
+        padding: 12px 16px;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s;
+
+        &:focus {
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+      }
+
+      .filter-btn {
+        background: #f8f9fa;
+        color: #666;
+        border: 1px solid #e1e5e9;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+          background: #e9ecef;
+          border-color: #667eea;
+          color: #667eea;
+        }
+      }
+    }
+  }
+
+  .tabs-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid #e1e5e9;
+      background: #f8f9fa;
+
+      .tab-button {
+        padding: 16px 24px;
+        border: none;
+        background: transparent;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+
+        &:hover {
+          color: #007bff;
+          background: rgba(0, 123, 255, 0.05);
+        }
+
+        &.active {
+          color: #007bff;
+          border-bottom-color: #007bff;
+          background: white;
+        }
+
+        .tab-count {
+          background: #007bff;
+          color: white;
+          font-size: 11px;
+          padding: 2px 6px;
+          border-radius: 10px;
+          margin-left: 6px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .tab-content {
+      padding: 24px;
+
+      .loading-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        color: #666;
+
+        .spinner {
+          width: 24px;
+          height: 24px;
+          border: 2px solid #f3f3f3;
+          border-top: 2px solid #007bff;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-right: 12px;
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+
+        .empty-icon {
+          font-size: 48px;
+          color: #ddd;
+          margin-bottom: 16px;
+        }
+
+        h3 {
+          margin: 0 0 8px 0;
+          color: #999;
+          font-size: 16px;
+          font-weight: 500;
+        }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+          color: #bbb;
+        }
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+
+        thead {
+          background: #f8f9fa;
+
+          th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #e1e5e9;
+            white-space: nowrap;
+
+            &.sortable {
+              cursor: pointer;
+              user-select: none;
+              position: relative;
+
+              &:hover {
+                background: #e9ecef;
+              }
+
+              .sort-icon {
+                margin-left: 6px;
+                opacity: 0.5;
+              }
+
+              &.sorted {
+                .sort-icon {
+                  opacity: 1;
+                  color: #007bff;
+                }
+              }
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background: #f8f9fa;
+            }
+
+            &:nth-child(even) {
+              background: rgba(0, 0, 0, 0.02);
+
+              &:hover {
+                background: #f8f9fa;
+              }
+            }
+
+            td {
+              padding: 12px 16px;
+              border-bottom: 1px solid #f1f3f4;
+              font-size: 14px;
+              vertical-align: middle;
+
+              &.image-cell {
+                img {
+                  width: 50px;
+                  height: 35px;
+                  object-fit: cover;
+                  border-radius: 4px;
+                  border: 1px solid #e1e5e9;
+                }
+              }
+
+              &.status-cell {
+                .status-badge {
+                  padding: 4px 8px;
+                  border-radius: 12px;
+                  font-size: 11px;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+
+                  &.pending {
+                    background: #fff3cd;
+                    color: #856404;
+                    border: 1px solid #ffeaa7;
+                  }
+
+                  &.checked {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                    border: 1px solid #b8daff;
+                  }
+
+                  &.selling {
+                    background: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
+                  }
+
+                  &.sold {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                  }
+
+                  &.rejected {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                  }
+                }
+              }
+
+              &.price-cell {
+                font-weight: 600;
+                color: #28a745;
+              }
+
+              &.actions-cell {
+                .action-buttons {
+                  display: flex;
+                  gap: 8px;
+
+                  .btn {
+                    padding: 6px 12px;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &.btn-view {
+                      background: #007bff;
+                      color: white;
+
+                      &:hover {
+                        background: #0056b3;
+                      }
+                    }
+
+                    &.btn-approve {
+                      background: #28a745;
+                      color: white;
+
+                      &:hover {
+                        background: #1e7e34;
+                      }
+                    }
+
+                    &.btn-reject {
+                      background: #dc3545;
+                      color: white;
+
+                      &:hover {
+                        background: #c82333;
+                      }
+                    }
+
+                    &.btn-assign {
+                      background: #17a2b8;
+                      color: white;
+
+                      &:hover {
+                        background: #138496;
+                      }
+                    }
+
+                    &:disabled {
+                      opacity: 0.6;
+                      cursor: not-allowed;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        padding: 24px 0;
+
+        .pagination-btn {
+          padding: 10px 20px;
+          background: white;
+          border: 1px solid #e1e5e9;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #495057;
+
+          &:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+          }
+
+          &:disabled {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+            border-color: #e9ecef;
+          }
+        }
+
+        .pagination-info {
+          font-size: 14px;
+          color: #6c757d;
+          font-weight: 500;
+        }
+      }
+
+      // Loading Spinner Animation
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      // Responsive Design
+      @media (max-width: 768px) {
+        padding: 16px;
+
+        .filters-section {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+
+          .search-box {
+            min-width: auto;
+          }
+
+          .filter-controls {
+            display: flex;
+            gap: 8px;
+          }
+        }
+
+        .requests-grid {
+          grid-template-columns: 1fr;
+
+          .request-card {
+            .request-header {
+              flex-direction: column;
+
+              .car-image {
+                width: 100%;
+                height: 200px;
+              }
+
+              .request-status {
+                position: static;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                background: #f8f9fa;
+                border-top: 1px solid #e9ecef;
+              }
+            }
+
+            .request-actions {
+              button {
+                font-size: 12px;
+                padding: 10px 8px;
+              }
+            }
+          }
+        }
+
+        .cars-grid {
+          grid-template-columns: 1fr;
+
+          .car-card {
+            .car-header {
+              .car-status {
+                position: static;
+                background: #f8f9fa;
+                border-top: 1px solid #e9ecef;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 20px;
+              }
+            }
+          }
+        }
+
+        .pagination {
+          gap: 8px;
+
+          .pagination-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+          }
+
+          .pagination-info {
+            font-size: 12px;
+            text-align: center;
+          }
+        }
+      }
+
+      @media (max-width: 480px) {
+        .requests-grid,
+        .cars-grid {
+          gap: 16px;
+        }
+
+        .request-card,
+        .car-card {
+          .request-actions,
+          .car-actions {
+            flex-direction: column;
+
+            button {
+              flex: none;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #007bff;
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      &.requests {
+        border-left-color: #ffc107;
+      }
+
+      &.approved {
+        border-left-color: #28a745;
+      }
+
+      &.selling {
+        border-left-color: #17a2b8;
+      }
+
+      &.sold {
+        border-left-color: #6f42c1;
+      }
+    }
+  }
+
+  // Cars Grid Styles
+  .cars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+
+    .car-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid #e1e5e9;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .car-header {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
+        .car-image {
+          width: 100%;
+          height: 220px;
+          object-fit: cover;
+          background: #f8f9fa;
+        }
+
+        .car-info {
+          padding: 20px;
+          flex: 1;
+
+          h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.3;
+          }
+
+          .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e74c3c;
+            margin: 0 0 8px 0;
+          }
+
+          .seller {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 12px 0;
+          }
+
+          .car-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+
+            span {
+              font-size: 13px;
+              color: #555;
+              padding: 6px 10px;
+              background: #f8f9fa;
+              border-radius: 6px;
+              border: 1px solid #e9ecef;
+            }
+          }
+
+          .car-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+
+            span {
+              font-size: 12px;
+              color: #666;
+              display: flex;
+              align-items: center;
+
+              &:before {
+                content: "👁️";
+                margin-right: 4px;
+              }
+
+              &:nth-child(2):before {
+                content: "❤️";
+              }
+            }
+          }
+        }
+
+        .car-status {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 8px 12px;
+          border-radius: 8px;
+          backdrop-filter: blur(10px);
+
+          .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            &.selling {
+              background: #d4edda;
+              color: #155724;
+              border: 1px solid #c3e6cb;
+            }
+
+            &.sold {
+              background: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+            }
+
+            &.pending {
+              background: #fff3cd;
+              color: #856404;
+              border: 1px solid #ffeaa7;
+            }
+
+            &.rejected {
+              background: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+            }
+          }
+
+          .created-date {
+            font-size: 11px;
+            color: #666;
+            margin: 4px 0 0 0;
+            text-align: center;
+          }
+        }
+      }
+
+      .car-actions {
+        padding: 16px 20px;
+        background: #fafbfc;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 8px;
+
+        button {
+          flex: 1;
+          padding: 10px 12px;
+          border: none;
+          border-radius: 8px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+
+          svg {
+            font-size: 14px;
+          }
+
+          &.btn-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+
+            &:hover {
+              background: #bbdefb;
+              color: #0d47a1;
+            }
+          }
+
+          &.btn-edit {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+
+            &:hover {
+              background: #ffcc02;
+              color: #e65100;
+            }
+          }
+
+          &.btn-delete {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+
+            &:hover {
+              background: #ffcdd2;
+              color: #b71c1c;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Requests Grid Styles
+  .requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+
+    .request-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid #e1e5e9;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .request-header {
+        display: flex;
+        position: relative;
+
+        .car-image {
+          width: 140px;
+          height: 120px;
+          object-fit: cover;
+          background: #f8f9fa;
+          flex-shrink: 0;
+        }
+
+        .request-info {
+          padding: 16px;
+          flex: 1;
+
+          h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.3;
+          }
+
+          .seller-info {
+            font-size: 13px;
+            color: #666;
+            margin: 0 0 6px 0;
+          }
+
+          .location {
+            font-size: 12px;
+            color: #888;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+
+            &:before {
+              content: "📍";
+              margin-right: 4px;
+            }
+          }
+
+          .car-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+
+            span {
+              font-size: 11px;
+              color: #555;
+              padding: 3px 8px;
+              background: #f8f9fa;
+              border-radius: 4px;
+              border: 1px solid #e9ecef;
+            }
+          }
+        }
+
+        .request-status {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          text-align: center;
+
+          .status-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+
+            &.pending {
+              background: #fff3cd;
+              color: #856404;
+              border: 1px solid #ffeaa7;
+            }
+
+            &.checked {
+              background: #d4edda;
+              color: #155724;
+              border: 1px solid #c3e6cb;
+            }
+
+            &.reject {
+              background: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+            }
+
+            &.done {
+              background: #d1ecf1;
+              color: #0c5460;
+              border: 1px solid #bee5eb;
+            }
+          }
+
+          .created-date {
+            font-size: 10px;
+            color: #666;
+            margin: 4px 0 0 0;
+          }
+        }
+      }
+
+      .price-recommendation {
+        padding: 12px 16px;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        font-size: 13px;
+        color: #495057;
+
+        strong {
+          color: #e74c3c;
+          font-weight: 600;
+        }
+      }
+
+      .assigned-inspectors {
+        padding: 8px 16px;
+        background: #e8f5e8;
+        border-top: 1px solid #c3e6cb;
+        font-size: 12px;
+        color: #155724;
+
+        strong {
+          font-weight: 600;
+        }
+      }
+
+      .rejection-reason {
+        padding: 8px 16px;
+        background: #f8d7da;
+        border-top: 1px solid #f5c6cb;
+        font-size: 12px;
+        color: #721c24;
+
+        strong {
+          font-weight: 600;
+        }
+      }
+
+      .request-actions {
+        padding: 16px;
+        background: #fafbfc;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        button {
+          padding: 8px 12px;
+          border: none;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          flex: 1;
+          min-width: 80px;
+          justify-content: center;
+
+          svg {
+            font-size: 12px;
+          }
+
+          &.btn-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+
+            &:hover {
+              background: #bbdefb;
+              color: #0d47a1;
+            }
+          }
+
+          &.btn-assign {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+
+            &:hover {
+              background: #ffcc02;
+              color: #e65100;
+            }
+          }
+
+          &.btn-approve {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+
+            &:hover {
+              background: #c8e6c9;
+              color: #1b5e20;
+            }
+          }
+
+          &.btn-reject {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+
+            &:hover {
+              background: #ffcdd2;
+              color: #b71c1c;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Tabs Navigation
+  .tabs-navigation {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    padding: 8px;
+    display: flex;
+    gap: 8px;
+
+    button {
+      flex: 1;
+      padding: 16px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: transparent;
+      color: #6c757d;
+
+      svg {
+        font-size: 16px;
+      }
+
+      &:hover {
+        background: #f8f9fa;
+        color: #495057;
+      }
+
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+        &:hover {
+          background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      button {
+        padding: 12px 16px;
+        font-size: 13px;
+
+        svg {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  // Modal styles improvements
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+    &.detail-modal {
+      max-width: 900px;
+      width: 95%;
+    }
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e6ed;
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  // Detail content styles
+  .detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .detail-image {
+    .car-image-modal {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .detail-info {
+    h4 {
+      margin: 0 0 20px 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+  }
+
+  .info-section {
+    margin-bottom: 24px;
+
+    h5 {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #4a5568;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .info-item {
+    padding: 8px 0;
+
+    strong {
+      color: #2d3748;
+      margin-right: 8px;
+    }
+  }
+
+  .seller-info-detail {
+    background: #f7fafc;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+
+  .price-range {
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    .price-low,
+    .price-high {
+      color: #38a169;
+    }
+
+    .price-separator {
+      color: #718096;
+      margin: 0 8px;
+    }
+  }
+
+  .price-highlight {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #38a169;
+  }
+
+  .inspectors-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .inspector-badge {
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+
+  .rejection-message {
+    background: #fed7d7;
+    border: 1px solid #fc8181;
+    padding: 12px;
+    border-radius: 6px;
+    color: #742a2a;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+
+    .stat-label {
+      display: block;
+      font-size: 0.875rem;
+      color: #718096;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+  }
+
+  .description {
+    background: #f7fafc;
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 1.6;
+    color: #4a5568;
+  }
+
+  // Improved card styles
+  .request-card,
+  .car-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e0;
+    }
+  }
+
+  .car-image-container {
+    position: relative;
+
+    .car-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .status-overlay {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .request-info,
+  .car-info {
+    padding: 20px;
+  }
+
+  .car-title {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .seller-info,
+  .seller {
+    color: #718096;
+    margin: 4px 0;
+    font-size: 0.875rem;
+  }
+
+  .location {
+    color: #4a5568;
+    margin: 4px 0;
+    font-size: 0.875rem;
+  }
+
+  .car-specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .spec-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+
+    .spec-label {
+      color: #718096;
+    }
+
+    .spec-value {
+      font-weight: 500;
+      color: #2d3748;
+    }
+  }
+
+  .car-stats {
+    display: flex;
+    gap: 16px;
+    margin: 12px 0;
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+
+      .stat-label {
+        color: #718096;
+      }
+
+      .stat-value {
+        font-weight: 500;
+        color: #2d3748;
+      }
+    }
+  }
+
+  .created-date {
+    color: #718096;
+    font-size: 0.875rem;
+    margin: 8px 0 0 0;
+  }
+
+  .price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #38a169;
+    margin: 8px 0;
+  }
+
+  .price-recommendation {
+    background: #f0fff4;
+    border: 1px solid #9ae6b4;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 16px 20px;
+    font-size: 0.875rem;
+
+    .price-range {
+      color: #38a169;
+      font-weight: 600;
+    }
+  }
+
+  .assigned-inspectors {
+    background: #ebf8ff;
+    border: 1px solid #90cdf4;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 16px 20px;
+    font-size: 0.875rem;
+  }
+
+  .rejection-reason {
+    background: #fed7d7;
+    border: 1px solid #fc8181;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 16px 20px;
+    font-size: 0.875rem;
+  }
+
+  .request-actions,
+  .car-actions {
+    padding: 16px 20px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  // Button improvements
+  .btn-info,
+  .btn-assign,
+  .btn-approve,
+  .btn-reject,
+  .btn-edit,
+  .btn-delete {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  .btn-info {
+    background: #667eea;
+    color: white;
+
+    &:hover {
+      background: #5a67d8;
+    }
+  }
+
+  .btn-assign {
+    background: #4299e1;
+    color: white;
+
+    &:hover {
+      background: #3182ce;
+    }
+  }
+
+  .btn-approve {
+    background: #48bb78;
+    color: white;
+
+    &:hover {
+      background: #38a169;
+    }
+  }
+
+  .btn-reject,
+  .btn-delete {
+    background: #f56565;
+    color: white;
+
+    &:hover {
+      background: #e53e3e;
+    }
+  }
+
+  .btn-edit {
+    background: #ed8936;
+    color: white;
+
+    &:hover {
+      background: #dd6b20;
+    }
+  }
+
+  .btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+
+    &:hover {
+      background: #cbd5e0;
+    }
+  }
+
+  .btn-primary {
+    background: #667eea;
+    color: white;
+
+    &:hover {
+      background: #5a67d8;
+    }
+  }
+
+  .btn-danger {
+    background: #f56565;
+    color: white;
+
+    &:hover {
+      background: #e53e3e;
+    }
+  }
+
+  // Inspector modal styles
+  .inspector-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f7fafc;
+      border-color: #cbd5e0;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+
+    .inspector-info {
+      .inspector-name {
+        display: block;
+        font-weight: 500;
+        color: #2d3748;
+      }
+
+      .inspector-email {
+        display: block;
+        color: #718096;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .reject-reason-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: vertical;
+    margin: 12px 0;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Pagination Styles
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+
+  .pagination-btn {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #495057;
+
+    &:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    &:disabled {
+      background: #f8f9fa;
+      color: #adb5bd;
+      cursor: not-allowed;
+      border-color: #e9ecef;
+    }
+  }
+
+  .pagination-info {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+}
+
+// Loading Spinner Animation
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .admin-car-management {
+    padding: 16px;
+
+    .filters-section {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+
+      .search-box {
+        min-width: auto;
+      }
+
+      .filter-controls {
+        display: flex;
+        gap: 8px;
+      }
+    }
+
+    .requests-grid {
+      grid-template-columns: 1fr;
+
+      .request-card {
+        .request-header {
+          flex-direction: column;
+
+          .car-image {
+            width: 100%;
+            height: 200px;
+          }
+
+          .request-status {
+            position: static;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+          }
+        }
+
+        .request-actions {
+          button {
+            font-size: 12px;
+            padding: 10px 8px;
+          }
+        }
+      }
+    }
+
+    .cars-grid {
+      grid-template-columns: 1fr;
+
+      .car-card {
+        .car-header {
+          .car-status {
+            position: static;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+          }
+        }
+      }
+    }
+
+    .pagination {
+      gap: 8px;
+
+      .pagination-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+
+      .pagination-info {
+        font-size: 12px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-car-management {
+    .requests-grid,
+    .cars-grid {
+      gap: 16px;
+    }
+
+    .request-card,
+    .car-card {
+      .request-actions,
+      .car-actions {
+        flex-direction: column;
+
+        button {
+          flex: none;
+          width: 100%;
+        }
+      }
+    }
+  }
+}

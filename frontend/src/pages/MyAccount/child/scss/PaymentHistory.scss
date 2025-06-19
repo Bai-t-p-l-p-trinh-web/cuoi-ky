@@ -1,0 +1,229 @@
+.payment-history {
+  padding: 20px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h2 {
+      margin: 0;
+      color: #2c3e50;
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: 8px;
+
+    button {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      &.active {
+        background: #3498db;
+        color: white;
+        border-color: #3498db;
+      }
+    }
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #7f8c8d;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+
+  p {
+    font-size: 1.1rem;
+  }
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-item {
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .transaction-id {
+      font-family: monospace;
+      background: #f8f9fa;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .status {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      &.status-pending {
+        background: #fef3cd;
+        color: #856404;
+      }
+
+      &.status-deposited {
+        background: #cce7ff;
+        color: #0056b3;
+      }
+
+      &.status-completed {
+        background: #d1edff;
+        color: #0f5132;
+      }
+
+      &.status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      &.status-refunded {
+        background: #e2e3e5;
+        color: #41464b;
+      }
+    }
+  }
+
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    .car-info {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 8px 0;
+        color: #2c3e50;
+        font-size: 1.1rem;
+      }
+
+      .payment-type {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+    }
+
+    .payment-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: right;
+
+      .amount,
+      .date {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .label {
+          font-size: 0.8rem;
+          color: #6c757d;
+        }
+
+        .value {
+          font-weight: 600;
+          color: #2c3e50;
+
+          &.amount {
+            color: #e74c3c;
+          }
+        }
+      }
+    }
+  }
+
+  &__note {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+
+    small {
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .payment-history {
+    padding: 16px;
+
+    &__header {
+      flex-direction: column;
+      align-items: stretch;
+
+      h2 {
+        text-align: center;
+      }
+    }
+
+    &__filters {
+      justify-content: center;
+    }
+  }
+
+  .payment-item {
+    &__header {
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+
+      .transaction-id,
+      .status {
+        text-align: center;
+      }
+    }
+
+    &__content {
+      flex-direction: column;
+      gap: 12px;
+
+      .payment-details {
+        text-align: left;
+      }
+    }
+  }
+}

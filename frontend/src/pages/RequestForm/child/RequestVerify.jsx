@@ -149,11 +149,12 @@ function RequestVerify() {
                     <>
                       <form className="requestVerify__checked__form">
                         <div className="requestVerify__checked__form__box">
+                          {" "}
                           <label
                             className="requestVerify__check__form__label"
                             htmlFor="rqV_price"
                           >
-                            Giá - triệu
+                            Giá - VNĐ
                           </label>
                           <input
                             type="number"

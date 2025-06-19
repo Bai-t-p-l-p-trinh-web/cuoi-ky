@@ -156,21 +156,22 @@ exports.login = async (req, res) => {
           error_code: "2FA_OTP_SEND_FAILED",
         });
       }
-    }
-
-    // Nếu không bật 2FA, đăng nhập bình thường
+    } // Nếu không bật 2FA, đăng nhập bình thường
     const tokens = await generateTokens(user);
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    };
+
     res
       .cookie("accessToken", tokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
+        ...cookieOptions,
         maxAge: 1000 * 60 * 15, // 15 phút
       })
       .cookie("refreshToken", tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
+        ...cookieOptions,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 ngày
       })
       .status(200)
@@ -182,9 +183,21 @@ exports.login = async (req, res) => {
             id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role,
-            is2FAEnabled: user.is2FAEnabled,
-            isVerified: user.isVerified,
+            role: user.role || "user",
+            phone: user.phone || "",
+            address: user.address || "",
+            city: user.city || "",
+            district: user.district || "",
+            avatar: user.avatar || "",
+            createdAt: user.createdAt,
+            contactFacebook: user.contactFacebook || "",
+            contactZalo: user.contactZalo || "",
+            contactEmail: user.contactEmail || "",
+            contactLinkedin: user.contactLinkedin || "",
+            is2FAEnabled: user.is2FAEnabled || false,
+            isVerified: user.isVerified || false,
+            isOAuthUser: user.isOAuthUser || false,
+            hasSetPassword: user.hasSetPassword || true,
           },
           accessToken: tokens.accessToken,
         },
@@ -258,9 +271,21 @@ exports.verifyLoginOtp = async (req, res) => {
             id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role,
-            is2FAEnabled: user.is2FAEnabled,
-            isVerified: user.isVerified,
+            role: user.role || "user",
+            phone: user.phone || "",
+            address: user.address || "",
+            city: user.city || "",
+            district: user.district || "",
+            avatar: user.avatar || "",
+            createdAt: user.createdAt,
+            contactFacebook: user.contactFacebook || "",
+            contactZalo: user.contactZalo || "",
+            contactEmail: user.contactEmail || "",
+            contactLinkedin: user.contactLinkedin || "",
+            is2FAEnabled: user.is2FAEnabled || false,
+            isVerified: user.isVerified || false,
+            isOAuthUser: user.isOAuthUser || false,
+            hasSetPassword: user.hasSetPassword || true,
           },
         },
       });
@@ -339,18 +364,16 @@ exports.logout = async (req, res) => {
       await UserToken.findOneAndDelete({ token: refreshToken });
     }
 
-    res.clearCookie("accessToken", {
+    const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
-    });
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "Strict" : "Lax",
+    };
 
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
-    });
-    console.log("hello");
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+    console.log("Logout successful");
     res.status(200).json({ success: true, message: "Đăng xuất thành công." });
   } catch (error) {
     console.error("Logout error:", error);

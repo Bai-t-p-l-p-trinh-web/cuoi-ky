@@ -48,7 +48,6 @@ function AppContent() {
     const urlParams = new URLSearchParams(location.search);
     const oauthSuccess = urlParams.get("oauth_success");
     const userDataParam = urlParams.get("user");
-
     if (oauthSuccess === "true" && userDataParam) {
       try {
         const userData = JSON.parse(decodeURIComponent(userDataParam));
@@ -58,6 +57,15 @@ function AppContent() {
         dispatch(fetchUser());
 
         toast.success("Đăng nhập Google thành công!");
+
+        // Redirect based on user role
+        setTimeout(() => {
+          if (userData.role === "admin") {
+            window.location.href = "/admin/dashboard";
+          } else {
+            window.location.href = "/";
+          }
+        }, 1500);
 
         const newUrl = window.location.pathname;
         window.history.replaceState({}, "", newUrl);
