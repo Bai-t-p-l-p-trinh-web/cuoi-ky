@@ -75,7 +75,7 @@ const carSchema = new mongoose.Schema(
     slug: {
       type: String,
       slug: "title",
-      // Removed duplicate unique: true - handled by plugin
+      unique : true
     },
     sellerId: {
       type: String,
@@ -119,18 +119,6 @@ const carSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for performance optimization
-carSchema.index({ status: 1, deleted: 1 }); // For listing active cars
-carSchema.index({ sellerId: 1, status: 1 }); // For seller's cars
-carSchema.index({ price: 1 }); // For price range queries
-carSchema.index({ year: 1 }); // For year range queries
-carSchema.index({ km: 1 }); // For km range queries
-carSchema.index({ "fuel_use.fuel_type": 1 }); // For fuel type filtering
-carSchema.index({ seat_capacity: 1 }); // For seat capacity filtering
-carSchema.index({ "location.query_location": 1 }); // For location filtering
-carSchema.index({ title: "text", brand: "text", model: "text" }); // For text search
-carSchema.index({ createdAt: -1 }); // For sorting by newest
-carSchema.index({ slug: 1 }, { unique: true }); // For unique slug access
 
 const Car = mongoose.model("Car", carSchema, "cars");
 

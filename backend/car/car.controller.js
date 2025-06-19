@@ -110,7 +110,6 @@ module.exports.index = async (req, res) => {
 // [GET] /api/v1/car/:slugCar
 module.exports.getCarBySlug = async (req, res) => {
     try {
-
         const slugCar = req.params.slugCar;
         if(!slugCar) {
             return res.status(404).json({ message : "Không có slug Car" });

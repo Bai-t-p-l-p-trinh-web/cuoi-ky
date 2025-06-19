@@ -45,7 +45,7 @@ const validateRequest = (req, res, next) => {
 
 const validateCheckedRequest = async (req, res, next) => {
     const { img_src, examine, price_recommend_high, price_recommend_low } = req.body;
-    
+    console.log(req.body);
 
     if (!Array.isArray(img_src) || img_src.length === 0) {
         return res.status(400).json({ message : "Phải có ít nhất 1 bức ảnh!" })

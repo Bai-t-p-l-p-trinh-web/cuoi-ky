@@ -43,6 +43,8 @@ router.patch(
   controller.AddTheInspectors
 );
 
+router.get('/inspects', verifyToken, controller.getRequestOfStaff);
+
 router.get("/:slugRequest", verifyToken, controller.getRequestBySlug);
 
 router.delete("/:slugRequest", verifyToken, controller.deleteRequest);

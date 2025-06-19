@@ -1,5 +1,6 @@
 const User = require("../user/user.model");
 const Car = require("../car/car.model");
+const slugify = require("slugify");
 
 const RequestAdd = require("./request_add.model");
 var md5 = require("md5");
@@ -107,6 +108,8 @@ const getRequestBySlug = async (req, res) => {
 
     if (user.role === "seller") {
       conditionFind.sellerId = userId;
+    } else if(user.role === "staff") {
+      conditionFind.userIds = userId;
     }
 
     conditionFind.slug = slugRequest;
@@ -304,7 +307,9 @@ const PostTheCar = async (req, res) => {
         .status(403)
         .json({ message: "Người dùng không có quyền đăng bán" });
     }
-
+    if (!user.bankInfo || !user.bankInfo.bankName || !user.bankInfo.bankCode || !user.bankInfo.accountNumber || !user.bankInfo.accountHolder) {
+      return res.status(400).json({ message : "Người dùng chưa xác thực thông tin tài khoản ngân hàng!"});  
+    }
     const slug = req.params.slugRequest;
     const find = {
       sellerId: userId,
@@ -312,6 +317,13 @@ const PostTheCar = async (req, res) => {
       slug,
     };
 
+    const {bankName, bankCode, accountNumber, accountHolder} = user.bankInfo;
+    const sellerBankInfo = {
+      bankName,
+      bankCode,
+      accountHolder,
+      accountNumber
+    };
     const request = await RequestAdd.findOne(find);
     if (!request) {
       return res.status(404).json({ message: "Không tìm thấy yêu cầu !" });
@@ -320,7 +332,8 @@ const PostTheCar = async (req, res) => {
     const { comment, price, category_id, location } = req.body;
     const CarData = {
       title: request.name,
-      price,
+      slug : slugify(request.name, { lower: true }),
+      price : parseInt(price),
       year: request.year,
       km: request.km,
       fuel_use: {
@@ -332,6 +345,7 @@ const PostTheCar = async (req, res) => {
       img_src: request.img_src,
       sellerId: userId,
       status: "selling",
+      sellerBankInfo
     };
 
     const recordCarSelling = new Car(CarData);
@@ -386,6 +400,49 @@ const deleteRequest = async (req, res) => {
   }
 };
 
+// [GET] /api/v1/requestAdd/inspects
+const getRequestOfStaff = async(req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if(!user) {
+      return res.status(404).json({
+        success : false,
+        message : "Không tìm thấy người dùng!"
+      });
+    }
+
+    if(user.role !== "staff") {
+      return res.status(400).json({
+        success : false,
+        message : "Không phải là nhân viên!"
+      });
+    }
+
+    const requests = await RequestAdd.find({
+      userIds : userId,
+      status : "pending"
+    });
+
+    if(!requests) {
+      return res.status(200).json({
+        success : true,
+        data : requests
+      });
+    }
+
+    return res.status(200).json({
+      success : true,
+      data : requests
+    })
+  } catch(error) {
+    return res.status(500).json({
+      success : false,
+      message : "Server Error!"
+    })
+  }
+}
 // const createPdfFileTest = async(req, res) => {
 //     const request = {
 //         name: "Mercedes-Benz GLC 300 2019",
@@ -423,5 +480,6 @@ module.exports = {
   PostTheCar,
   AddTheInspectors,
   deleteRequest,
+  getRequestOfStaff
   // createPdfFileTest
 };

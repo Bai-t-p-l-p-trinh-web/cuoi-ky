@@ -42,6 +42,8 @@ import CauHoiThuongGap from "../../pages/FooterPages/CauHoiThuongGap";
 import LienHe from "../../pages/FooterPages/LienHe";
 import CoHoiViecLam from "../../pages/FooterPages/CoHoiViecLam";
 import SellerInfo from "../../pages/SellerInfo";
+import Examine from "../../pages/MyAccount/child/Examine";
+import StaffExamine from "../../pages/StaffExamine";
 
 export const routes = [
   {
@@ -140,6 +142,10 @@ export const routes = [
             path: "bank-info",
             element: <BankInfoManagement />,
           },
+          {
+            path: "examine_requests",
+            element: <Examine/>
+          }
         ],
       },
       {
@@ -204,6 +210,10 @@ export const routes = [
       {
         path: "nguoi-ban/:slugSeller",
         element: <SellerInfo/>
+      },
+      {
+        path: "examine/:slugCar",
+        element : <StaffExamine/>
       },
       {
         path: "*",

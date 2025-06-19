@@ -341,33 +341,6 @@ function DashBoard() {
             />
           </div>
 
-          {/* Quick Links Section */}
-          <div className="dashboard__quick-links">
-            <h3 className="dashboard__quick-links__title">Liên kết nhanh</h3>
-            <div className="dashboard__quick-links__grid">
-              <button
-                className="dashboard__quick-links__btn"
-                onClick={() => navigate("/transaction-history")}
-              >
-                <span className="icon">📋</span>
-                <span>Lịch sử giao dịch</span>
-              </button>
-              <button
-                className="dashboard__quick-links__btn"
-                onClick={() => navigate("/my_account/manage-car")}
-              >
-                <span className="icon">🚗</span>
-                <span>Quản lý xe</span>
-              </button>
-              <button
-                className="dashboard__quick-links__btn"
-                onClick={() => navigate("/chat")}
-              >
-                <span className="icon">💬</span>
-                <span>Tin nhắn</span>
-              </button>
-            </div>
-          </div>
 
           <div className="dashboard__profile">
             <h3 className="dashboard__profile__title">Quản lý thông tin</h3>
@@ -405,6 +378,8 @@ function DashBoard() {
                       ? "người mua"
                       : profile.role == "seller"
                       ? "người bán"
+                      : profile.role == "staff" 
+                      ? "nhân viên" 
                       : "quản trị viên"
                   }
                   className="dashboard__profile__form__input"

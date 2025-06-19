@@ -5,6 +5,7 @@ import { TbEyeShare } from "react-icons/tb";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { FaQuestion, FaCreditCard } from "react-icons/fa6";
 import { FaShoppingCart, FaUniversity } from "react-icons/fa";
+import { TbPencilCheck } from "react-icons/tb";
 import { PiCarLight } from "react-icons/pi";
 import { MdPayment } from "react-icons/md";
 import { useDispatch } from "react-redux";
@@ -199,6 +200,18 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
+            {
+              (user && user.role === "staff")
+              &&
+              <li className="myAccount__pages__item">
+                <Link className="myAccount__pages__item__link" to="examine_requests">
+                  <TbPencilCheck className="myAccount__pages__item__link__svg" />
+                  <span className="myAccount__pages__item__span">
+                    Kiểm tra xe
+                  </span>
+                </Link>
+            </li>
+            }
             <li className="myAccount__pages__item logout">
               <button
                 className="myAccount__pages__logout"
