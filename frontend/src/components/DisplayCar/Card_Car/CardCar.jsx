@@ -6,7 +6,6 @@ import { SlCalender } from "react-icons/sl";
 import { LuFuel } from "react-icons/lu";
 import { PiArmchair } from "react-icons/pi";
 function CardCar({item}){
-    console.log(item);
     return (
         <>
         <div className="home__content__main__display__list-item--description">

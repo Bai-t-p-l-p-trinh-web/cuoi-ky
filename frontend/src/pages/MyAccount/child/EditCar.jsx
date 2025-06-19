@@ -1,7 +1,7 @@
 import apiClient from "../../../utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "../scss/EditCar.scss";
 
 function EditCar() {
@@ -64,6 +64,7 @@ function EditCar() {
 
   return (
     <div className="editCar">
+      <ToastContainer/>
       <div className="editCar__header">
         <h2>Chỉnh sửa xe</h2>
       </div>
@@ -110,7 +111,7 @@ function EditCar() {
                 <option value="selling">Đang bán</option>
                 <option value="deposited">Đã đặt cọc</option>
                 <option value="hidden">Đã ẩn</option>
-                <option value="sold">Đã bán</option>
+                {/* <option value="sold">Đã bán</option> */}
               </select>
             </div>
           )}

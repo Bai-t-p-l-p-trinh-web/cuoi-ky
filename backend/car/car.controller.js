@@ -68,8 +68,6 @@ module.exports.index = async (req, res) => {
 
 
         const recordsCar = await Car.find(find).select('-__v -deleted -_id');
-        console.log(find);
-        console.log(recordsCar);
 
         let prices = recordsCar.map(car => car.price);
         const minPrice = Math.min(...prices);
@@ -157,7 +155,8 @@ module.exports.getCarBySlug = async (req, res) => {
             id : seller._id,
             name: seller.name,
             phone: seller.phone,
-            email: seller.email
+            email: seller.email,
+            slug : seller.slug
         };
 
         await getInTouchView({sellerId : seller._id});

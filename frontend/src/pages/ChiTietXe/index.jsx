@@ -7,7 +7,7 @@ import { FaRegComment } from "react-icons/fa6";
 import { MdEventSeat } from "react-icons/md";
 import SwiperDetail from "../../components/Swiper/CustomSwiper/Swiper_Detail";
 import "./scss/ChiTietXe.scss";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../../utils/axiosConfig";
 
 import { useEffect, useState } from "react";
@@ -61,6 +61,22 @@ function ChiTietXe() {
     };
     startMessage();
   };
+
+  const copyPhoneToClipboard = () => {
+    if (!xe || !xe.user?.phone) {
+      toast.error("Không có số điện thoại để sao chép");
+      return;
+    }
+  
+    navigator.clipboard.writeText(xe.user.phone)
+      .then(() => {
+        toast.success("Đã sao chép số điện thoại vào clipboard!");
+      })
+      .catch(() => {
+        toast.error("Không thể sao chép số điện thoại!");
+      });
+  };
+
   return (
     <>
       <div className="chitiet">
@@ -161,7 +177,7 @@ function ChiTietXe() {
                           Địa điểm
                         </span>
                         <span className="chitiet__xe__lienhe--detail-value">
-                          {xe.location.query_name}
+                          {xe.location.query_name || "Toàn quốc"}
                         </span>
                       </div>
                       <div className="chitiet__xe__lienhe--detail">
@@ -170,12 +186,17 @@ function ChiTietXe() {
                           Đăng bởi
                         </span>
                         <span className="chitiet__xe__lienhe--detail-value">
-                          {xe.user.name}
+                          <Link to={`/nguoi-ban/${xe.user.slug}`}>
+                            {xe.user.name}
+                          </Link>
                         </span>
                       </div>
                     </div>
                     <div className="chitiet__xe__buttons">
-                      <button className="chitiet__xe__buttons__call">
+                      <button
+                        className="chitiet__xe__buttons__call"
+                        onClick={copyPhoneToClipboard}
+                      >
                         <FaPhoneAlt className="chitiet__xe__buttons__call-icon" />
                         <span className="chitiet__xe__buttons__call-span">
                           Gọi người bán

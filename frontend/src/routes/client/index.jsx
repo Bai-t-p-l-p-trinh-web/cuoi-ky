@@ -3,7 +3,6 @@ import BanXe from "../../pages/BanXe";
 import ChiTietXe from "../../pages/ChiTietXe";
 import GioiThieu from "../../pages/GioiThieu";
 import Home from "../../pages/Home";
-import BlogXeHoi from "../../pages/BlogXeHoi";
 import ClientAuth from "../../pages/Auth/client";
 import Message from "../../pages/Message";
 import ClientRegister from "../../pages/Auth/client/ClientRegister";
@@ -41,10 +40,6 @@ export const routes = [
   {
     path: "/maintenance",
     element: <MaintenancePage />,
-  },
-  {
-    path: "/blog-xe-hoi",
-    element: <BlogXeHoi />,
   },
   {
     path: "/",

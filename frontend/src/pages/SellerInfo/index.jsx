@@ -1,27 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify"; 
 import "./scss/SellerInfo.scss";
+import apiClient from "../../utils/axiosConfig";
 
 function SellerInfo() {
     const { slugSeller } = useParams();
     const [seller, setSeller] = useState({
-        name: "Sinh viên 1 tốt",
-        email: "n23dccn069@student.ptithcm.edu.vn",
-        avatar: "https://res.cloudinary.com/dpabf2tar/image/upload/c_crop,w_960,h_960,x_218,y_0/q1sfg4vjv2dzxzok6g1d.jpg",
-        createdAt: "2025-06-06T14:40:30.808Z",
-        phone: "0356446244",
-        address: "97 Man Thiện",
-        city: "Hồ Chí Minh",
-        district: "Thủ Đức",
-        contactEmail: "xuantryingbetter@gmail.com",
-        contactFacebook: "https://www.facebook.com/",
-        contactLinkedin: "https://www.linkedin.com/feed/",
-        contactZalo: "0345454545",
+        name: "",
+        email: "",
+        avatar: "",
+        createdAt: "",
+        phone: "",
+        address: "",
+        city: "",
+        district: "",
+        contactEmail: "",
+        contactFacebook: "",
+        contactLinkedin: "",
+        contactZalo: "",
         statistic: {
             star: 4.3,
             total_order: 120
         }
     });
+
+    useEffect(() => {
+        const fetchSeller = async() => {
+            try {
+                const responseSeller = await apiClient.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/user/${slugSeller}`);
+                setSeller((prev) => ({
+                    ...prev,
+                    ...responseSeller.data
+                }));
+                
+            } catch(error) {
+                toast.error(error.response?.data?.message || "Lỗi khi lấy thông tin người bán!");
+            }
+        }
+        fetchSeller();
+    }, []);
 
     return (
         <div className="seller-info">

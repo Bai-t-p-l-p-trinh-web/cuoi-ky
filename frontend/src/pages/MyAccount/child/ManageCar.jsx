@@ -345,15 +345,19 @@ function ManageCar() {
                           Chi tiết
                         </span>
                       </Link>
-                      <Link
-                        to={`/my_account/edit-car/${car.slug}`}
-                        className="manageCar__functions__link edit"
-                      >
-                        <FaRegEdit className="manageCar__functions__svg" />
-                        <span className="manageCar__functions__span">
-                          Chỉnh sửa
-                        </span>
-                      </Link>
+                      {
+                        car.status !== "sold"
+                        &&
+                        <Link
+                          to={`/my_account/edit-car/${car.slug}`}
+                          className="manageCar__functions__link edit"
+                        >
+                          <FaRegEdit className="manageCar__functions__svg" />
+                          <span className="manageCar__functions__span">
+                            Chỉnh sửa
+                          </span>
+                        </Link>
+                      }
                       {
                         car.status === "selling"
                         &&
