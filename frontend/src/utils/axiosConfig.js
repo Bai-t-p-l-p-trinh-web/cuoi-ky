@@ -203,7 +203,8 @@ export const adminAPI = {
   deleteUser: (id) => apiClient.delete(`/admin/users/${id}`),
   updateUserStatus: (id, data) =>
     apiClient.put(`/admin/users/${id}/status`, data),
-  changeRoleUser: (slugUser, data) => apiClient.patch(`/user/${slugUser}`, data),
+  changeRoleUser: (slugUser, data) =>
+    apiClient.patch(`/user/${slugUser}`, data),
 
   // Car management
   getCars: (params) => apiClient.get("/admin/cars", { params }),

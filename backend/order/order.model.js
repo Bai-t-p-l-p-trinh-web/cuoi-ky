@@ -28,7 +28,7 @@ const OrderSchema = new mongoose.Schema(
     orderCode: {
       type: String,
       unique: true,
-      required: true,
+      // Bỏ required để middleware có thể tạo
     },
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -136,21 +136,56 @@ const OrderSchema = new mongoose.Schema(
   }
 );
 
-// Tạo orderCode tự động
+// Tạo orderCode tự động - đảm bảo luôn có orderCode
 OrderSchema.pre("save", async function (next) {
   if (!this.orderCode) {
-    const date = new Date();
-    const dateStr =
-      date.getFullYear().toString() +
-      (date.getMonth() + 1).toString().padStart(2, "0") +
-      date.getDate().toString().padStart(2, "0");
+    try {
+      const date = new Date();
+      const dateStr =
+        date.getFullYear().toString() +
+        (date.getMonth() + 1).toString().padStart(2, "0") +
+        date.getDate().toString().padStart(2, "0");
 
-    // Tìm số thứ tự trong ngày
-    const count = await this.constructor.countDocuments({
-      orderCode: { $regex: `^ORD${dateStr}` },
-    });
+      // Tìm số thứ tự trong ngày
+      const OrderModel = mongoose.model("Order");
+      const count = await OrderModel.countDocuments({
+        orderCode: { $regex: `^ORD${dateStr}` },
+      });
 
-    this.orderCode = `ORD${dateStr}${(count + 1).toString().padStart(3, "0")}`;
+      this.orderCode = `ORD${dateStr}${(count + 1)
+        .toString()
+        .padStart(3, "0")}`;
+      console.log("Generated orderCode:", this.orderCode);
+    } catch (error) {
+      console.error("Error generating orderCode:", error);
+      // Nếu lỗi, tạo orderCode đơn giản
+      this.orderCode = `ORD${Date.now()}`;
+    }
+  }
+  next();
+});
+
+// Đảm bảo orderCode được tạo trước khi validate
+OrderSchema.pre("validate", async function (next) {
+  if (!this.orderCode) {
+    try {
+      const date = new Date();
+      const dateStr =
+        date.getFullYear().toString() +
+        (date.getMonth() + 1).toString().padStart(2, "0") +
+        date.getDate().toString().padStart(2, "0");
+
+      const OrderModel = mongoose.model("Order");
+      const count = await OrderModel.countDocuments({
+        orderCode: { $regex: `^ORD${dateStr}` },
+      });
+
+      this.orderCode = `ORD${dateStr}${(count + 1)
+        .toString()
+        .padStart(3, "0")}`;
+    } catch (error) {
+      this.orderCode = `ORD${Date.now()}`;
+    }
   }
   next();
 });

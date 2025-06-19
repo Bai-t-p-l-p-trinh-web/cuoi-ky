@@ -10,24 +10,35 @@ const contractService = require("../contract/contract.service");
 const notificationService = require("../utils/notificationService");
 const Car = require("../car/car.model");
 const User = require("../user/user.model");
+const { populateOrder, createLog } = require("./order.service");
 
 class OrderController {
   /**
    * Tạo đơn hàng mới
    */ async createOrder(req, res) {
     try {
+      console.log("=== BẮTĐẦU API createOrder ===");
+      console.log("req.body:", req.body);
+      console.log("req.user:", req.user);
+
       const { carId, paymentMethod, depositPercentage = 20 } = req.body;
       const buyerId = req.user.id || req.user._id || req.user.userId;
 
-      console.log("Create order - buyerId:", buyerId);
-      console.log("Create order - carId:", carId);
-      console.log("Create order - req.user:", req.user); // Kiểm tra xe tồn tại và chưa bán
+      console.log(
+        "Parsed data - buyerId:",
+        buyerId,
+        "carId:",
+        carId,
+        "paymentMethod:",
+        paymentMethod
+      );
+
       const car = await Car.findOne({
         _id: carId,
         status: { $ne: "sold" },
       });
 
-      console.log(car);
+      console.log("Tạo đơn hàng cho xe này: ", car);
 
       if (!car) {
         return res.status(404).json({
@@ -72,8 +83,11 @@ class OrderController {
       if (paymentMethod === PaymentMethod.DEPOSIT) {
         depositAmount = Math.round(totalAmount * (depositPercentage / 100));
         remainingAmount = totalAmount - depositAmount;
-      } // Tạo đơn hàng
+      }
+
+      // Tạo đơn hàng
       const order = new Order({
+        // orderCode: orderCode, // Thêm orderCode thủ công
         buyer: buyerId,
         seller: seller._id,
         car: carId,
@@ -90,7 +104,7 @@ class OrderController {
       await order.save();
 
       // Log tạo đơn hàng
-      await this.createLog({
+      await createLog({
         type: LogType.ORDER_STATUS_CHANGE,
         order: order._id,
         user: buyerId,
@@ -112,7 +126,7 @@ class OrderController {
           message:
             "Đơn hàng đã được tạo. Vui lòng liên hệ người bán để thống nhất giao dịch.",
           data: {
-            order: await this.populateOrder(order),
+            order: await populateOrder(order),
             nextStep: "contact_seller",
           },
         });
@@ -152,7 +166,7 @@ class OrderController {
       await payment.save();
 
       // Log tạo thanh toán
-      await this.createLog({
+      await createLog({
         type: LogType.PAYMENT_CREATED,
         order: order._id,
         user: buyerId,
@@ -162,18 +176,28 @@ class OrderController {
         req: req,
       });
 
+      console.log("=== SẮP TRẢ VỀ RESPONSE ===");
+      console.log("Order đã tạo:", order._id);
+      console.log("Payment đã tạo:", payment._id);
+
+      const populatedOrder = await populateOrder(order);
+      console.log("Populated order thành công:", !!populatedOrder);
+
       res.status(201).json({
         success: true,
         message: "Đơn hàng đã được tạo thành công",
         data: {
-          order: await this.populateOrder(order),
+          order: populatedOrder,
           payment: payment,
           qrCode: qrResult.data,
           nextStep: "payment",
         },
       });
+      console.log("=== ĐÃ GỬI RESPONSE THÀNH CÔNG ===");
     } catch (error) {
+      console.error("=== LỖI TRONG createOrder ===");
       console.error("Create order error:", error);
+      console.error("Error stack:", error.stack);
       res.status(500).json({
         success: false,
         message: "Lỗi tạo đơn hàng",
@@ -1131,46 +1155,6 @@ class OrderController {
         message: "Lỗi tạo lại hợp đồng",
         error: error.message,
       });
-    }
-  }
-
-  // Helper methods
-  async populateOrder(order) {
-    if (!order) return null;
-
-    return await Order.findById(order._id)
-      .populate("buyer", "fullName email phoneNumber avatar address")
-      .populate("seller", "fullName email phoneNumber avatar address")
-      .populate("car");
-  }
-
-  async createLog({
-    type,
-    order,
-    user,
-    action,
-    description,
-    previousData,
-    newData,
-    req,
-  }) {
-    try {
-      const log = new Log({
-        type: type,
-        order: order,
-        user: user,
-        action: action,
-        description: description,
-        previousData: previousData,
-        newData: newData,
-        ipAddress: req?.ip,
-        userAgent: req?.get("User-Agent"),
-      });
-
-      await log.save();
-      return log;
-    } catch (error) {
-      console.error("Create log error:", error);
     }
   }
 }

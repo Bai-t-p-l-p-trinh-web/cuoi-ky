@@ -30,7 +30,6 @@ function ChiTietXe() {
   useEffect(() => {
     const getDataCar = async () => {
       try {
-        console.log("get car by slug");
         const resDataCar = await apiClient.get(`/car/${slugCar}`);
         setXe(resDataCar.data);
       } catch (error) {
@@ -43,7 +42,6 @@ function ChiTietXe() {
       getDataCar();
     }
   }, [slugCar]);
-  console.log(xe);
   const contactSeller = () => {
     const dataSend = {
       sellerId: xe.user.id,
