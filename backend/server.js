@@ -209,7 +209,7 @@ app.use("/api/v1/notices", noticesUserRoutes);
 //  global error handler
 app.use((err, req, res, next) => {
   console.log(err.stack);
-  res.status(500).json({ error: "Internal Server Error" });
+  res.status(500).json({ error: "Internal Server Error " });
 });
 
 // start server
