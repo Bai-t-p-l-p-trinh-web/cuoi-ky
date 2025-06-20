@@ -7,8 +7,10 @@ const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
+    console.log("🚫 VALIDATION ERRORS DETECTED!");
     console.log("Validation errors:", errors.array());
     console.log("Request body:", req.body);
+    console.log("Request URL:", req.originalUrl);
     return res.status(400).json({
       success: false,
       message: "Dữ liệu không hợp lệ",
@@ -20,6 +22,7 @@ const handleValidationErrors = (req, res, next) => {
     });
   }
 
+  console.log("✅ Validation passed for:", req.originalUrl);
   next();
 };
 

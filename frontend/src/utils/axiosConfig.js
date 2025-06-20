@@ -2,10 +2,12 @@ import axios from "axios";
 
 // Create axios instance with default configuration
 const baseServerUrl = import.meta.env.VITE_AUTH_SERVER_URL;
+console.log("Base server URL:", baseServerUrl);
+
 const apiClient = axios.create({
   baseURL: baseServerUrl,
   withCredentials: true, // Always send cookies with requests
-  timeout: 10000, // 10 second timeout
+  timeout: 30000, // Tăng timeout lên 30 giây để test
 });
 
 // Helper function to get user data from localStorage
@@ -85,9 +87,27 @@ const processQueue = (error, token = null) => {
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
+    console.log("=== AXIOS RESPONSE INTERCEPTOR ===");
+    console.log(
+      "Response received:",
+      response.status,
+      response.config.method.toUpperCase(),
+      response.config.url
+    );
+    console.log("Response data exists:", !!response.data);
+    if (
+      response.config.method === "post" &&
+      response.config.url.includes("/orders")
+    ) {
+      console.log("🎯 ĐÂY LÀ RESPONSE CỦA CREATE ORDER!");
+      console.log("Response data:", response.data);
+    }
     return response;
   },
   async (error) => {
+    console.log("=== AXIOS ERROR INTERCEPTOR ===");
+    console.log("Error in response interceptor:", error.message);
+    console.log("Error status:", error.response?.status);
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {

@@ -1,0 +1,289 @@
+.admin-payment-flow {
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h2 {
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    .status-filter {
+      .form-select {
+        min-width: 200px;
+      }
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #666;
+  }
+
+  .payments-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .table {
+      margin: 0;
+
+      th {
+        background: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        padding: 12px;
+      }
+
+      td {
+        padding: 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .badge {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+
+        &.badge-warning {
+          background: #ffc107;
+          color: #212529;
+        }
+
+        &.badge-info {
+          background: #17a2b8;
+          color: white;
+        }
+
+        &.badge-primary {
+          background: #007bff;
+          color: white;
+        }
+
+        &.badge-secondary {
+          background: #6c757d;
+          color: white;
+        }
+
+        &.badge-success {
+          background: #28a745;
+          color: white;
+        }
+      }
+
+      .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-warning {
+          background: #ffc107;
+          color: #212529;
+
+          &:hover {
+            background: #e0a800;
+          }
+        }
+
+        &.btn-primary {
+          background: #007bff;
+          color: white;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+
+        &.btn-success {
+          background: #28a745;
+          color: white;
+
+          &:hover {
+            background: #1e7e34;
+          }
+        }
+      }
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #dee2e6;
+
+      h3 {
+        margin: 0;
+        color: #2c3e50;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 20px;
+
+      .payment-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+
+        h4 {
+          margin-top: 0;
+          margin-bottom: 10px;
+          color: #2c3e50;
+        }
+
+        p {
+          margin: 5px 0;
+
+          strong {
+            display: inline-block;
+            min-width: 80px;
+          }
+        }
+      }
+
+      .seller-bank-info {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+
+        h5 {
+          margin-top: 0;
+          margin-bottom: 10px;
+          color: #155724;
+        }
+
+        p {
+          margin: 5px 0;
+
+          strong {
+            display: inline-block;
+            min-width: 120px;
+          }
+        }
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+
+        label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: 500;
+          color: #333;
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          font-size: 14px;
+
+          &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+          }
+        }
+
+        textarea.form-control {
+          resize: vertical;
+          min-height: 80px;
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #dee2e6;
+
+        .btn {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+
+          &.btn-secondary {
+            background: #6c757d;
+            color: white;
+
+            &:hover {
+              background: #545b62;
+            }
+          }
+
+          &.btn-primary {
+            background: #007bff;
+            color: white;
+
+            &:hover {
+              background: #0056b3;
+            }
+          }
+        }
+      }
+    }
+  }
+}

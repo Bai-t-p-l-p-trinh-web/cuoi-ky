@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { adminAPI } from "../../../utils/axiosConfig";
+import AdminPaymentFlow from "../../../components/admin/AdminPaymentFlow";
 import {
   FaSearch,
   FaFilter,
@@ -12,10 +13,13 @@ import {
   FaCreditCard,
   FaExclamationTriangle,
   FaClock,
+  FaRoute,
+  FaList,
 } from "react-icons/fa";
 import "./AdminPaymentManagement.scss";
 
 const AdminPaymentManagement = () => {
+  const [activeTab, setActiveTab] = useState("legacy"); // "legacy" hoặc "flow"
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -158,7 +162,6 @@ const AdminPaymentManagement = () => {
     };
     return methods[method] || method;
   };
-
   return (
     <div className="admin-payment-management">
       <div className="page-header">
@@ -169,384 +172,441 @@ const AdminPaymentManagement = () => {
         <p>Quản lý và theo dõi các giao dịch thanh toán</p>
       </div>
 
-      {/* Filters */}
-      <div className="filters-section">
-        <div className="search-box">
-          <FaSearch />{" "}
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo mã GD, tên khách hàng, email hoặc tên xe..."
-            value={searchTerm}
-            onChange={handleSearch}
-            onKeyPress={(e) => e.key === "Enter" && handleSearchSubmit()}
-          />
-          <button onClick={handleSearchSubmit} className="search-btn">
-            Tìm kiếm
-          </button>
-        </div>
-
-        <div className="filter-controls">
-          {" "}
-          <select value={filterStatus} onChange={handleFilterChange}>
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ xác nhận</option>
-            <option value="completed">Hoàn thành</option>
-            <option value="failed">Thất bại</option>
-            <option value="refunded">Đã hoàn tiền</option>
-            <option value="cancelled">Đã hủy</option>
-            <option value="deposited">Đã cọc</option>
-          </select>
-          <button onClick={handleSearchSubmit} className="filter-btn">
-            <FaFilter />
-            Lọc
-          </button>
-        </div>
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button
+          className={`tab-btn ${activeTab === "flow" ? "active" : ""}`}
+          onClick={() => setActiveTab("flow")}
+        >
+          <FaRoute className="tab-icon" />
+          Payment Flow (Mới)
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "legacy" ? "active" : ""}`}
+          onClick={() => setActiveTab("legacy")}
+        >
+          <FaList className="tab-icon" />
+          Quản lý cũ
+        </button>
       </div>
 
-      {/* Content */}
-      <div className="payments-section">
-        {loading ? (
-          <div className="loading-content">
-            <FaSpinner className="spinning" />
-            <span>Đang tải dữ liệu...</span>
+      {/* Tab Content */}
+      {activeTab === "flow" ? (
+        <div className="flow-tab-content">
+          <div className="flow-description">
+            <h3>🔄 Payment Flow System</h3>
+            <p>
+              Hệ thống quản lý luồng thanh toán mới: Buyer → Admin xác nhận →
+              Thông báo → Trao đổi → Chuyển tiền Seller
+            </p>
+            <div className="quick-stats">
+              <div className="stat-item pending">
+                <FaClock />
+                <span>Chờ xác nhận</span>
+              </div>
+              <div className="stat-item processing">
+                <FaSpinner />
+                <span>Đang xử lý</span>
+              </div>
+              <div className="stat-item completed">
+                <FaCheck />
+                <span>Hoàn thành</span>
+              </div>
+            </div>{" "}
           </div>
-        ) : (
-          <>
-            {" "}
-            <div className="payments-grid">
-              {payments.length === 0 ? (
-                <div className="no-data">
-                  <FaExclamationTriangle className="no-data-icon" />
-                  <p>Không có dữ liệu thanh toán</p>
-                </div>
-              ) : (
-                payments.map((payment) => (
-                  <div key={payment._id} className="payment-card">
-                    <div className="payment-header">
-                      <div className="payment-info">
-                        <h3>
-                          <FaCreditCard className="card-icon" />
-                          Giao dịch #{payment._id.slice(-6)}
-                        </h3>{" "}
-                        <p className="transaction-id">
-                          <strong>Mã GD:</strong>{" "}
-                          {payment.paymentCode ||
-                            payment.transactionId ||
-                            "N/A"}
-                        </p>
-                        <p className="user-info">
-                          <strong>Khách hàng:</strong>{" "}
-                          {payment.user?.name || "N/A"}
-                        </p>
-                        <p className="user-email">
-                          {payment.user?.email || "N/A"}
-                        </p>
-                      </div>
-                      <div className="payment-status">
-                        {getStatusBadge(payment.status)}
-                        <p className="created-date">
-                          {formatDate(payment.createdAt)}
-                        </p>
-                      </div>
-                    </div>
+          <AdminPaymentFlow />
+        </div>
+      ) : (
+        <div className="legacy-tab-content">
+          {/* Filters */}
+          <div className="filters-section">
+            <div className="search-box">
+              <FaSearch />{" "}
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo mã GD, tên khách hàng, email hoặc tên xe..."
+                value={searchTerm}
+                onChange={handleSearch}
+                onKeyPress={(e) => e.key === "Enter" && handleSearchSubmit()}
+              />
+              <button onClick={handleSearchSubmit} className="search-btn">
+                Tìm kiếm
+              </button>
+            </div>
 
-                    <div className="payment-details">
-                      <div className="amount-info">
-                        <span className="amount-label">Số tiền:</span>
-                        <span className="amount-value">
-                          {formatCurrency(payment.amount)}
+            <div className="filter-controls">
+              {" "}
+              <select value={filterStatus} onChange={handleFilterChange}>
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chờ xác nhận</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="failed">Thất bại</option>
+                <option value="refunded">Đã hoàn tiền</option>
+                <option value="cancelled">Đã hủy</option>
+                <option value="deposited">Đã cọc</option>
+              </select>
+              <button onClick={handleSearchSubmit} className="filter-btn">
+                <FaFilter />
+                Lọc
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="payments-section">
+            {loading ? (
+              <div className="loading-content">
+                <FaSpinner className="spinning" />
+                <span>Đang tải dữ liệu...</span>
+              </div>
+            ) : (
+              <>
+                {" "}
+                <div className="payments-grid">
+                  {payments.length === 0 ? (
+                    <div className="no-data">
+                      <FaExclamationTriangle className="no-data-icon" />
+                      <p>Không có dữ liệu thanh toán</p>
+                    </div>
+                  ) : (
+                    payments.map((payment) => (
+                      <div key={payment._id} className="payment-card">
+                        {" "}
+                        <div className="payment-header">
+                          <div className="payment-info">
+                            <h3>
+                              <FaCreditCard className="card-icon" />
+                              Giao dịch #{payment._id.slice(-6)}
+                            </h3>{" "}
+                            <p className="transaction-id">
+                              <strong>Mã GD:</strong>{" "}
+                              {payment.transactionInfo?.bankTransactionId ||
+                                payment.paymentCode ||
+                                payment.transactionId ||
+                                "N/A"}
+                            </p>
+                            <p className="user-info">
+                              <strong>Người chuyển:</strong>{" "}
+                              {payment.transactionInfo?.payerName ||
+                                payment.user?.fullName ||
+                                payment.user?.name ||
+                                "N/A"}
+                            </p>
+                            <p className="user-email">
+                              {payment.user?.email || "N/A"}
+                            </p>
+                            <p className="transfer-message">
+                              <strong>Lời nhắn:</strong>{" "}
+                              {payment.transactionInfo?.transferMessage ||
+                                payment.qrCode?.content ||
+                                "N/A"}
+                            </p>
+                          </div>
+                          <div className="payment-status">
+                            {getStatusBadge(payment.status)}
+                            <p className="created-date">
+                              {formatDate(payment.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="payment-details">
+                          <div className="amount-info">
+                            <span className="amount-label">Số tiền:</span>
+                            <span className="amount-value">
+                              {formatCurrency(payment.amount)}
+                            </span>
+                          </div>{" "}
+                          <div className="method-info">
+                            <span className="method-label">Phương thức:</span>
+                            <span className="method-value">
+                              {getPaymentMethodLabel(
+                                payment.paymentMethod || "bank_transfer"
+                              )}
+                            </span>
+                          </div>
+                          {payment.type && (
+                            <div className="type-info">
+                              <span className="type-label">Loại:</span>
+                              <span className="type-value">
+                                {payment.type === "deposit"
+                                  ? "Cọc"
+                                  : payment.type === "final_payment"
+                                  ? "Thanh toán cuối"
+                                  : payment.type === "full_payment"
+                                  ? "Thanh toán đầy đủ"
+                                  : payment.type}
+                              </span>
+                            </div>
+                          )}
+                        </div>{" "}
+                        <div className="payment-actions">
+                          {payment.status === "pending" && (
+                            <>
+                              <button
+                                className="btn-approve"
+                                onClick={() =>
+                                  handleUpdatePaymentStatus(
+                                    payment._id,
+                                    "completed",
+                                    "Xác nhận từ admin"
+                                  )
+                                }
+                              >
+                                <FaCheck />
+                                Xác nhận
+                              </button>
+                              <button
+                                className="btn-reject"
+                                onClick={() =>
+                                  handleUpdatePaymentStatus(
+                                    payment._id,
+                                    "failed",
+                                    "Từ chối từ admin"
+                                  )
+                                }
+                              >
+                                <FaTimes />
+                                Từ chối
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      onClick={() =>
+                        handlePageChange(pagination.currentPage - 1)
+                      }
+                      disabled={!pagination.hasPrev}
+                      className="pagination-btn"
+                    >
+                      Trước
+                    </button>
+
+                    <span className="pagination-info">
+                      Trang {pagination.currentPage} / {pagination.totalPages}(
+                      {pagination.totalItems} giao dịch)
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        handlePageChange(pagination.currentPage + 1)
+                      }
+                      disabled={!pagination.hasNext}
+                      className="pagination-btn"
+                    >
+                      Sau
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Detail Modal */}
+          {showDetailModal && selectedPayment && (
+            <div
+              className="modal-overlay"
+              onClick={() => setShowDetailModal(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Chi tiết thanh toán</h3>
+                  <button
+                    className="close-btn"
+                    onClick={() => setShowDetailModal(false)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="detail-section">
+                    <h4>Thông tin giao dịch</h4>
+                    <div className="detail-grid">
+                      <div className="detail-item">
+                        <label>ID Giao dịch:</label>
+                        <span>{selectedPayment._id}</span>
+                      </div>{" "}
+                      <div className="detail-item">
+                        <label>Mã giao dịch:</label>
+                        <span>
+                          {selectedPayment.paymentCode ||
+                            selectedPayment.transactionId ||
+                            "N/A"}
+                        </span>
+                      </div>
+                      <div className="detail-item">
+                        <label>Số tiền:</label>
+                        <span className="amount">
+                          {formatCurrency(selectedPayment.amount)}
                         </span>
                       </div>{" "}
-                      <div className="method-info">
-                        <span className="method-label">Phương thức:</span>
-                        <span className="method-value">
+                      <div className="detail-item">
+                        <label>Phương thức:</label>
+                        <span>
                           {getPaymentMethodLabel(
-                            payment.paymentMethod || "bank_transfer"
+                            selectedPayment.paymentMethod || "bank_transfer"
                           )}
                         </span>
                       </div>
-                      {payment.type && (
-                        <div className="type-info">
-                          <span className="type-label">Loại:</span>
-                          <span className="type-value">
-                            {payment.type === "deposit"
+                      {selectedPayment.type && (
+                        <div className="detail-item">
+                          <label>Loại thanh toán:</label>
+                          <span>
+                            {selectedPayment.type === "deposit"
                               ? "Cọc"
-                              : payment.type === "final_payment"
+                              : selectedPayment.type === "final_payment"
                               ? "Thanh toán cuối"
-                              : payment.type === "full_payment"
+                              : selectedPayment.type === "full_payment"
                               ? "Thanh toán đầy đủ"
-                              : payment.type}
+                              : selectedPayment.type}
                           </span>
                         </div>
                       )}
-                    </div>
-
-                    <div className="payment-actions">
-                      <button
-                        className="btn-info"
-                        onClick={() => handleViewPaymentDetail(payment._id)}
-                      >
-                        <FaEye />
-                        Chi tiết
-                      </button>
-                      {payment.status === "pending" && (
-                        <>
-                          <button
-                            className="btn-approve"
-                            onClick={() =>
-                              handleUpdatePaymentStatus(
-                                payment._id,
-                                "completed",
-                                "Xác nhận từ admin"
-                              )
-                            }
-                          >
-                            <FaCheck />
-                            Xác nhận
-                          </button>
-                          <button
-                            className="btn-reject"
-                            onClick={() =>
-                              handleUpdatePaymentStatus(
-                                payment._id,
-                                "failed",
-                                "Từ chối từ admin"
-                              )
-                            }
-                          >
-                            <FaTimes />
-                            Từ chối
-                          </button>
-                        </>
-                      )}{" "}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={!pagination.hasPrev}
-                  className="pagination-btn"
-                >
-                  Trước
-                </button>
-
-                <span className="pagination-info">
-                  Trang {pagination.currentPage} / {pagination.totalPages}(
-                  {pagination.totalItems} giao dịch)
-                </span>
-
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={!pagination.hasNext}
-                  className="pagination-btn"
-                >
-                  Sau
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Detail Modal */}
-      {showDetailModal && selectedPayment && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowDetailModal(false)}
-        >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Chi tiết thanh toán</h3>
-              <button
-                className="close-btn"
-                onClick={() => setShowDetailModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h4>Thông tin giao dịch</h4>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <label>ID Giao dịch:</label>
-                    <span>{selectedPayment._id}</span>
-                  </div>{" "}
-                  <div className="detail-item">
-                    <label>Mã giao dịch:</label>
-                    <span>
-                      {selectedPayment.paymentCode ||
-                        selectedPayment.transactionId ||
-                        "N/A"}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <label>Số tiền:</label>
-                    <span className="amount">
-                      {formatCurrency(selectedPayment.amount)}
-                    </span>
-                  </div>{" "}
-                  <div className="detail-item">
-                    <label>Phương thức:</label>
-                    <span>
-                      {getPaymentMethodLabel(
-                        selectedPayment.paymentMethod || "bank_transfer"
+                      <div className="detail-item">
+                        <label>Trạng thái:</label>
+                        {getStatusBadge(selectedPayment.status)}
+                      </div>{" "}
+                      <div className="detail-item">
+                        <label>Ngày tạo:</label>
+                        <span>{formatDate(selectedPayment.createdAt)}</span>
+                      </div>
+                      {selectedPayment.note && (
+                        <div className="detail-item">
+                          <label>Ghi chú:</label>
+                          <span>{selectedPayment.note}</span>
+                        </div>
                       )}
-                    </span>
+                    </div>
                   </div>
-                  {selectedPayment.type && (
-                    <div className="detail-item">
-                      <label>Loại thanh toán:</label>
-                      <span>
-                        {selectedPayment.type === "deposit"
-                          ? "Cọc"
-                          : selectedPayment.type === "final_payment"
-                          ? "Thanh toán cuối"
-                          : selectedPayment.type === "full_payment"
-                          ? "Thanh toán đầy đủ"
-                          : selectedPayment.type}
-                      </span>
+
+                  {selectedPayment.user && (
+                    <div className="detail-section">
+                      <h4>Thông tin khách hàng</h4>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>Tên:</label>
+                          <span>{selectedPayment.user.name}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Email:</label>
+                          <span>{selectedPayment.user.email}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Số điện thoại:</label>
+                          <span>{selectedPayment.user.phone || "N/A"}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
-                  <div className="detail-item">
-                    <label>Trạng thái:</label>
-                    {getStatusBadge(selectedPayment.status)}
-                  </div>{" "}
-                  <div className="detail-item">
-                    <label>Ngày tạo:</label>
-                    <span>{formatDate(selectedPayment.createdAt)}</span>
-                  </div>
+
+                  {selectedPayment.seller && (
+                    <div className="detail-section">
+                      <h4>Thông tin người bán</h4>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>Tên:</label>
+                          <span>{selectedPayment.seller.name}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Email:</label>
+                          <span>{selectedPayment.seller.email}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Số điện thoại:</label>
+                          <span>{selectedPayment.seller.phone || "N/A"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedPayment.order && (
+                    <div className="detail-section">
+                      <h4>Thông tin xe</h4>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>ID xe:</label>
+                          <span>{selectedPayment.order._id}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Tên xe:</label>
+                          <span>{selectedPayment.order.title}</span>
+                        </div>
+                        <div className="detail-item">
+                          <label>Trạng thái xe:</label>
+                          <span>{selectedPayment.order.status}</span>
+                        </div>{" "}
+                        <div className="detail-item">
+                          <label>Giá xe:</label>
+                          <span>
+                            {formatCurrency(selectedPayment.order.totalAmount)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {selectedPayment.note && (
-                    <div className="detail-item">
-                      <label>Ghi chú:</label>
-                      <span>{selectedPayment.note}</span>
+                    <div className="detail-section">
+                      <h4>Ghi chú</h4>
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <label>Nội dung:</label>
+                          <span>{selectedPayment.note}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
+                </div>
+                <div className="modal-actions">
+                  {selectedPayment.status === "pending" && (
+                    <>
+                      <button
+                        className="btn-approve"
+                        onClick={() =>
+                          handleUpdatePaymentStatus(
+                            selectedPayment._id,
+                            "completed",
+                            "Xác nhận từ admin"
+                          )
+                        }
+                      >
+                        <FaCheck />
+                        Xác nhận thanh toán
+                      </button>
+                      <button
+                        className="btn-reject"
+                        onClick={() =>
+                          handleUpdatePaymentStatus(
+                            selectedPayment._id,
+                            "failed",
+                            "Từ chối từ admin"
+                          )
+                        }
+                      >
+                        <FaTimes />
+                        Từ chối thanh toán
+                      </button>
+                    </>
+                  )}{" "}
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setShowDetailModal(false)}
+                  >
+                    Đóng
+                  </button>
                 </div>
               </div>
-
-              {selectedPayment.user && (
-                <div className="detail-section">
-                  <h4>Thông tin khách hàng</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Tên:</label>
-                      <span>{selectedPayment.user.name}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Email:</label>
-                      <span>{selectedPayment.user.email}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Số điện thoại:</label>
-                      <span>{selectedPayment.user.phone || "N/A"}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedPayment.seller && (
-                <div className="detail-section">
-                  <h4>Thông tin người bán</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Tên:</label>
-                      <span>{selectedPayment.seller.name}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Email:</label>
-                      <span>{selectedPayment.seller.email}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Số điện thoại:</label>
-                      <span>{selectedPayment.seller.phone || "N/A"}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedPayment.order && (
-                <div className="detail-section">
-                  <h4>Thông tin xe</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>ID xe:</label>
-                      <span>{selectedPayment.order._id}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Tên xe:</label>
-                      <span>{selectedPayment.order.title}</span>
-                    </div>
-                    <div className="detail-item">
-                      <label>Trạng thái xe:</label>
-                      <span>{selectedPayment.order.status}</span>
-                    </div>{" "}
-                    <div className="detail-item">
-                      <label>Giá xe:</label>
-                      <span>
-                        {formatCurrency(selectedPayment.order.totalAmount)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedPayment.note && (
-                <div className="detail-section">
-                  <h4>Ghi chú</h4>
-                  <div className="detail-grid">
-                    <div className="detail-item">
-                      <label>Nội dung:</label>
-                      <span>{selectedPayment.note}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
-            <div className="modal-actions">
-              {selectedPayment.status === "pending" && (
-                <>
-                  <button
-                    className="btn-approve"
-                    onClick={() =>
-                      handleUpdatePaymentStatus(
-                        selectedPayment._id,
-                        "completed",
-                        "Xác nhận từ admin"
-                      )
-                    }
-                  >
-                    <FaCheck />
-                    Xác nhận thanh toán
-                  </button>
-                  <button
-                    className="btn-reject"
-                    onClick={() =>
-                      handleUpdatePaymentStatus(
-                        selectedPayment._id,
-                        "failed",
-                        "Từ chối từ admin"
-                      )
-                    }
-                  >
-                    <FaTimes />
-                    Từ chối thanh toán
-                  </button>
-                </>
-              )}
-              <button
-                className="btn-secondary"
-                onClick={() => setShowDetailModal(false)}
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>

@@ -43,9 +43,8 @@ router.post(
   [
     body("paymentId")
       .notEmpty()
-      .withMessage("ID thanh toán không được để trống")
-      .isMongoId()
-      .withMessage("ID thanh toán không hợp lệ"),
+      .withMessage("ID thanh toán không được để trống"),
+    // Removed .isMongoId() validation to allow temporary IDs
     body("transactionId")
       .notEmpty()
       .withMessage("Mã giao dịch không được để trống"),

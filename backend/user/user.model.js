@@ -86,9 +86,8 @@ const userSchema = new mongoose.Schema(
     contactLinkedin: {
       type: String,
       default: null,
-    },
-    // Thông tin ngân hàng cho giao dịch
-    bankInfo: {
+    }, // Thông tin ngân hàng cho giao dịch
+    bankAccount: {
       bankName: {
         type: String,
         default: null,
@@ -101,7 +100,7 @@ const userSchema = new mongoose.Schema(
         type: String,
         default: null,
       },
-      accountHolder: {
+      accountName: {
         type: String,
         default: null,
       },

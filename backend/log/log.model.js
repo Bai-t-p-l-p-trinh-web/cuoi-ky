@@ -6,6 +6,10 @@ const LogType = {
   PAYMENT_COMPLETED: "payment_completed",
   PAYMENT_VERIFIED: "payment_verified",
   PAYMENT_REJECTED: "payment_rejected",
+  PAYMENT_CONFIRMED: "payment_confirmed", // Admin xác nhận nhận tiền
+  NOTIFICATION_SENT: "notification_sent", // Gửi thông báo
+  EXCHANGE_CONFIRMED: "exchange_confirmed", // Xác nhận trao đổi
+  PAYMENT_TRANSFERRED: "payment_transferred", // Chuyển tiền cho seller
   REFUND_REQUESTED: "refund_requested",
   REFUND_PROCESSED: "refund_processed",
   CONTRACT_GENERATED: "contract_generated",
@@ -24,6 +28,10 @@ const LogSchema = new mongoose.Schema(
     order: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
+    },
+    payment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Payment",
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

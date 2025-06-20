@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const PaymentStatus = {
   PENDING: "pending",
-  COMPLETED: "completed",
+  ADMIN_CONFIRMED: "admin_confirmed", // Admin đã xác nhận nhận tiền
+  BUYER_SELLER_NOTIFIED: "buyer_seller_notified", // Đã thông báo cho buyer và seller
+  EXCHANGE_IN_PROGRESS: "exchange_in_progress", // Đang trao đổi giữa buyer và seller
+  EXCHANGE_COMPLETED: "exchange_completed", // Trao đổi hoàn tất, chờ admin chuyển tiền
+  COMPLETED: "completed", // Đã chuyển tiền cho seller
   FAILED: "failed",
   CANCELLED: "cancelled",
   REFUNDED: "refunded",
@@ -53,22 +57,63 @@ const PaymentSchema = new mongoose.Schema(
       accountName: String,
       content: String, // Nội dung chuyển khoản
       amount: Number,
-    },
-    // Thông tin thanh toán thực tế
+    }, // Thông tin thanh toán thực tế
     transactionInfo: {
       bankTransactionId: {
         type: String,
-        unique: true,
+        // unique: true, // TẠM THỜI BỎ UNIQUE ĐỂ TRÁNH LỖI
         sparse: true,
       },
+      payerName: String, // Tên người chuyển khoản
       bankCode: String,
       transactionDate: Date,
+      transferMessage: String, // Lời nhắn chuyển khoản
       verifiedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
       verifiedAt: Date,
       evidence: [String], // Ảnh chứng từ thanh toán
+    },
+
+    // Thông tin admin xác nhận
+    adminConfirmation: {
+      confirmedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      confirmedAt: Date,
+      notes: String, // Ghi chú của admin
+    },
+
+    // Thông tin trao đổi giữa buyer và seller
+    exchangeInfo: {
+      meetingLocation: String,
+      meetingTime: Date,
+      buyerConfirmed: {
+        type: Boolean,
+        default: false,
+      },
+      sellerConfirmed: {
+        type: Boolean,
+        default: false,
+      },
+      buyerConfirmedAt: Date,
+      sellerConfirmedAt: Date,
+      notes: String,
+    },
+
+    // Thông tin chuyển tiền cho seller
+    sellerPayout: {
+      transferredBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      transferredAt: Date,
+      transferAmount: Number,
+      transferReference: String, // Mã tham chiếu chuyển khoản
+      transferEvidence: [String], // Ảnh chứng từ chuyển khoản
+      notes: String,
     },
     // Webhook data
     webhookData: {

@@ -2,6 +2,7 @@ const { Payment, PaymentStatus } = require("./payment.model");
 const { Order, OrderStatus } = require("../order/order.model");
 const { Log, LogType } = require("../log/log.model");
 const notificationService = require("../notification/notification.service");
+const paymentFlowService = require("./payment.flow.service");
 
 class PaymentController {
   /**
@@ -267,6 +268,354 @@ class PaymentController {
         success: false,
         message: "Lỗi lấy chi tiết thanh toán",
         error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Admin xác nhận đã nhận tiền từ buyer
+   */ async adminConfirmPayment(req, res) {
+    try {
+      console.log("=== ADMIN CONFIRM PAYMENT ===");
+      console.log("params:", req.params);
+      console.log("body:", req.body);
+      console.log("user:", req.user);
+
+      const { paymentId } = req.params;
+      const adminId = req.user.id;
+      const { notes, transactionInfo } = req.body;
+
+      // Kiểm tra quyền admin
+      if (req.user.role !== "admin") {
+        console.log("Access denied - not admin");
+        return res.status(403).json({
+          success: false,
+          message: "Only admin can confirm payments",
+        });
+      }
+
+      console.log("Calling paymentFlowService.adminConfirmPaymentReceived...");
+      const result = await paymentFlowService.adminConfirmPaymentReceived(
+        paymentId,
+        adminId,
+        { notes, transactionInfo }
+      );
+
+      console.log("Service result:", result);
+      res.json({
+        success: true,
+        message: result.message,
+        data: result,
+      });
+    } catch (error) {
+      console.error("Admin confirm payment error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * DEBUG: Kiểm tra payment info
+   */
+  async debugPayment(req, res) {
+    try {
+      const { paymentId } = req.params;
+
+      console.log("=== DEBUG PAYMENT ===");
+      console.log("paymentId:", paymentId);
+
+      const payment = await Payment.findById(paymentId)
+        .populate("order")
+        .populate("user", "fullName email phone");
+
+      console.log("Found payment:", !!payment);
+      if (payment) {
+        console.log("Payment status:", payment.status);
+        console.log("Payment user:", payment.user?.fullName);
+        console.log("Payment amount:", payment.amount);
+        console.log("Order code:", payment.order?.orderCode);
+      }
+
+      res.json({
+        success: true,
+        data: {
+          paymentExists: !!payment,
+          payment: payment
+            ? {
+                id: payment._id,
+                status: payment.status,
+                amount: payment.amount,
+                user: payment.user?.fullName,
+                orderCode: payment.order?.orderCode,
+                createdAt: payment.createdAt,
+              }
+            : null,
+        },
+      });
+    } catch (error) {
+      console.error("Debug payment error:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Thông báo cho buyer và seller
+   */
+  async notifyBuyerSeller(req, res) {
+    try {
+      const { paymentId } = req.params;
+      const adminId = req.user.id;
+
+      if (req.user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Only admin can send notifications",
+        });
+      }
+
+      const result = await paymentFlowService.notifyBuyerSeller(
+        paymentId,
+        adminId
+      );
+
+      res.json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      console.error("Notify users error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Sắp xếp cuộc gặp (buyer/seller)
+   */
+  async scheduleMeeting(req, res) {
+    try {
+      const { orderId } = req.params;
+      const userId = req.user.id;
+      const { location, time, notes } = req.body;
+
+      const result = await paymentFlowService.scheduleMeeting(orderId, userId, {
+        location,
+        time,
+        notes,
+      });
+
+      res.json({
+        success: true,
+        message: result.message,
+        data: result.meeting,
+      });
+    } catch (error) {
+      console.error("Schedule meeting error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Xác nhận trao đổi thành công (buyer/seller)
+   */
+  async confirmExchange(req, res) {
+    try {
+      const { orderId } = req.params;
+      const userId = req.user.id;
+      const { confirmed = true } = req.body;
+
+      const result = await paymentFlowService.confirmExchange(
+        orderId,
+        userId,
+        confirmed
+      );
+
+      res.json({
+        success: true,
+        message: result.message,
+        data: {
+          bothConfirmed: result.bothConfirmed,
+        },
+      });
+    } catch (error) {
+      console.error("Confirm exchange error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Admin chuyển tiền cho seller
+   */
+  async transferToSeller(req, res) {
+    try {
+      const { paymentId } = req.params;
+      const adminId = req.user.id;
+      const { amount, reference, evidence, notes } = req.body;
+
+      if (req.user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Only admin can transfer payments",
+        });
+      }
+
+      const result = await paymentFlowService.transferToSeller(
+        paymentId,
+        adminId,
+        {
+          amount,
+          reference,
+          evidence,
+          notes,
+        }
+      );
+
+      res.json({
+        success: true,
+        message: result.message,
+        data: result.transfer,
+      });
+    } catch (error) {
+      console.error("Transfer to seller error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Lấy trạng thái chi tiết của payment flow
+   */
+  async getPaymentFlowStatus(req, res) {
+    try {
+      const { paymentId } = req.params;
+
+      const result = await paymentFlowService.getPaymentFlowStatus(paymentId);
+
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      console.error("Get payment flow status error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Lấy danh sách payments theo trạng thái cho admin
+   */
+  async getPaymentsByStatus(req, res) {
+    try {
+      const { status, page = 1, limit = 20 } = req.query;
+
+      if (req.user.role !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "Only admin can view all payments",
+        });
+      }
+
+      const filter = {};
+      if (status) {
+        filter.status = status;
+      }
+
+      const payments = await Payment.find(filter)
+        .populate({
+          path: "order",
+          populate: [
+            { path: "buyer", select: "fullName email phone" },
+            { path: "seller", select: "fullName email phone bankAccount" },
+            { path: "car", select: "title price images" },
+          ],
+        })
+        .populate("adminConfirmation.confirmedBy", "fullName")
+        .populate("sellerPayout.transferredBy", "fullName")
+        .sort({ createdAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+
+      const total = await Payment.countDocuments(filter);
+
+      res.json({
+        success: true,
+        data: {
+          payments,
+          pagination: {
+            current: parseInt(page),
+            total: Math.ceil(total / limit),
+            count: total,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get payments by status error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * Lấy trạng thái payment flow theo orderId
+   */
+  async getPaymentFlowByOrder(req, res) {
+    try {
+      const { orderId } = req.params;
+
+      // Tìm payment của order
+      const payment = await Payment.findOne({ order: orderId })
+        .populate({
+          path: "order",
+          populate: [
+            { path: "buyer", select: "fullName email phone" },
+            { path: "seller", select: "fullName email phone bankAccount" },
+            { path: "car", select: "title price images" },
+          ],
+        })
+        .populate("adminConfirmation.confirmedBy", "fullName")
+        .populate("sellerPayout.transferredBy", "fullName");
+
+      if (!payment) {
+        return res.status(404).json({
+          success: false,
+          message: "Payment not found for this order",
+        });
+      }
+
+      const flowSteps = paymentFlowService.getFlowSteps(payment);
+
+      res.json({
+        success: true,
+        data: {
+          payment,
+          flowSteps,
+        },
+      });
+    } catch (error) {
+      console.error("Get payment flow by order error:", error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
       });
     }
   }

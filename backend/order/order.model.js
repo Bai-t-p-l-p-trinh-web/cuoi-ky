@@ -2,9 +2,14 @@ const mongoose = require("mongoose");
 
 const OrderStatus = {
   AWAITING_PAYMENT: "awaiting_payment",
+  PAYMENT_RECEIVED: "payment_received", // Admin đã xác nhận nhận tiền
+  PENDING_MEETING: "pending_meeting", // Chờ sắp xếp cuộc gặp
+  MEETING_SCHEDULED: "meeting_scheduled", // Đã sắp xếp cuộc gặp
+  EXCHANGE_IN_PROGRESS: "exchange_in_progress", // Đang trao đổi
+  EXCHANGE_COMPLETED: "exchange_completed", // Trao đổi hoàn tất
+  AWAITING_FINAL_TRANSFER: "awaiting_final_transfer", // Chờ admin chuyển tiền
   PAID_PARTIAL: "paid_partial",
   PAID_FULL: "paid_full",
-  PENDING_MEETING: "pending_meeting",
   WAITING_CONFIRMATION: "waiting_confirmation",
   NEGOTIATING: "negotiating",
   PENDING_FINAL_PAYMENT: "pending_final_payment",
