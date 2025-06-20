@@ -22,11 +22,11 @@ function verifyToken(req, res, next) {
       ? req.headers.authorization.split(" ")[1]
       : "undefined"
   );
-  // console.log(
-  //   "Token from cookies:",
-  //   req.cookies ? req.cookies.accessToken : "undefined"
-  // );
-  // console.log("Final token used:", token);
+  console.log(
+    "Token from cookies:",
+    req.cookies ? req.cookies.accessToken : "undefined"
+  );
+  console.log("Final token used:", token);
 
   if (!token) {
     return res.status(401).json({ message: "không có token" });

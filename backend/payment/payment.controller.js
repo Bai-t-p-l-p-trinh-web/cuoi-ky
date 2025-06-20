@@ -543,7 +543,7 @@ class PaymentController {
           path: "order",
           populate: [
             { path: "buyer", select: "fullName email phone" },
-            { path: "seller", select: "fullName email phone bankAccount" },
+            { path: "seller", select: "fullName email phone bankInfo" },
             { path: "car", select: "title price images" },
           ],
         })
@@ -588,7 +588,7 @@ class PaymentController {
           path: "order",
           populate: [
             { path: "buyer", select: "fullName email phone" },
-            { path: "seller", select: "fullName email phone bankAccount" },
+            { path: "seller", select: "fullName email phone bankInfo" },
             { path: "car", select: "title price images" },
           ],
         })

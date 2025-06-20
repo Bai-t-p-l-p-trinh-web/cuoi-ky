@@ -87,7 +87,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     }, // Thông tin ngân hàng cho giao dịch
-    bankAccount: {
+    bankInfo: {
       bankName: {
         type: String,
         default: null,
@@ -100,7 +100,7 @@ const userSchema = new mongoose.Schema(
         type: String,
         default: null,
       },
-      accountName: {
+      accountHolder: {
         type: String,
         default: null,
       },
