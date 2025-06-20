@@ -75,13 +75,13 @@ function Header() {
               <div className="header__menuUser__authenticated">
                 {" "}
                 {/* Notification Bell */}
-                <div
+                <Link to="/my_account/notifications"
                   className="header__menuUser__notification"
                   title="Thông báo"
                 >
                   <FaBell />
-                  <span className="notification-badge">3</span>
-                </div>
+                  <span className="notification-badge"></span>
+                </Link>
                 {/* Chat Link */}
                 <Link
                   className="header__menuUser__chat"

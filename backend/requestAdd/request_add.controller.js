@@ -6,6 +6,7 @@ const RequestAdd = require("./request_add.model");
 var md5 = require("md5");
 const { createPdf } = require("./request_add.service");
 const fuel = require("../constants/fuelEnum");
+const { createNoti } = require("../notiUser/noti.service");
 
 // [POST] /api/v1/requestAdd
 const createRequest = async (req, res) => {
@@ -177,7 +178,12 @@ const AddTheInspectors = async (req, res) => {
       (userId) => !request.userIds.includes(userId)
     );
     request.userIds = [...request.userIds, ...userIdsValid];
+
+    
     await request.save();
+    Promise.all(userIdsValid.map(async(userId) => {
+      await createNoti(userId, 'Bạn được phân công đến kiểm tra yêu cầu xe mới!'); 
+    }))
 
     return res.send("Đã phái nhân viên đến thành công! ");
   } catch (error) {
@@ -264,6 +270,8 @@ const checkedTheRequest = async (req, res) => {
       responseMessage += " Lưu ý: Seller chưa có thông tin ngân hàng.";
     }
 
+    await createNoti(sellerId, 'Đơn yêu cầu của bạn đã được duyệt, vui lòng nhập thông tin để đăng bán!');
+
     return res.status(200).json({
       message: responseMessage,
       bankVerified: seller.bankInfo?.isVerified || false,
@@ -325,6 +333,9 @@ const rejectRequest = async (req, res) => {
     request.secure_url = secure_url;
 
     await request.save();
+
+    await createNoti(sellerId, 'Đơn yêu cầu của bạn đã được duyệt, vui lòng nhập thông tin để đăng bán!');
+
     return res.send("Đã chuyển trạng thái sang từ chối xong thành công! ");
   } catch (error) {
     return res.status(500).json({ message: "Server Error!" });

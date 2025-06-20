@@ -103,6 +103,8 @@ function Message() {
 
     socketRef.current = socket;
 
+    // socket.connect()
+
     socket.emit("user-online", user._id);
 
     socket.on("get-online-users", (receiveUsers) => {

@@ -180,6 +180,7 @@ const OrderRoutes = require("./order/order.routes");
 const RefundRoutes = require("./refund/refund.routes");
 const NotificationRoutes = require("./notification/notification.routes");
 const AdminRoutes = require("./admin/admin.routes");
+const noticesUserRoutes = require('./notiUser/notiUser.routes');
 
 // api docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));  
@@ -203,6 +204,7 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/orders", OrderRoutes);
 app.use("/api/v1/refunds", RefundRoutes);
 app.use("/api/v1/notifications", NotificationRoutes);
+app.use("/api/v1/notices", noticesUserRoutes);
 
 //  global error handler
 app.use((err, req, res, next) => {

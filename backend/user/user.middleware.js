@@ -22,11 +22,11 @@ function verifyToken(req, res, next) {
       ? req.headers.authorization.split(" ")[1]
       : "undefined"
   );
-  console.log(
-    "Token from cookies:",
-    req.cookies ? req.cookies.accessToken : "undefined"
-  );
-  console.log("Final token used:", token);
+  // console.log(
+  //   "Token from cookies:",
+  //   req.cookies ? req.cookies.accessToken : "undefined"
+  // );
+  // console.log("Final token used:", token);
 
   if (!token) {
     return res.status(401).json({ message: "không có token" });
@@ -39,16 +39,16 @@ function verifyToken(req, res, next) {
     req.userId = decoded.id || decoded.userId || decoded._id;
 
     if (!req.userId) {
-      console.error("User ID không tìm thấy trong token payload:", decoded);
+      // console.error("User ID không tìm thấy trong token payload:", decoded);
       return res
         .status(401)
         .json({ message: "Token không hợp lệ: thiếu User ID" });
     }
 
-    console.log("Decoded userId:", req.userId);
+    // console.log("Decoded userId:", req.userId);
     next();
   } catch (err) {
-    console.error("JWT verification error:", err.message);
+    // console.error("JWT verification error:", err.message);
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token đã hết hạn" });
     }
