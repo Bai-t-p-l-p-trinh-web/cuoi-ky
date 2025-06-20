@@ -1,26 +1,34 @@
 import { useEffect, useState, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./scss/Car_Filter.scss";
 
 function CarFilter() {
     const [keyword, setKeyword] = useState("");
     const debounceTimeout = useRef(null);
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const kw = params.get("keyword") || "";
         setKeyword(kw);
-    }, []);
+    }, [location.search]);
 
     const updateURLAndReload = (value) => {
-        const url = new URL(window.location.href);
+        const params = new URLSearchParams(location.search);
+        
         if (value.trim() === "") {
-            url.searchParams.delete("keyword");
+            params.delete("keyword");
         } else {
-            url.searchParams.set("keyword", value);
+            params.set("keyword", value);
         }
 
-        window.history.replaceState({}, '', url);
+        navigate({
+            pathname: location.pathname,
+            search: params.toString(),
+        }, { replace: true });
     };
 
     const handleChange = (e) => {

@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Filter_In_3(props) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {data} = props;
   const { Types, query_name } = data;
 
@@ -32,7 +35,10 @@ function Filter_In_3(props) {
         url.searchParams.delete(query_name);
       }
 
-      window.history.replaceState({}, "", url);
+      navigate({
+        pathname: location.pathname,
+        search: url.searchParams.toString(),
+      }, { replace: true });
       return updated;
     });
 

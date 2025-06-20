@@ -1,104 +1,142 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Filter_In_2(props) {
-    const { data } = props;
-    const { defaultMin, defaultMax, gapMin_Max, unit, query_name } = data;
+  const { data } = props;
+  const { defaultMin, defaultMax, gapMin_Max, unit, query_name } = data;
 
-    const inputMin = useRef(null);
-    const inputMax = useRef(null);
-    const progress_bar = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const [minValue, setMinValue] = useState(defaultMin);
-    const [maxValue, setMaxValue] = useState(defaultMax);
+  const inputMin = useRef(null);
+  const inputMax = useRef(null);
+  const progress_bar = useRef(null);
 
-    
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const min = Number(params.get(`${query_name}min`)) || defaultMin;
-        const max = Number(params.get(`${query_name}max`)) || defaultMax;
+  const [minValue, setMinValue] = useState(defaultMin);
+  const [maxValue, setMaxValue] = useState(defaultMax);
 
-        setMinValue(min);
-        setMaxValue(max);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const min = Number(params.get(`${query_name}min`)) || defaultMin;
+    const max = Number(params.get(`${query_name}max`)) || defaultMax;
 
-        if (inputMin.current) inputMin.current.value = min;
-        if (inputMax.current) inputMax.current.value = max;
+    setMinValue(min);
+    setMaxValue(max);
 
-        if (progress_bar.current) {
-            progress_bar.current.style.left = ((min - defaultMin) / (defaultMax - defaultMin)) * 100 + "%";
-            progress_bar.current.style.right = (100 - ((max - defaultMin) / (defaultMax - defaultMin)) * 100) + "%";
-        }
-    }, []);
+    if (inputMin.current) inputMin.current.value = min;
+    if (inputMax.current) inputMax.current.value = max;
 
-    const handleChangeValue = (e) => {
-        let value_range_min = Number(inputMin.current.value);
-        let value_range_max = Number(inputMax.current.value);
+    if (progress_bar.current) {
+      progress_bar.current.style.left =
+        ((min - defaultMin) / (defaultMax - defaultMin)) * 100 + "%";
+      progress_bar.current.style.right =
+        100 -
+        ((max - defaultMin) / (defaultMax - defaultMin)) * 100 +
+        "%";
+    }
+  }, [location.search, defaultMin, defaultMax, query_name]);
 
-        if (value_range_max - value_range_min < gapMin_Max) {
-            if (e.target.getAttribute("data-type") === "range-min") {
-                value_range_min = value_range_max - gapMin_Max;
-                inputMin.current.value = value_range_min;
-            } else {
-                value_range_max = value_range_min + gapMin_Max;
-                inputMax.current.value = value_range_max;
-            }
-        }
+  const handleChangeValue = (e) => {
+    let value_range_min = Number(inputMin.current.value);
+    let value_range_max = Number(inputMax.current.value);
 
-        if (progress_bar.current) {
-            progress_bar.current.style.left = ((value_range_min - defaultMin) / (defaultMax - defaultMin)) * 100 + "%";
-            progress_bar.current.style.right = (100 - ((value_range_max - defaultMin) / (defaultMax - defaultMin)) * 100) + "%";
-        }
+    if (value_range_max - value_range_min < gapMin_Max) {
+      if (e.target.getAttribute("data-type") === "range-min") {
+        value_range_min = value_range_max - gapMin_Max;
+        inputMin.current.value = value_range_min;
+      } else {
+        value_range_max = value_range_min + gapMin_Max;
+        inputMax.current.value = value_range_max;
+      }
+    }
 
-        setMinValue(value_range_min);
-        setMaxValue(value_range_max);
-    };
+    if (progress_bar.current) {
+      progress_bar.current.style.left =
+        ((value_range_min - defaultMin) / (defaultMax - defaultMin)) * 100 +
+        "%";
+      progress_bar.current.style.right =
+        100 -
+        ((value_range_max - defaultMin) / (defaultMax - defaultMin)) * 100 +
+        "%";
+    }
 
-    const handleSubmit = () => {
-        const url = new URL(window.location.href);
-        url.searchParams.set(`${query_name}min`, minValue);
-        url.searchParams.set(`${query_name}max`, maxValue);
+    setMinValue(value_range_min);
+    setMaxValue(value_range_max);
+  };
 
-        window.history.replaceState({}, '', url);
-    };
+  const handleSubmit = () => {
+    const params = new URLSearchParams(location.search);
 
-    return (
-        <>
-            <div className="home__content__filter__range">
-                <div className="home__content__filter__range--slide">
-                    <div className="home__content__filter__range--slide-progress" ref={progress_bar}></div>
-                </div>
+    if (minValue !== defaultMin) {
+      params.set(`${query_name}min`, minValue);
+    } else {
+      params.delete(`${query_name}min`);
+    }
 
-                <div className="home__content__filter__range--input">
-                    <input
-                        type="range"
-                        ref={inputMin}
-                        className="home__content__filter__range--input-min"
-                        min={defaultMin}
-                        max={defaultMax}
-                        defaultValue={defaultMin}
-                        data-type="range-min"
-                        onInput={handleChangeValue}
-                    />
-                    <input
-                        type="range"
-                        ref={inputMax}
-                        className="home__content__filter__range--input-max"
-                        min={defaultMin}
-                        max={defaultMax}
-                        defaultValue={defaultMax}
-                        data-type="range-max"
-                        onInput={handleChangeValue}
-                    />
-                </div>
+    if (maxValue !== defaultMax) {
+      params.set(`${query_name}max`, maxValue);
+    } else {
+      params.delete(`${query_name}max`);
+    }
 
-                <div className="home__content__filter__range--showValue">
-                    <div className="home__content__filter__range--showValue-Min">{minValue} {unit}</div>
-                    <div className="home__content__filter__range--showValue-Max">{maxValue} {unit}</div>
-                </div>
-
-                <button className="home__content__filter__range--submit" onClick={handleSubmit}>Xác nhận</button>
-            </div>
-        </>
+    navigate(
+      {
+        pathname: location.pathname,
+        search: params.toString(),
+      },
+      { replace: true }
     );
+  };
+
+  return (
+    <div className="home__content__filter__range">
+      <div className="home__content__filter__range--slide">
+        <div
+          className="home__content__filter__range--slide-progress"
+          ref={progress_bar}
+        ></div>
+      </div>
+
+      <div className="home__content__filter__range--input">
+        <input
+          type="range"
+          ref={inputMin}
+          className="home__content__filter__range--input-min"
+          min={defaultMin}
+          max={defaultMax}
+          defaultValue={defaultMin}
+          data-type="range-min"
+          onInput={handleChangeValue}
+        />
+        <input
+          type="range"
+          ref={inputMax}
+          className="home__content__filter__range--input-max"
+          min={defaultMin}
+          max={defaultMax}
+          defaultValue={defaultMax}
+          data-type="range-max"
+          onInput={handleChangeValue}
+        />
+      </div>
+
+      <div className="home__content__filter__range--showValue">
+        <div className="home__content__filter__range--showValue-Min">
+          {minValue} {unit}
+        </div>
+        <div className="home__content__filter__range--showValue-Max">
+          {maxValue} {unit}
+        </div>
+      </div>
+
+      <button
+        className="home__content__filter__range--submit"
+        onClick={handleSubmit}
+      >
+        Xác nhận
+      </button>
+    </div>
+  );
 }
 
 export default Filter_In_2;
