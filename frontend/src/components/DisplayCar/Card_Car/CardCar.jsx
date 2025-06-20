@@ -34,12 +34,6 @@ function CardCar({ item }) {
           <FaLocationDot /> <span>{item.location.query_name}</span>
         </div>
       </div>
-      <div className="home__content__main__display__list-item--description-price">
-        {convertCurrency(item.price)}
-      </div>
-      <div className="home__content__main__display__list-item--description-location">
-        <FaLocationDot /> <span>{item.location.query_name}</span>
-      </div>
     </>
   );
 }
