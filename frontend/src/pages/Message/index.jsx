@@ -24,17 +24,16 @@ function Message() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [onlineUsersTyping, setOnlineUsersTyping] = useState([]);
   const dates = [];
-
   const [textMessage, setTextMessage] = useState("");
-
   const socketRef = useRef();
   const bottomRef = useRef(null);
   const shouldScrool = useRef(true);
   const selectedThreadId = useRef(null);
   const timeoutTyping = useRef(null);
-
   useEffect(() => {
     if (isLoading.current == false && loading == false && !user) {
+      // Clear reload flag when user is not logged in
+      sessionStorage.removeItem("messagePageReloaded");
       toast.error("Người dùng chưa đăng nhập vui lòng đăng nhập | đăng ký!");
       setTimeout(() => {
         navigate("/login");
@@ -42,6 +41,13 @@ function Message() {
     }
     isLoading.current = false;
   }, [user, loading, isLoading.current]);
+  // Auto reload page when entering Message page to ensure fresh data
+  useEffect(() => {
+    if (user?._id && !sessionStorage.getItem("messagePageReloaded")) {
+      sessionStorage.setItem("messagePageReloaded", "true");
+      window.location.reload();
+    }
+  }, [user?._id]);
 
   useEffect(() => {
     const getMessages = async () => {

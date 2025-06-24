@@ -6,6 +6,13 @@ const { body, param } = require("express-validator");
 const { handleValidationErrors } = require("../validates/validation.helper");
 
 /**
+ * User routes - Lịch sử thanh toán
+ */
+
+// Lấy lịch sử thanh toán của user
+router.get("/history", requireAuth, paymentController.getPaymentHistory);
+
+/**
  * Admin routes - Quản lý thanh toán
  */
 

@@ -266,4 +266,30 @@ router.post(
   orderController.regenerateContract
 );
 
+/**
+ * @route POST /api/orders/verify-payment
+ * @desc Admin xác minh thanh toán
+ * @access Private (Admin only)
+ */
+router.post(
+  "/verify-payment",
+  [
+    body("paymentId")
+      .notEmpty()
+      .withMessage("ID thanh toán không được để trống")
+      .isMongoId()
+      .withMessage("ID thanh toán không hợp lệ"),
+    body("approved")
+      .isBoolean()
+      .withMessage("Trạng thái phê duyệt phải là true/false"),
+    body("note")
+      .optional()
+      .isLength({ max: 500 })
+      .withMessage("Ghi chú không được quá 500 ký tự"),
+    handleValidationErrors,
+  ],
+  authMiddleware.requireAdmin, // Chỉ admin mới được xác minh
+  orderController.verifyPayment
+);
+
 module.exports = router;

@@ -29,9 +29,7 @@ import RequestDone from "../../pages/RequestForm/child/RequestDone";
 import Error404 from "../../pages/Error404";
 import EditCar from "../../pages/MyAccount/child/EditCar";
 import TransactionHistory from "../../pages/TransactionHistory";
-
-// New pages for order management system
-import OrderManagement from "../../pages/OrderManagement/OrderManagement";
+import OrderHistory from "../../pages/MyAccount/child/OrderHistory";
 import BankInfoManagement from "../../pages/BankInfoManagement/BankInfoManagement";
 import RefundPage from "../../pages/RefundPage/RefundPage";
 
@@ -135,8 +133,12 @@ export const routes = [
             element: <EditCar />,
           },
           {
-            path: "orders",
-            element: <OrderManagement />,
+            path: "payment-history",
+            element: <PaymentHistory />,
+          },
+          {
+            path: "order-history",
+            element: <OrderHistory />,
           },
           {
             path: "bank-info",
@@ -144,8 +146,8 @@ export const routes = [
           },
           {
             path: "examine_requests",
-            element: <Examine/>
-          }
+            element: <Examine />,
+          },
         ],
       },
       {
@@ -209,11 +211,11 @@ export const routes = [
       },
       {
         path: "nguoi-ban/:slugSeller",
-        element: <SellerInfo/>
+        element: <SellerInfo />,
       },
       {
         path: "examine/:slugCar",
-        element : <StaffExamine/>
+        element: <StaffExamine />,
       },
       {
         path: "*",

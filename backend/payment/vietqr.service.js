@@ -23,8 +23,7 @@ class VietQRService {
    * @param {number} params.amount - Số tiền
    * @param {string} params.description - Nội dung chuyển khoản
    * @param {string} params.template - Template QR (default: "compact")
-   */
-  async generateQR({
+   */ async generateQR({
     bankCode = process.env.SYSTEM_BANK_CODE || "970422",
     accountNumber = process.env.SYSTEM_BANK_ACCOUNT_NUMBER,
     accountName = process.env.SYSTEM_BANK_ACCOUNT_NAME,
@@ -33,6 +32,28 @@ class VietQRService {
     template = "compact",
   }) {
     try {
+      // Kiểm tra các biến môi trường cần thiết
+      if (!process.env.VIETQR_CLIENT_ID || !process.env.VIETQR_API_KEY) {
+        console.error("VietQR credentials not found in environment variables");
+        return {
+          success: false,
+          error: "VietQR API credentials not configured",
+        };
+      }
+
+      if (!accountNumber || !accountName || !amount || !description) {
+        console.error("Missing required parameters:", {
+          accountNumber: !!accountNumber,
+          accountName: !!accountName,
+          amount: !!amount,
+          description: !!description,
+        });
+        return {
+          success: false,
+          error: "Missing required payment information",
+        };
+      }
+
       const payload = {
         accountNo: accountNumber,
         accountName: accountName,
@@ -72,18 +93,24 @@ class VietQRService {
       console.error("VietQR Error:", error.message);
       return {
         success: false,
-        error: error.message,
+        error:
+          error.response?.data?.desc ||
+          error.message ||
+          "Failed to generate QR code",
+        details: {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          responseData: error.response?.data,
+        },
       };
     }
   }
-
   /**
    * Tạo QR code với thông tin đơn hàng
    * @param {Object} order - Thông tin đơn hàng
    * @param {number} amount - Số tiền cần thanh toán
    * @param {string} paymentType - Loại thanh toán (deposit/final/full)
-   */
-  async generateOrderQR(order, amount, paymentType) {
+   */ async generateOrderQR(order, amount, paymentType) {
     const description = this.generatePaymentDescription(order, paymentType);
 
     return await this.generateQR({
@@ -91,7 +118,6 @@ class VietQRService {
       description: description,
     });
   }
-
   /**
    * Tạo nội dung chuyển khoản
    */
@@ -102,7 +128,10 @@ class VietQRService {
       full_payment: "MUA XE",
     };
 
-    return `${typeText[paymentType]} ${order.orderCode}`;
+    // Sử dụng orderCode nếu có, nếu không thì dùng order ID
+    const orderIdentifier = order.orderCode || order._id?.toString() || "TEMP";
+
+    return `${typeText[paymentType]} ${orderIdentifier}`;
   }
 
   /**

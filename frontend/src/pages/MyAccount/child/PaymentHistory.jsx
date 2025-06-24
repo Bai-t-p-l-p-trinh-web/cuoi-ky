@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import apiClient from "../../../utils/axiosConfig";
 import { convertCurrency } from "../../../utils/ConvertNumber";
-import "./scss/PaymentHistory.scss";
+import "../scss/PaymentHistory.scss";
 
 function PaymentHistory() {
   const [payments, setPayments] = useState([]);
@@ -12,15 +12,22 @@ function PaymentHistory() {
   useEffect(() => {
     fetchPaymentHistory();
   }, [filter]);
-
   const fetchPaymentHistory = async () => {
     try {
       setLoading(true);
       const params = filter !== "all" ? { type: filter } : {};
       const response = await apiClient.get("/payment/history", { params });
-      setPayments(response.data);
+
+      if (response.data.success) {
+        setPayments(response.data.data.payments || []);
+      } else {
+        setPayments([]);
+        toast.error("Không thể tải lịch sử giao dịch!");
+      }
     } catch (error) {
+      console.error("Error fetching payment history:", error);
       toast.error("Không thể tải lịch sử giao dịch!");
+      setPayments([]);
     } finally {
       setLoading(false);
     }

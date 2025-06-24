@@ -2,13 +2,29 @@ import React, { useState, useEffect } from "react";
 import { orderAPI } from "../../utils/axiosConfig";
 import { toast } from "react-toastify";
 import "./QRCodeModal.scss";
+import PaymentSuccessModal from "./PaymentSuccessModal";
 
 const QRCodeModal = ({ orderData, onSuccess, onClose }) => {
+  if (!orderData || !orderData.order) {
+    return (
+      <div className="qr-modal-overlay">
+        <div className="qr-modal">
+          <div className="modal-header">
+            <h3>Đang tải...</h3>
+            <button className="close-btn" onClick={onClose}>
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [transactionId, setTransactionId] = useState("");
   const [evidence, setEvidence] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [countdown, setCountdown] = useState(1800); // 30 minutes
+  const [countdown, setCountdown] = useState(1800);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,27 +77,15 @@ const QRCodeModal = ({ orderData, onSuccess, onClose }) => {
         evidence: evidence,
       };
 
-      console.log("=== CONFIRM PAYMENT DEBUG ===");
-      console.log("orderData:", orderData);
-      console.log("paymentData:", paymentData);
-      console.log("payment._id:", orderData.payment._id);
-      console.log("transactionId:", transactionId.trim());
-      console.log("evidence:", evidence);
-
       const response = await orderAPI.confirmPayment(paymentData);
-      console.log("API response:", response);
+      console.log("Payment confirmed successfully:", response.data);
 
       toast.success(
         "Xác nhận thanh toán thành công! Vui lòng chờ admin xác minh."
       );
       setPaymentConfirmed(true);
-      setTimeout(() => {
-        onSuccess();
-      }, 2000);
     } catch (error) {
       console.error("Error confirming payment:", error);
-      console.error("Error response:", error.response);
-      console.error("Error data:", error.response?.data);
 
       let errorMessage = "Lỗi khi xác nhận thanh toán";
       if (error.response?.data?.message) {
@@ -106,31 +110,23 @@ const QRCodeModal = ({ orderData, onSuccess, onClose }) => {
   const downloadQR = () => {
     const link = document.createElement("a");
     link.href = orderData.qrCode.qrDataURL;
-    link.download = `QR_${orderData.order.orderCode}.png`;
+    link.download = `QR_${
+      orderData.order?.orderCode || orderData.order._id
+    }.png`;
     link.click();
   };
-
   if (paymentConfirmed) {
-    return (
-      <div className="qr-modal-overlay">
-        <div className="qr-modal success">
-          <div className="success-content">
-            <div className="success-icon">✅</div>
-            <h3>Xác nhận thanh toán thành công!</h3>
-            <p>Đơn hàng {orderData.order.orderCode} đang chờ admin xác minh.</p>
-            <p>Bạn sẽ nhận được thông báo khi thanh toán được xác nhận.</p>
-            <button onClick={onSuccess}>Đóng</button>
-          </div>
-        </div>
-      </div>
-    );
+    return <PaymentSuccessModal orderData={orderData} onClose={onClose} />;
   }
 
   return (
     <div className="qr-modal-overlay">
       <div className="qr-modal">
         <div className="modal-header">
-          <h3>Thanh toán đơn hàng {orderData.order.orderCode}</h3>
+          <h3>
+            Thanh toán đơn hàng{" "}
+            {orderData.order?.orderCode || orderData.order._id}
+          </h3>
           <div className="countdown">
             Hết hạn sau: <span>{formatTime(countdown)}</span>
           </div>
@@ -181,14 +177,18 @@ const QRCodeModal = ({ orderData, onSuccess, onClose }) => {
                 <span className="transfer-text">
                   {orderData.qrCode.content ||
                     orderData.qrCode.description ||
-                    `THANH TOAN ${orderData.order.orderCode}`}
+                    `THANH TOAN ${
+                      orderData.order?.orderCode || orderData.order._id
+                    }`}
                   <button
                     className="copy-btn"
                     onClick={() =>
                       copyToClipboard(
                         orderData.qrCode.content ||
                           orderData.qrCode.description ||
-                          `THANH TOAN ${orderData.order.orderCode}`
+                          `THANH TOAN ${
+                            orderData.order?.orderCode || orderData.order._id
+                          }`
                       )
                     }
                   >

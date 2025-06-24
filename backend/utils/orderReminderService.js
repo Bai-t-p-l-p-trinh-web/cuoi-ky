@@ -15,10 +15,8 @@ class OrderReminderService {
     // Chạy mỗi giờ để kiểm tra các đơn hàng cần nhắc nhở
     cron.schedule("0 * * * *", () => {
       this.checkPendingConfirmations();
-    });
-
-    // Chạy mỗi 30 phút để kiểm tra payment timeout
-    cron.schedule("*/30 * * * *", () => {
+    }); // Chạy mỗi 6 giờ để kiểm tra payment timeout (ít gắt hơn)
+    cron.schedule("0 */6 * * *", () => {
       this.checkExpiredPayments();
     });
 
@@ -26,8 +24,6 @@ class OrderReminderService {
     cron.schedule("0 2 * * *", () => {
       this.dailyCleanup();
     });
-
-    console.log("✅ Order reminder jobs started");
   }
 
   /**
@@ -43,10 +39,6 @@ class OrderReminderService {
         "confirmations.deliveryConfirmedAt": { $lt: cutoffTime },
         reminderSent: false,
       }).populate("buyer seller car");
-
-      console.log(
-        `Found ${pendingOrders.length} orders pending buyer confirmation`
-      );
 
       for (const order of pendingOrders) {
         await this.sendBuyerReminder(order);
@@ -67,23 +59,25 @@ class OrderReminderService {
       console.error("Check pending confirmations error:", error);
     }
   }
-
   /**
-   * Kiểm tra thanh toán hết hạn
+   * Kiểm tra thanh toán hết hạn (30 ngày)
    */
   async checkExpiredPayments() {
     try {
       const { Payment, PaymentStatus } = require("../payment/payment.model");
 
-      // Tìm thanh toán hết hạn
+      // Tìm thanh toán hết hạn (sau 30 ngày)
       const expiredPayments = await Payment.find({
         status: PaymentStatus.PENDING,
         expiresAt: { $lt: new Date() },
       }).populate("order");
 
-      console.log(`Found ${expiredPayments.length} expired payments`);
-
       for (const payment of expiredPayments) {
+        // Log chi tiết payment sắp bị hủy
+        console.log(
+          `Auto-cancelling payment ${payment._id} created at ${payment.createdAt}`
+        );
+
         payment.status = PaymentStatus.CANCELLED;
         await payment.save();
 
@@ -98,7 +92,8 @@ class OrderReminderService {
             type: LogType.SYSTEM_ACTION,
             order: order._id,
             action: "auto_cancel_expired_payment",
-            description: "Hệ thống tự động hủy đơn hàng do thanh toán hết hạn",
+            description:
+              "Hệ thống tự động hủy đơn hàng do thanh toán hết hạn (30 ngày)",
           });
 
           // Gửi thông báo
@@ -118,8 +113,6 @@ class OrderReminderService {
    */
   async dailyCleanup() {
     try {
-      console.log("Starting daily cleanup...");
-
       // 1. Dọn dẹp hợp đồng cũ
       const contractService = require("../contract/contract.service");
       await contractService.cleanupOldContracts(30);
@@ -128,11 +121,9 @@ class OrderReminderService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - 90);
 
-      const deletedLogs = await Log.deleteMany({
+      await Log.deleteMany({
         createdAt: { $lt: cutoffDate },
       });
-
-      console.log(`Deleted ${deletedLogs.deletedCount} old logs`);
 
       // 3. Reset reminder flag cho đơn hàng đã hoàn tất
       await Order.updateMany(
@@ -144,8 +135,6 @@ class OrderReminderService {
         },
         { reminderSent: false }
       );
-
-      console.log("Daily cleanup completed");
     } catch (error) {
       console.error("Daily cleanup error:", error);
     }
@@ -189,10 +178,6 @@ class OrderReminderService {
           message: `Nhac nho: Vui long xac nhan don hang ${order.orderCode} da duoc giao thanh cong. Truy cap ${process.env.CLIENT_URL} de xac nhan.`,
         });
       }
-
-      console.log(
-        `Sent reminder to buyer ${order.buyer.email} for order ${order.orderCode}`
-      );
     } catch (error) {
       console.error("Send buyer reminder error:", error);
     }
@@ -210,8 +195,6 @@ class OrderReminderService {
         "confirmations.deliveryConfirmedAt": { $lt: cutoffTime },
         reminderSent: true,
       });
-
-      console.log(`Found ${autoCompleteOrders.length} orders to auto-complete`);
 
       for (const order of autoCompleteOrders) {
         order.status = OrderStatus.COMPLETED;

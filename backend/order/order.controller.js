@@ -17,35 +17,21 @@ class OrderController {
    * Tạo đơn hàng mới
    */ async createOrder(req, res) {
     try {
-      console.log("=== BẮTĐẦU API createOrder ===");
-      console.log("req.body:", req.body);
-      console.log("req.user:", req.user);
-
       const { carId, paymentMethod, depositPercentage = 20 } = req.body;
       const buyerId = req.user.id || req.user._id || req.user.userId;
-
-      console.log(
-        "Parsed data - buyerId:",
-        buyerId,
-        "carId:",
-        carId,
-        "paymentMethod:",
-        paymentMethod
-      );
 
       const car = await Car.findOne({
         _id: carId,
         status: { $ne: "sold" },
       });
 
-      console.log("Tạo đơn hàng cho xe này: ", car);
-
       if (!car) {
         return res.status(404).json({
           success: false,
           message: "Xe không tồn tại hoặc đã được bán",
         });
-      } // Lấy thông tin seller riêng
+      }
+
       const seller = await User.findById(car.sellerId);
 
       if (!seller) {
@@ -53,7 +39,8 @@ class OrderController {
           success: false,
           message: "Không tìm thấy thông tin người bán",
         });
-      } // Kiểm tra thông tin ngân hàng của seller nếu không phải giao dịch trực tiếp
+      }
+
       if (paymentMethod !== PaymentMethod.DIRECT_TRANSACTION) {
         if (
           !seller.bankInfo ||
@@ -67,15 +54,14 @@ class OrderController {
             sellerBankNotConfigured: true,
           });
         }
-      } // Không cho phép tự mua xe của mình
+      }
+
       if (seller._id.toString() === buyerId) {
         return res.status(400).json({
           success: false,
           message: "Bạn không thể mua xe của chính mình",
         });
-      }
-
-      // Tính toán số tiền
+      } // Tính toán số tiền
       const totalAmount = car.price;
       let depositAmount = 0;
       let remainingAmount = totalAmount;
@@ -87,7 +73,6 @@ class OrderController {
 
       // Tạo đơn hàng
       const order = new Order({
-        // orderCode: orderCode, // Thêm orderCode thủ công
         buyer: buyerId,
         seller: seller._id,
         car: carId,
@@ -100,10 +85,7 @@ class OrderController {
             ? OrderStatus.PENDING_MEETING
             : OrderStatus.AWAITING_PAYMENT,
       });
-
       await order.save();
-
-      // Log tạo đơn hàng
       await createLog({
         type: LogType.ORDER_STATUS_CHANGE,
         order: order._id,
@@ -130,9 +112,7 @@ class OrderController {
             nextStep: "contact_seller",
           },
         });
-      }
-
-      // Tạo QR thanh toán cho đặt cọc hoặc thanh toán toàn bộ
+      } // Tạo QR thanh toán cho đặt cọc hoặc thanh toán toàn bộ
       const paymentAmount =
         paymentMethod === PaymentMethod.DEPOSIT ? depositAmount : totalAmount;
       const paymentType =
@@ -164,8 +144,6 @@ class OrderController {
       });
 
       await payment.save();
-
-      // Log tạo thanh toán
       await createLog({
         type: LogType.PAYMENT_CREATED,
         order: order._id,
@@ -175,28 +153,31 @@ class OrderController {
         newData: { paymentCode: payment.paymentCode, amount: paymentAmount },
         req: req,
       });
-      console.log("=== SẮP TRẢ VỀ RESPONSE ===");
-      console.log("Order đã tạo:", order._id);
-      console.log("Payment đã tạo:", payment._id);
-
-      // Tạm thời bỏ populateOrder để test
-      console.log("Bỏ qua populate, trả về order gốc");
 
       res.status(201).json({
         success: true,
         message: "Đơn hàng đã được tạo thành công",
         data: {
-          order: order,
+          order: {
+            _id: order._id,
+            orderCode: order.orderCode,
+            buyerId: order.buyerId,
+            carId: order.carId,
+            paymentMethod: order.paymentMethod,
+            totalAmount: order.totalAmount,
+            depositAmount: order.depositAmount,
+            remainingAmount: order.remainingAmount,
+            status: order.status,
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+          },
           payment: payment,
           qrCode: qrResult.data,
           nextStep: "payment",
         },
       });
-      console.log("=== ĐÃ GỬI RESPONSE THÀNH CÔNG ===");
     } catch (error) {
-      console.error("=== LỖI TRONG createOrder ===");
       console.error("Create order error:", error);
-      console.error("Error stack:", error.stack);
       res.status(500).json({
         success: false,
         message: "Lỗi tạo đơn hàng",
@@ -208,13 +189,9 @@ class OrderController {
    * Xác nhận thanh toán
    */ async confirmPayment(req, res) {
     try {
-      console.log("=== CONFIRM PAYMENT ===");
-      console.log("req.body:", req.body);
       const { transactionId, evidence, paymentId } = req.body;
       const userId = req.user.id;
-      const { Order, OrderStatus } = require("./order.model");
 
-      // Lấy thông tin user để lấy tên người chuyển khoản
       const user = await User.findById(userId).select(
         "fullName firstName lastName"
       );
@@ -223,78 +200,84 @@ class OrderController {
         `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
         "Khách hàng";
 
-      // TÌM ORDER THẬT có sẵn trong DB thay vì tạo mới
-      let existingOrder = await Order.findOne({
-        buyer: userId,
-      }).sort({ createdAt: -1 }); // Lấy order mới nhất của user
-
-      if (!existingOrder) {
-        // Nếu user chưa có order nào, lấy bất kỳ order nào trong DB
-        existingOrder = await Order.findOne({}).sort({ createdAt: -1 });
-      }
-
-      if (!existingOrder) {
-        // Thực sự không có order nào, tạo mới
-        existingOrder = new Order({
+      let payment = null;
+      let order = null;
+      if (paymentId.startsWith("temp_pay_")) {
+        order = await Order.findOne({
           buyer: userId,
-          seller: userId,
-          car: "507f1f77bcf86cd799439011",
-          orderCode: `ORD${Date.now()}`,
-          status: OrderStatus.AWAITING_PAYMENT,
-          totalAmount: 100000000,
-          paidAmount: 20000000,
-          paymentMethod: "deposit",
+          status: { $in: [OrderStatus.AWAITING_PAYMENT] },
+        }).sort({ createdAt: -1 });
+
+        if (!order) {
+          return res.status(404).json({
+            success: false,
+            message: "Không tìm thấy đơn hàng đang chờ thanh toán",
+          });
+        }
+
+        payment = await Payment.findOne({
+          order: order._id,
+          status: PaymentStatus.PENDING,
         });
-        await existingOrder.save();
-      }
 
-      const {
-        Payment,
-        PaymentStatus,
-        PaymentType,
-      } = require("../payment/payment.model");
-
-      // Tạo nội dung chuyển khoản realistic
-      const transferMessage = `THANH TOAN ${existingOrder.orderCode}`;
-
-      const newPayment = new Payment({
-        user: userId,
-        order: existingOrder._id, // Sử dụng order thật
-        amount: existingOrder.totalAmount * 0.2, // 20% của order thật
-        status: PaymentStatus.PENDING,
-        transactionInfo: {
-          bankTransactionId: transactionId, // Mã GD thực từ user
-          payerName: payerName, // Tên người chuyển thực
-          transferMessage: transferMessage, // Nội dung chuyển khoản
-          transactionDate: new Date(),
-          evidence: evidence || [], // Ảnh chứng từ nếu có
-        },
-        paymentCode: `PAY${Date.now()}`,
-        type: PaymentType.DEPOSIT,
-      });
-
-      await newPayment.save();
-
-      console.log("✅ Payment created with real info:", {
-        orderCode: existingOrder.orderCode,
-        paymentId: newPayment._id,
+        if (!payment) {
+          return res.status(404).json({
+            success: false,
+            message: "Không tìm thấy thông tin thanh toán",
+          });
+        }
+      } else {
+        payment = await Payment.findById(paymentId);
+        if (!payment) {
+          return res.status(404).json({
+            success: false,
+            message: "Không tìm thấy thông tin thanh toán",
+          });
+        }
+        order = await Order.findById(payment.order);
+      } // Cập nhật thông tin giao dịch
+      payment.transactionInfo = {
+        bankTransactionId: transactionId,
         payerName: payerName,
-        transactionId: transactionId,
-        transferMessage: transferMessage,
+        transferMessage: `THANH TOAN ${order.orderCode}`,
+        transactionDate: new Date(),
+        evidence: evidence || [],
+      };
+      payment.status = PaymentStatus.PENDING;
+
+      await payment.save();
+
+      await createLog({
+        type: LogType.PAYMENT_CREATED,
+        order: order._id,
+        user: userId,
+        action: "confirm_payment",
+        description: `User xác nhận đã thanh toán ${payment.paymentCode}`,
+        newData: {
+          transactionId: transactionId,
+          paymentStatus: payment.status,
+        },
+        req: req,
       });
+
+      console.log(
+        "✅ Payment confirmed:",
+        order.orderCode,
+        payment.paymentCode
+      );
 
       res.json({
         success: true,
         message: "Xác nhận thanh toán thành công! Admin sẽ xác minh.",
         data: {
-          payment: newPayment,
-          order: existingOrder, // Trả về order thật
-          paymentId: newPayment._id,
+          payment: payment,
+          order: order,
+          paymentId: payment._id,
           nextStep: "wait_admin_verification",
         },
       });
     } catch (error) {
-      console.error("Create payment error:", error);
+      console.error("Confirm payment error:", error);
       res.status(500).json({
         success: false,
         message: "Lỗi tạo thanh toán: " + error.message,
@@ -474,7 +457,7 @@ class OrderController {
   }
 
   /**
-   * Bắt đầu giao xe
+   * Bắt đầu giao xeF
    */
   async startDelivery(req, res) {
     try {
@@ -852,11 +835,9 @@ class OrderController {
       });
     }
   }
-
   /**
    * Lấy danh sách đơn hàng
-   */
-  async getOrders(req, res) {
+   */ async getOrders(req, res) {
     try {
       const userId = req.user.id;
       const {
@@ -868,45 +849,84 @@ class OrderController {
         sortOrder = "desc",
       } = req.query;
 
-      const query = {};
-
-      if (role === "buyer") {
-        query.buyer = userId;
-      } else if (role === "seller") {
-        query.seller = userId;
-      } else {
-        query.$or = [{ buyer: userId }, { seller: userId }];
-      }
-
-      if (status) {
-        query.status = status;
-      }
-
-      const skip = (page - 1) * limit;
       const sort = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
-      const orders = await Order.find(query)
-        .populate("buyer", "fullName email phoneNumber avatar")
-        .populate("seller", "fullName email phoneNumber avatar")
-        .populate("car", "name brand year price images")
-        .sort(sort)
-        .skip(skip)
-        .limit(parseInt(limit));
+      if (role === "all") {
+        // Trả về 2 mảng riêng biệt
 
-      const total = await Order.countDocuments(query);
+        // Query cho đơn hàng user tạo (user là buyer)
+        const buyerQuery = { buyer: userId };
+        if (status) buyerQuery.status = status;
 
-      res.json({
-        success: true,
-        data: {
-          orders: orders,
-          pagination: {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            total: total,
-            pages: Math.ceil(total / limit),
+        // Query cho đơn hàng người khác tạo khi mua xe của user (user là seller)
+        const sellerQuery = { seller: userId };
+        if (status) sellerQuery.status = status;
+
+        // Lấy đơn hàng user tạo (làm buyer)
+        const buyerOrders = await Order.find(buyerQuery)
+          .populate("buyer", "name email phoneNumber avatar")
+          .populate("seller", "name email phoneNumber avatar")
+          .populate("car", "name title brand year price images")
+          .sort(sort);
+
+        // Lấy đơn hàng người khác tạo khi mua xe của user (user làm seller)
+        const sellerOrders = await Order.find(sellerQuery)
+          .populate("buyer", "name email phoneNumber avatar")
+          .populate("seller", "name email phoneNumber avatar")
+          .populate("car", "name title brand year price images")
+          .sort(sort);
+
+        res.json({
+          success: true,
+          data: {
+            buyerOrders: buyerOrders, // Đơn hàng user tạo
+            sellerOrders: sellerOrders, // Đơn hàng người khác mua xe của user
+            summary: {
+              totalBuyerOrders: buyerOrders.length,
+              totalSellerOrders: sellerOrders.length,
+              totalOrders: buyerOrders.length + sellerOrders.length,
+            },
           },
-        },
-      });
+        });
+      } else {
+        // Xử lý theo role cụ thể (giữ nguyên logic cũ cho tương thích)
+        const query = {};
+
+        if (role === "buyer") {
+          query.buyer = userId;
+        } else if (role === "seller") {
+          query.seller = userId;
+        }
+
+        if (status) {
+          query.status = status;
+        }
+
+        const skip = (page - 1) * limit;
+
+        const orders = await Order.find(query)
+          .populate("buyer", "fullName email phoneNumber avatar")
+          .populate("seller", "fullName email phoneNumber avatar")
+          .populate("car", "name title brand year price images")
+          .sort(sort)
+          .skip(skip)
+          .limit(parseInt(limit));
+
+        const total = await Order.countDocuments(query);
+
+        res.json({
+          success: true,
+          data: {
+            orders: orders,
+            pagination: {
+              page: parseInt(page),
+              limit: parseInt(limit),
+              total: total,
+              pages: Math.ceil(total / limit),
+            },
+          },
+        });
+      }
     } catch (error) {
       console.error("Get orders error:", error);
       res.status(500).json({
@@ -1121,6 +1141,116 @@ class OrderController {
       res.status(500).json({
         success: false,
         message: "Lỗi tạo lại hợp đồng",
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Admin xác minh thanh toán và kích hoạt luồng thông báo + chat
+   */
+  async verifyPayment(req, res) {
+    try {
+      const { paymentId, approved, note } = req.body;
+      const adminId = req.user.id;
+
+      // Tìm payment
+      const payment = await Payment.findById(paymentId)
+        .populate("order")
+        .populate("user", "fullName firstName lastName");
+
+      if (!payment) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy thanh toán",
+        });
+      }
+
+      const order = await Order.findById(payment.order._id)
+        .populate("buyer seller", "fullName firstName lastName phone email")
+        .populate("car", "title name price location");
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy đơn hàng",
+        });
+      }
+
+      if (approved) {
+        // Xác minh thành công
+        payment.status = PaymentStatus.COMPLETED;
+        payment.verifiedBy = adminId;
+        payment.verifiedAt = new Date();
+        payment.adminNote = note;
+
+        // Cập nhật trạng thái order
+        if (payment.type === PaymentType.DEPOSIT) {
+          order.status = OrderStatus.PAID_PARTIAL;
+          order.paidAmount = payment.amount;
+        } else if (payment.type === PaymentType.FULL_PAYMENT) {
+          order.status = OrderStatus.PAID_FULL;
+          order.paidAmount = order.totalAmount;
+        }
+
+        await payment.save();
+        await order.save(); // Log payment verification
+        await createLog({
+          type: LogType.PAYMENT_VERIFIED,
+          order: order._id,
+          user: adminId,
+          action: "verify_payment",
+          description: `Admin xác minh thanh toán ${payment.paymentCode}`,
+          newData: { paymentStatus: payment.status, orderStatus: order.status },
+          req: req,
+        });
+
+        res.json({
+          success: true,
+          message: "Xác minh thanh toán thành công",
+          data: {
+            payment: payment,
+            order: await populateOrder(order),
+            nextStep:
+              order.status === OrderStatus.PAID_PARTIAL
+                ? "pending_final_payment"
+                : "delivery",
+          },
+        });
+      } else {
+        // Từ chối thanh toán
+        payment.status = PaymentStatus.REJECTED;
+        payment.verifiedBy = adminId;
+        payment.verifiedAt = new Date();
+        payment.adminNote = note;
+
+        await payment.save();
+
+        // Log payment rejection
+        await createLog({
+          type: LogType.PAYMENT_REJECTED,
+          order: order._id,
+          user: adminId,
+          action: "reject_payment",
+          description: `Admin từ chối thanh toán ${payment.paymentCode}`,
+          newData: { paymentStatus: payment.status, reason: note },
+          req: req,
+        });
+
+        res.json({
+          success: true,
+          message: "Đã từ chối thanh toán",
+          data: {
+            payment: payment,
+            order: order,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Verify payment error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Lỗi xác minh thanh toán",
         error: error.message,
       });
     }

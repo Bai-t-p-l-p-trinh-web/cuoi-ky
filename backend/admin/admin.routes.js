@@ -104,5 +104,12 @@ router.put(
   requireAdmin,
   controller.updatePaymentStatus
 );
+// QR chuyển khoản cho seller
+router.get(
+  "/payments/:paymentId/transfer-qr",
+  verifyToken,
+  requireAdmin,
+  controller.createSellerTransferQR
+);
 
 module.exports = router;

@@ -243,13 +243,13 @@ class PaymentController {
         .populate({
           path: "order",
           populate: [
-            { path: "buyer", select: "fullName email phone" },
-            { path: "seller", select: "fullName email phone" },
-            { path: "car", select: "title price images" },
+            { path: "buyer", select: "name email phone" },
+            { path: "seller", select: "name email phone" },
+            { path: "car", select: "name title price images" },
           ],
         })
-        .populate("user", "fullName email phone")
-        .populate("transactionInfo.verifiedBy", "fullName email");
+        .populate("user", "name email phone")
+        .populate("transactionInfo.verifiedBy", "name email");
 
       if (!payment) {
         return res.status(404).json({
@@ -257,7 +257,6 @@ class PaymentController {
           message: "Không tìm thấy thanh toán",
         });
       }
-
       res.json({
         success: true,
         data: { payment },
@@ -276,32 +275,24 @@ class PaymentController {
    * Admin xác nhận đã nhận tiền từ buyer
    */ async adminConfirmPayment(req, res) {
     try {
-      console.log("=== ADMIN CONFIRM PAYMENT ===");
-      console.log("params:", req.params);
-      console.log("body:", req.body);
-      console.log("user:", req.user);
-
       const { paymentId } = req.params;
       const adminId = req.user.id;
       const { notes, transactionInfo } = req.body;
 
       // Kiểm tra quyền admin
       if (req.user.role !== "admin") {
-        console.log("Access denied - not admin");
         return res.status(403).json({
           success: false,
           message: "Only admin can confirm payments",
         });
       }
 
-      console.log("Calling paymentFlowService.adminConfirmPaymentReceived...");
       const result = await paymentFlowService.adminConfirmPaymentReceived(
         paymentId,
         adminId,
         { notes, transactionInfo }
       );
 
-      console.log("Service result:", result);
       res.json({
         success: true,
         message: result.message,
@@ -323,20 +314,9 @@ class PaymentController {
     try {
       const { paymentId } = req.params;
 
-      console.log("=== DEBUG PAYMENT ===");
-      console.log("paymentId:", paymentId);
-
       const payment = await Payment.findById(paymentId)
         .populate("order")
         .populate("user", "fullName email phone");
-
-      console.log("Found payment:", !!payment);
-      if (payment) {
-        console.log("Payment status:", payment.status);
-        console.log("Payment user:", payment.user?.fullName);
-        console.log("Payment amount:", payment.amount);
-        console.log("Order code:", payment.order?.orderCode);
-      }
 
       res.json({
         success: true,
@@ -468,7 +448,7 @@ class PaymentController {
       if (req.user.role !== "admin") {
         return res.status(403).json({
           success: false,
-          message: "Only admin can transfer payments",
+          message: "Only admin can transfer to seller",
         });
       }
 
@@ -617,6 +597,151 @@ class PaymentController {
         success: false,
         message: error.message,
       });
+    }
+  }
+  /**
+   * Lấy lịch sử thanh toán của user
+   */
+  async getPaymentHistory(req, res) {
+    try {
+      const userId = req.user.id;
+      const {
+        type, // 'buyer', 'seller' hoặc để trống để lấy tất cả
+        status,
+        page = 1,
+        limit = 20,
+        sortBy = "createdAt",
+        sortOrder = "desc",
+      } = req.query;
+
+      // Build query để lấy orders mà user tham gia
+      let orderQuery = {};
+      if (type === "buyer") {
+        orderQuery.buyer = userId;
+      } else if (type === "seller") {
+        orderQuery.seller = userId;
+      } else {
+        // Lấy tất cả orders mà user là buyer hoặc seller
+        orderQuery.$or = [{ buyer: userId }, { seller: userId }];
+      }
+
+      // Tìm tất cả orders của user
+      const userOrders = await Order.find(orderQuery).select("_id");
+      const orderIds = userOrders.map((order) => order._id);
+
+      // Build payment query
+      const paymentQuery = {
+        order: { $in: orderIds },
+      };
+
+      if (status) {
+        paymentQuery.status = status;
+      }
+
+      const sort = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+      const skip = (page - 1) * limit;
+
+      // Lấy payments
+      const payments = await Payment.find(paymentQuery)
+        .populate({
+          path: "order",
+          populate: [
+            { path: "buyer", select: "fullName email phone avatar" },
+            { path: "seller", select: "fullName email phone avatar" },
+            { path: "car", select: "title name brand year price images" },
+          ],
+        })
+        .populate("user", "fullName email phone avatar")
+        .sort(sort)
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      const total = await Payment.countDocuments(paymentQuery);
+
+      // Thêm thông tin role của user trong từng payment
+      const paymentsWithRole = payments.map((payment) => {
+        const paymentObj = payment.toObject();
+        const isBuyer = payment.order.buyer._id.toString() === userId;
+        const isSeller = payment.order.seller._id.toString() === userId;
+
+        paymentObj.userRole = isBuyer
+          ? "buyer"
+          : isSeller
+          ? "seller"
+          : "unknown";
+        return paymentObj;
+      }); // Lấy thống kê theo status
+      const statusSummary = await Payment.aggregate([
+        { $match: { order: { $in: orderIds } } },
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      const byStatus = statusSummary.reduce((acc, item) => {
+        acc[item._id] = {
+          count: item.count,
+          totalAmount: item.totalAmount,
+        };
+        return acc;
+      }, {});
+
+      res.json({
+        success: true,
+        data: {
+          payments: paymentsWithRole,
+          pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total: total,
+            pages: Math.ceil(total / limit),
+          },
+          summary: {
+            totalPayments: total,
+            byStatus: byStatus,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get payment history error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Lỗi lấy lịch sử thanh toán",
+        error: error.message,
+      });
+    }
+  }
+
+  /**
+   * Lấy thống kê thanh toán theo trạng thái
+   */
+  async getPaymentSummaryByStatus(orderIds) {
+    try {
+      const summary = await Payment.aggregate([
+        { $match: { order: { $in: orderIds } } },
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      return summary.reduce((acc, item) => {
+        acc[item._id] = {
+          count: item.count,
+          totalAmount: item.totalAmount,
+        };
+        return acc;
+      }, {});
+    } catch (error) {
+      console.error("Get payment summary error:", error);
+      return {};
     }
   }
 

@@ -53,13 +53,16 @@ class NotificationController {
         category,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         metadata,
-      });
-
-      // Populate sender info
+      }); // Populate sender info
       await notification.populate("sender", "fullName avatar");
 
       // Send real-time notification via Socket.IO
-      this.sendRealTimeNotification(recipient, notification);
+      try {
+        socketUtils.emitToUser(recipient, "notification", notification);
+        console.log(`Real-time notification sent to user ${recipient}`);
+      } catch (socketError) {
+        console.error("Send real-time notification error:", socketError);
+      }
 
       res.status(201).json({
         success: true,
@@ -155,13 +158,16 @@ class NotificationController {
           success: false,
           message: "Không tìm thấy thông báo",
         });
+      } // Send real-time update
+      try {
+        socketUtils.emitToUser(userId, "notification", {
+          type: "notification_read",
+          notificationId: notificationId,
+        });
+        console.log(`Real-time notification update sent to user ${userId}`);
+      } catch (socketError) {
+        console.error("Send real-time notification error:", socketError);
       }
-
-      // Send real-time update
-      this.sendRealTimeNotification(userId, {
-        type: "notification_read",
-        notificationId: notificationId,
-      });
 
       res.json({
         success: true,
@@ -186,13 +192,16 @@ class NotificationController {
       const userId = req.user.id;
       const { category } = req.query;
 
-      const result = await Notification.markAllAsRead(userId, category);
-
-      // Send real-time update
-      this.sendRealTimeNotification(userId, {
-        type: "all_notifications_read",
-        category: category || "all",
-      });
+      const result = await Notification.markAllAsRead(userId, category); // Send real-time update
+      try {
+        socketUtils.emitToUser(userId, "notification", {
+          type: "all_notifications_read",
+          category: category || "all",
+        });
+        console.log(`Real-time notification update sent to user ${userId}`);
+      } catch (socketError) {
+        console.error("Send real-time notification error:", socketError);
+      }
 
       res.json({
         success: true,

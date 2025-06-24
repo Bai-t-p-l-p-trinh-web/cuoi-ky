@@ -16,6 +16,8 @@ const LogType = {
   DISPUTE_CREATED: "dispute_created",
   ADMIN_ACTION: "admin_action",
   SYSTEM_ACTION: "system_action",
+  CHAT_ROOM_CREATED: "chat_room_created", // Tạo phòng chat
+  CHAT_MESSAGE_SENT: "chat_message_sent", // Gửi tin nhắn
 };
 
 const LogSchema = new mongoose.Schema(

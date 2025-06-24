@@ -180,7 +180,7 @@ exports.login = async (req, res) => {
         message: "Đăng nhập thành công.",
         data: {
           user: {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             name: user.name,
             role: user.role || "user",
@@ -268,7 +268,7 @@ exports.verifyLoginOtp = async (req, res) => {
         message: "Xác minh OTP thành công. Đăng nhập hoàn tất.",
         data: {
           user: {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             name: user.name,
             role: user.role || "user",

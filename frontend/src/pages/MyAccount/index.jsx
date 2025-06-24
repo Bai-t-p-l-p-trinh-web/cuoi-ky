@@ -160,6 +160,14 @@ function MyAccount() {
               </Link>
             </li>
             <li className="myAccount__pages__item">
+              <Link className="myAccount__pages__item__link" to="order-history">
+                <FaShoppingCart className="myAccount__pages__item__link__svg" />
+                <span className="myAccount__pages__item__span">
+                  Lịch sử đơn hàng
+                </span>
+              </Link>
+            </li>
+            <li className="myAccount__pages__item">
               <Link
                 className="myAccount__pages__item__link"
                 to="payment-history"
@@ -185,14 +193,6 @@ function MyAccount() {
               </Link>
             </li>{" "}
             <li className="myAccount__pages__item">
-              <Link className="myAccount__pages__item__link" to="orders">
-                <FaShoppingCart className="myAccount__pages__item__link__svg" />
-                <span className="myAccount__pages__item__span">
-                  Quản lý đơn hàng
-                </span>
-              </Link>
-            </li>
-            <li className="myAccount__pages__item">
               <Link className="myAccount__pages__item__link" to="bank-info">
                 <FaUniversity className="myAccount__pages__item__link__svg" />
                 <span className="myAccount__pages__item__span">
@@ -200,18 +200,19 @@ function MyAccount() {
                 </span>
               </Link>
             </li>
-            {
-              (user && user.role === "staff")
-              &&
+            {user && user.role === "staff" && (
               <li className="myAccount__pages__item">
-                <Link className="myAccount__pages__item__link" to="examine_requests">
+                <Link
+                  className="myAccount__pages__item__link"
+                  to="examine_requests"
+                >
                   <TbPencilCheck className="myAccount__pages__item__link__svg" />
                   <span className="myAccount__pages__item__span">
                     Kiểm tra xe
                   </span>
                 </Link>
-            </li>
-            }
+              </li>
+            )}
             <li className="myAccount__pages__item logout">
               <button
                 className="myAccount__pages__logout"

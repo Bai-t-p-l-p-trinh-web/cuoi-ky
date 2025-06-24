@@ -1,0 +1,296 @@
+.payment-success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.payment-success-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.success-header {
+  text-align: center;
+  padding: 30px 20px 20px;
+  border-bottom: 1px solid #eee;
+  position: relative;
+
+  .success-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    animation: bounce 0.6s ease-in-out;
+  }
+
+  h2 {
+    color: #27ae60;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+
+    &:hover {
+      color: #333;
+    }
+  }
+}
+
+.success-content {
+  padding: 20px;
+}
+
+.order-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+
+  h3 {
+    margin: 0 0 15px 0;
+    color: #2c3e50;
+    font-size: 18px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: #e74c3c;
+    }
+  }
+}
+
+.next-steps {
+  margin-bottom: 25px;
+
+  h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    font-size: 18px;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+
+    .step-number {
+      background: #3498db;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .step-content {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+.chat-rooms {
+  background: #e8f5e8;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+
+  h3 {
+    margin: 0 0 15px 0;
+    color: #27ae60;
+    font-size: 18px;
+  }
+
+  .chat-room-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .chat-info {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 5px 0;
+        color: #2c3e50;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+
+    .open-chat-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &:hover {
+        background: #219a52;
+      }
+    }
+  }
+}
+
+.contact-info {
+  background: #fff3cd;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+
+  h3 {
+    margin: 0 0 10px 0;
+    color: #856404;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0 0 15px 0;
+    color: #856404;
+  }
+
+  .contact-methods {
+    .contact-item {
+      margin-bottom: 8px;
+      color: #856404;
+      font-weight: 500;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.success-actions {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+
+  .primary-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background: #2980b9;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%,
+  43% {
+    transform: translate3d(0, -15px, 0);
+  }
+  70% {
+    transform: translate3d(0, -8px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-success-modal {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .success-header {
+    padding: 20px 15px 15px;
+
+    .success-icon {
+      font-size: 50px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+  }
+
+  .success-content {
+    padding: 15px;
+  }
+
+  .step {
+    .step-number {
+      width: 25px;
+      height: 25px;
+      font-size: 14px;
+    }
+  }
+}

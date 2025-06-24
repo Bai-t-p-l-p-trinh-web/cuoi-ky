@@ -23,6 +23,9 @@ const AdminRequestManagement = lazy(() =>
 const AdminPaymentManagement = lazy(() =>
   import("../../pages/Admin/AdminPaymentManagement/AdminPaymentManagement")
 );
+const PaymentVerificationTest = lazy(() =>
+  import("../../components/test/PaymentVerificationTest")
+);
 
 export const routesAdmin = [
   {
@@ -60,6 +63,10 @@ export const routesAdmin = [
       {
         path: "payments",
         element: <AdminPaymentManagement />,
+      },
+      {
+        path: "test-payment",
+        element: <PaymentVerificationTest />,
       },
       {
         path: "*",

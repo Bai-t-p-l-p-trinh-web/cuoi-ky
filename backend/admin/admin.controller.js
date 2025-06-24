@@ -6,6 +6,8 @@ const { Payment } = require("../payment/payment.model");
 const { Refund } = require("../refund/refund.model");
 const { Notification } = require("../notification/notification.model");
 const Category = require("../category/category.model");
+const { Thread } = require("../thread/thread.model");
+const threadService = require("../thread/thread.service");
 
 // [GET] /api/v1/admin/dashboard/stats
 const getDashboardStats = async (req, res) => {
@@ -1935,46 +1937,82 @@ const getPayments = async (req, res) => {
     sort[sortBy] = sortOrder === "desc" ? -1 : 1; // Get payments with pagination
     const Payment = require("../payment/payment.model").Payment;
     const [payments, totalPayments] = await Promise.all([
-      Payment.find(filter).sort(sort).skip(skip).limit(limitNum),
+      Payment.find(filter)
+        .populate("user", "name email phone fullName")
+        .populate({
+          path: "order",
+          select: "buyer seller car status totalAmount",
+          populate: [
+            {
+              path: "buyer",
+              select: "name email phone",
+            },
+            {
+              path: "seller",
+              select: "name email phone",
+            },
+            {
+              path: "car",
+              select: "title price img_demo",
+            },
+          ],
+        })
+        .sort(sort)
+        .skip(skip)
+        .limit(limitNum),
       Payment.countDocuments(filter),
     ]);
 
-    console.log("payment: ", payments); // Simply return payments with minimal transformation
+    console.log("payment: ", payments);
     const enrichedPayments = payments.map((payment) => {
       const paymentObj = payment.toObject();
 
       // Add missing fields that frontend expects
       paymentObj.paymentMethod = paymentObj.paymentMethod || "bank_transfer";
       paymentObj.paymentCode = paymentObj.transactionId;
-      paymentObj.type = paymentObj.paymentType;
+      paymentObj.type = paymentObj.type || "full_payment";
 
-      // Create user object from buyer info
-      if (paymentObj.buyerId) {
+      // User info đã được populate
+      if (payment.user) {
         paymentObj.user = {
-          _id: paymentObj.buyerId,
-          name: paymentObj.buyerName,
-          email: paymentObj.buyerEmail,
-          phone: paymentObj.buyerPhone,
+          _id: payment.user._id,
+          name: payment.user.name,
+          email: payment.user.email,
+          phone: payment.user.phone,
+          fullName: payment.user.fullName || payment.user.name,
         };
       }
 
-      // Create order object from car info
-      if (paymentObj.carId) {
+      // Order info với buyer và seller đã được populate
+      if (payment.order) {
         paymentObj.order = {
-          _id: paymentObj.carId,
-          title: paymentObj.carTitle,
-          status: "active",
-          totalAmount: paymentObj.amount * 1000000, // Assuming amount is in millions
-        };
-      }
-
-      // Create seller info
-      if (paymentObj.sellerId) {
-        paymentObj.seller = {
-          _id: paymentObj.sellerId,
-          name: paymentObj.sellerName,
-          email: paymentObj.sellerEmail || "",
-          phone: paymentObj.sellerPhone || "",
+          _id: payment.order._id,
+          status: payment.order.status,
+          totalAmount: payment.order.totalAmount,
+          buyer: payment.order.buyer
+            ? {
+                _id: payment.order.buyer._id,
+                name: payment.order.buyer.name,
+                email: payment.order.buyer.email,
+                phone: payment.order.buyer.phone,
+              }
+            : null,
+          seller: payment.order.seller
+            ? {
+                _id: payment.order.seller._id,
+                name: payment.order.seller.name,
+                email: payment.order.seller.email,
+                phone: payment.order.seller.phone,
+              }
+            : null,
+          car: payment.order.car
+            ? {
+                _id: payment.order.car._id,
+                title: payment.order.car.title,
+                price: payment.order.car.price,
+                img_demo: payment.order.car.img_demo,
+              }
+            : null,
         };
       }
 
@@ -2012,51 +2050,77 @@ const getPaymentDetail = async (req, res) => {
   try {
     const { id } = req.params;
     const Payment = require("../payment/payment.model").Payment;
-    const payment = await Payment.findById(id);
+    const payment = await Payment.findById(id)
+      .populate("user", "name email phone fullName")
+      .populate({
+        path: "order",
+        select: "buyer seller car status totalAmount",
+        populate: [
+          {
+            path: "buyer",
+            select: "name email phone",
+          },
+          {
+            path: "seller",
+            select: "name email phone",
+          },
+          {
+            path: "car",
+            select: "title price img_demo",
+          },
+        ],
+      });
 
     if (!payment) {
       return res.status(404).json({
         success: false,
         message: "Không tìm thấy thanh toán",
       });
-    } // Return payment with minimal transformation
+    }
+
+    // Return payment with proper populated data
     const enrichedPayment = payment.toObject();
 
     // Add missing fields that frontend expects
     enrichedPayment.paymentMethod =
       enrichedPayment.paymentMethod || "bank_transfer";
     enrichedPayment.paymentCode = enrichedPayment.transactionId;
-    enrichedPayment.type = enrichedPayment.paymentType;
+    enrichedPayment.type = enrichedPayment.type || "full_payment";
 
-    // Create user object from buyer info
-    if (enrichedPayment.buyerId) {
-      enrichedPayment.user = {
-        _id: enrichedPayment.buyerId,
-        name: enrichedPayment.buyerName,
-        email: enrichedPayment.buyerEmail,
-        phone: enrichedPayment.buyerPhone,
-      };
-    }
-
-    // Create order object from car info
-    if (enrichedPayment.carId) {
+    // Order info với buyer và seller đã được populate
+    if (payment.order) {
       enrichedPayment.order = {
-        _id: enrichedPayment.carId,
-        title: enrichedPayment.carTitle,
-        status: "active",
-        totalAmount: enrichedPayment.amount * 1000000, // Assuming amount is in millions
+        _id: payment.order._id,
+        status: payment.order.status,
+        totalAmount: payment.order.totalAmount,
+        buyer: payment.order.buyer
+          ? {
+              _id: payment.order.buyer._id,
+              name: payment.order.buyer.name,
+              email: payment.order.buyer.email,
+              phone: payment.order.buyer.phone,
+            }
+          : null,
+        seller: payment.order.seller
+          ? {
+              _id: payment.order.seller._id,
+              name: payment.order.seller.name,
+              email: payment.order.seller.email,
+              phone: payment.order.seller.phone,
+            }
+          : null,
+        car: payment.order.car
+          ? {
+              _id: payment.order.car._id,
+              title: payment.order.car.title,
+              price: payment.order.car.price,
+              img_demo: payment.order.car.img_demo,
+            }
+          : null,
       };
     }
 
-    // Create seller info
-    if (enrichedPayment.sellerId) {
-      enrichedPayment.seller = {
-        _id: enrichedPayment.sellerId,
-        name: enrichedPayment.sellerName,
-        email: enrichedPayment.sellerEmail || "",
-        phone: enrichedPayment.sellerPhone || "",
-      };
-    }
+    console.log("enrichedPayment", enrichedPayment);
 
     res.json({
       success: true,
@@ -2110,6 +2174,16 @@ const updatePaymentStatus = async (req, res) => {
       });
     }
 
+    // Nếu admin xác minh thành công (completed), tự động tạo chat rooms
+    if (status === "completed") {
+      try {
+        await createTransactionChatRooms(payment._id, req.userId);
+      } catch (chatError) {
+        console.error("Error creating chat rooms:", chatError);
+        // Không fail toàn bộ request nếu tạo chat lỗi
+      }
+    }
+
     res.json({
       success: true,
       message: "Cập nhật trạng thái thanh toán thành công",
@@ -2125,23 +2199,172 @@ const updatePaymentStatus = async (req, res) => {
   }
 };
 
+// Helper function: Tạo 3 chat rooms sau khi admin xác minh payment
+const createTransactionChatRooms = async (paymentId, adminId) => {
+  try {
+    // Lấy thông tin payment với populate đầy đủ
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      throw new Error("Payment not found");
+    }
+    // Lấy thông tin order để có buyer và seller
+    const order = await Order.findById(payment.order)
+      .populate("buyer", "name email")
+      .populate("seller", "name email")
+      .populate("car", "title");
+
+    if (!order || !order.buyer || !order.seller) {
+      throw new Error("Order or participants not found");
+    }
+
+    const buyerId = order.buyer._id;
+    const sellerId = order.seller._id;
+    const carTitle = order.car?.title || "xe";
+
+    console.log("Creating chat rooms for:", {
+      buyerId,
+      sellerId,
+      adminId,
+      carTitle,
+    });
+
+    // 1. Tạo chat buyer-admin
+    await threadService.startMessage({
+      senderId: adminId,
+      receiverId: buyerId,
+      message: `Chào bạn! Thanh toán cho xe "${carTitle}" đã được xác minh. Admin sẽ hỗ trợ bạn theo dõi quá trình giao dịch.`,
+      orderId: order._id,
+    });
+
+    // 2. Tạo chat admin-seller
+    await threadService.startMessage({
+      senderId: adminId,
+      receiverId: sellerId,
+      message: `Chào bạn! Đã nhận được thanh toán cho xe "${carTitle}". Vui lòng liên hệ với khách hàng để sắp xếp giao xe.`,
+      orderId: order._id,
+    });
+
+    // 3. Tạo chat buyer-seller (từ admin thay mặt buyer)
+    await threadService.startMessage({
+      senderId: buyerId,
+      receiverId: sellerId,
+      message: `Chào bạn! Tôi đã thanh toán cho xe "${carTitle}". Chúng ta có thể thảo luận về việc giao xe được không?`,
+      orderId: order._id,
+    });
+
+    console.log("✅ Successfully created 3 chat rooms for transaction");
+  } catch (error) {
+    console.error("Error creating transaction chat rooms:", error);
+    throw error;
+  }
+};
+
+// [GET] /api/v1/admin/payments/:paymentId/transfer-qr
+const createSellerTransferQR = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const adminId = req.userId;
+
+    // Tìm payment và populate thông tin cần thiết
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy thanh toán",
+      });
+    }
+
+    if (payment.status !== "completed") {
+      return res.status(400).json({
+        success: false,
+        message: "Payment chưa được xác minh",
+      });
+    } // Lấy thông tin order và seller
+    const order = await Order.findById(payment.order)
+      .populate("seller", "name email phone bankInfo")
+      .populate("car", "title price");
+
+    if (!order || !order.seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy thông tin seller",
+      });
+    }
+
+    const seller = order.seller;
+    if (!seller.bankInfo || !seller.bankInfo.accountNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Seller chưa có thông tin ngân hàng",
+      });
+    }
+
+    // Tạo QR data cho chuyển khoản
+    const transferAmount = payment.amount;
+    const transferContent = `GIAINGANHANG ${order.car.title
+      .substring(0, 20)
+      .toUpperCase()
+      .replace(/\s+/g, "")} CHO ${seller.name
+      .toUpperCase()
+      .replace(/\s+/g, "")}`;
+
+    const qrData = {
+      bankCode: seller.bankInfo.bankCode || "970422", // VCB default
+      accountNumber: seller.bankInfo.accountNumber,
+      accountName: seller.bankInfo.accountHolder || seller.name,
+      amount: transferAmount,
+      content: transferContent,
+      template: "compact2",
+    };
+
+    // Tạo QR URL (sử dụng API VietQR)
+    const qrUrl = `https://img.vietqr.io/image/${qrData.bankCode}-${
+      qrData.accountNumber
+    }-${qrData.template}.png?amount=${
+      qrData.amount
+    }&addInfo=${encodeURIComponent(
+      qrData.content
+    )}&accountName=${encodeURIComponent(qrData.accountName)}`;
+
+    res.json({
+      success: true,
+      data: {
+        payment: {
+          id: payment._id,
+          amount: payment.amount,
+          carTitle: order.car.title,
+        },
+        seller: {
+          name: seller.name,
+          bankInfo: {
+            bankName: seller.bankInfo.bankName || "Vietcombank",
+            bankCode: seller.bankInfo.bankCode || "970422",
+            accountNumber: seller.bankInfo.accountNumber,
+            accountHolder: seller.bankInfo.accountHolder || seller.name,
+          },
+        },
+        qrData: qrData,
+        qrUrl: qrUrl,
+        transferContent: transferContent,
+      },
+    });
+  } catch (error) {
+    console.error("Create transfer QR error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi tạo QR chuyển khoản",
+      error: error.message,
+    });
+  }
+};
+
 // [PATCH] /api/v1/admin/users/:userId/verify-bank
 const verifyUserBankInfo = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { isVerified } = req.body;
-    const adminId = req.userId;
+    const { verified, bankName, bankCode, accountNumber, accountHolder } =
+      req.body;
 
-    // Kiểm tra quyền admin/inspector
-    const admin = await User.findById(adminId);
-    if (!admin || !["admin", "inspector"].includes(admin.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "Không có quyền thực hiện thao tác này",
-      });
-    }
-
-    // Tìm user cần verify
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -2150,39 +2373,42 @@ const verifyUserBankInfo = async (req, res) => {
       });
     }
 
-    if (!user.bankInfo || !user.bankInfo.accountNumber) {
-      return res.status(400).json({
+    // Cập nhật thông tin ngân hàng
+    const updateData = {
+      "bankInfo.isVerified": verified,
+      "bankInfo.verifiedAt": verified ? new Date() : null,
+    };
+
+    if (bankName) updateData["bankInfo.bankName"] = bankName;
+    if (bankCode) updateData["bankInfo.bankCode"] = bankCode;
+    if (accountNumber) updateData["bankInfo.accountNumber"] = accountNumber;
+    if (accountHolder) updateData["bankInfo.accountHolder"] = accountHolder;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
         success: false,
-        message: "User chưa có thông tin ngân hàng",
+        message: "Không thể cập nhật thông tin ngân hàng",
       });
     }
 
-    // Cập nhật trạng thái verification
-    user.bankInfo.isVerified = isVerified;
-    user.bankInfo.verifiedAt = isVerified ? new Date() : null;
-    user.bankInfo.verifiedBy = adminId;
-
-    await user.save();
-
     res.json({
       success: true,
-      message: isVerified
-        ? "Đã xác thực thông tin ngân hàng thành công"
-        : "Đã từ chối xác thực thông tin ngân hàng",
-      data: {
-        userId: user._id,
-        bankInfo: {
-          isVerified: user.bankInfo.isVerified,
-          verifiedAt: user.bankInfo.verifiedAt,
-          verifiedBy: admin.name,
-        },
-      },
+      message: verified
+        ? "Xác minh thông tin ngân hàng thành công"
+        : "Hủy xác minh thông tin ngân hàng",
+      data: updatedUser,
     });
   } catch (error) {
-    console.error("Verify bank info error:", error);
+    console.error("Verify user bank info error:", error);
     res.status(500).json({
       success: false,
-      message: "Lỗi khi xác thực thông tin ngân hàng",
+      message: "Lỗi khi xác minh thông tin ngân hàng",
       error: error.message,
     });
   }
@@ -2208,7 +2434,7 @@ module.exports = {
   approveRequest,
   rejectRequest,
   assignInspectors,
-  // Inspector APIs
+  // Inspector API
   getInspectors,
   // Order management APIs
   getOrders,
@@ -2218,5 +2444,5 @@ module.exports = {
   getPayments,
   getPaymentDetail,
   updatePaymentStatus,
-  verifyUserBankInfo,
+  createSellerTransferQR,
 };

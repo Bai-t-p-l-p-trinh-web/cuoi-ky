@@ -7,7 +7,7 @@ console.log("Base server URL:", baseServerUrl);
 const apiClient = axios.create({
   baseURL: baseServerUrl,
   withCredentials: true, // Always send cookies with requests
-  timeout: 30000, // Tăng timeout lên 30 giây để test
+  timeout: 30000,
 });
 
 // Helper function to get user data from localStorage
@@ -163,8 +163,10 @@ export const orderAPI = {
   create: (data) => apiClient.post("/orders", data),
   list: (params) => apiClient.get("/orders", { params }),
   getAllOrders: (params) => apiClient.get("/orders", { params }),
+  getUserOrders: (params) => apiClient.get("/orders", { params }),
   getDetail: (id) => apiClient.get(`/orders/${id}`),
   confirmPayment: (data) => apiClient.post("/orders/confirm-payment", data),
+  confirmReceived: (id) => apiClient.patch(`/orders/${id}/confirm-delivery`),
   downloadContract: (id) => apiClient.get(`/orders/${id}/contract`),
   regenerateContract: (id) =>
     apiClient.post(`/orders/${id}/regenerate-contract`),
@@ -172,6 +174,7 @@ export const orderAPI = {
   cancelOrder: (id, data) => apiClient.patch(`/orders/${id}/cancel`, data),
   confirmDelivery: (id, data) =>
     apiClient.patch(`/orders/${id}/confirm-delivery`, data),
+  verifyPayment: (data) => apiClient.post("/orders/verify-payment", data),
 };
 
 // Payment APIs (Admin)
@@ -195,9 +198,18 @@ export const refundAPI = {
 // Notification APIs
 export const notificationAPI = {
   list: (params) => apiClient.get("/notifications", { params }),
-  markAsRead: (id) => apiClient.patch(`/notifications/${id}/read`),
-  markAllAsRead: () => apiClient.patch("/notifications/mark-all-read"),
+  create: (data) => apiClient.post("/notifications", data),
+  markAsRead: (id) => apiClient.put(`/notifications/${id}/read`),
+  markAllAsRead: () => apiClient.put("/notifications/mark-all-read"),
+  getUnreadCount: () => apiClient.get("/notifications/unread-count"),
   delete: (id) => apiClient.delete(`/notifications/${id}`),
+};
+
+// Chat/Thread APIs
+export const chatAPI = {
+  getThreads: () => apiClient.get("/thread/threads"),
+  startMessage: (data) => apiClient.post("/thread/start", data),
+  getThreadById: () => apiClient.get("/thread/threads"),
 };
 
 // User Bank Info APIs
@@ -250,12 +262,15 @@ export const adminAPI = {
   getOrderDetail: (id) => apiClient.get(`/admin/orders/${id}`),
   updateOrderStatus: (id, data) =>
     apiClient.put(`/admin/orders/${id}/status`, data),
-
   // Payment management
   getPayments: (params) => apiClient.get("/admin/payments", { params }),
   getPaymentDetail: (id) => apiClient.get(`/admin/payments/${id}`),
   updatePaymentStatus: (id, data) =>
     apiClient.put(`/admin/payments/${id}/status`, data),
+  verifyPayment: (data) => apiClient.post("/orders/verify-payment", data),
+  // Tạo QR chuyển khoản cho seller
+  createSellerTransferQR: (paymentId) =>
+    apiClient.get(`/admin/payments/${paymentId}/transfer-qr`),
 
   // Refund management
   getRefunds: (params) => apiClient.get("/admin/refunds", { params }),

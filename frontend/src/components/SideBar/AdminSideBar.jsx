@@ -9,6 +9,7 @@ import {
   FaCog,
   FaChevronLeft,
   FaChevronRight,
+  FaFlask,
 } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import "./AdminSideBar.scss";
@@ -22,6 +23,7 @@ const AdminSideBar = () => {
     { to: "/admin/cars", label: "Quản lý Xe", icon: FaCar },
     { to: "/admin/orders", label: "Quản lý Orders", icon: FaShoppingCart },
     { to: "/admin/payments", label: "Thanh toán", icon: FaMoneyBillWave },
+    { to: "/admin/test-payment", label: "Test Payment", icon: FaFlask },
     { to: "/my_account", label: "Cài đặt", icon: FaCog },
   ];
 

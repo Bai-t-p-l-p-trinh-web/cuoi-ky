@@ -57,12 +57,14 @@ const PaymentSchema = new mongoose.Schema(
       accountName: String,
       content: String, // Nội dung chuyển khoản
       amount: Number,
-    }, // Thông tin thanh toán thực tế
+    },
+    // Thông tin thanh toán thực tế
+    transactionId: {
+      type: String,
+    },
     transactionInfo: {
       bankTransactionId: {
         type: String,
-        // unique: true, // TẠM THỜI BỎ UNIQUE ĐỂ TRÁNH LỖI
-        sparse: true,
       },
       payerName: String, // Tên người chuyển khoản
       bankCode: String,
@@ -119,10 +121,9 @@ const PaymentSchema = new mongoose.Schema(
     webhookData: {
       type: mongoose.Schema.Types.Mixed,
     },
-
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 30 * 60 * 1000), // 30 phút
+      default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
   },
   {
@@ -130,7 +131,7 @@ const PaymentSchema = new mongoose.Schema(
   }
 );
 
-// Tạo paymentCode tự động
+// Tạo paymentCode và transactionId tự động
 PaymentSchema.pre("save", async function (next) {
   if (!this.paymentCode) {
     const date = new Date();
@@ -139,14 +140,85 @@ PaymentSchema.pre("save", async function (next) {
       (date.getMonth() + 1).toString().padStart(2, "0") +
       date.getDate().toString().padStart(2, "0");
 
-    const count = await this.constructor.countDocuments({
-      paymentCode: { $regex: `^PAY${dateStr}` },
-    });
+    let isUnique = false;
+    let retryCount = 0;
+    const maxRetries = 10;
 
-    this.paymentCode = `PAY${dateStr}${(count + 1)
-      .toString()
-      .padStart(4, "0")}`;
+    while (!isUnique && retryCount < maxRetries) {
+      const timestamp = Date.now();
+      const randomNum = Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, "0");
+      const timeSeq = timestamp.toString().slice(-4);
+
+      this.paymentCode = `PAY${dateStr}${timeSeq}${randomNum}`;
+
+      const existing = await this.constructor.findOne({
+        paymentCode: this.paymentCode,
+        _id: { $ne: this._id },
+      });
+
+      if (!existing) {
+        isUnique = true;
+      } else {
+        retryCount++;
+        await new Promise((resolve) => setTimeout(resolve, Math.random() * 10));
+      }
+    }
+
+    if (!isUnique) {
+      throw new Error(
+        "Unable to generate unique paymentCode after multiple attempts"
+      );
+    }
   }
+
+  if (!this.transactionId) {
+    const timestamp = Date.now();
+    const randomNum = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, "0");
+    const date = new Date();
+    const dateStr =
+      date.getFullYear().toString() +
+      (date.getMonth() + 1).toString().padStart(2, "0") +
+      date.getDate().toString().padStart(2, "0");
+
+    this.transactionId = `TXN${dateStr}${timestamp
+      .toString()
+      .slice(-6)}${randomNum}`;
+
+    let isUnique = false;
+    let retryCount = 0;
+    const maxRetries = 5;
+
+    while (!isUnique && retryCount < maxRetries) {
+      const existing = await this.constructor.findOne({
+        transactionId: this.transactionId,
+        _id: { $ne: this._id },
+      });
+
+      if (!existing) {
+        isUnique = true;
+      } else {
+        const newRandomNum = Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, "0");
+        const newTimestamp = Date.now();
+        this.transactionId = `TXN${dateStr}${newTimestamp
+          .toString()
+          .slice(-6)}${newRandomNum}`;
+        retryCount++;
+      }
+    }
+
+    if (!isUnique) {
+      throw new Error(
+        "Unable to generate unique transactionId after multiple attempts"
+      );
+    }
+  }
+
   next();
 });
 
@@ -155,6 +227,7 @@ PaymentSchema.index({ order: 1 });
 PaymentSchema.index({ user: 1 });
 PaymentSchema.index({ status: 1 });
 PaymentSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+PaymentSchema.index({ transactionId: 1 }, { unique: true, sparse: true });
 
 module.exports = {
   Payment: mongoose.model("Payment", PaymentSchema),
