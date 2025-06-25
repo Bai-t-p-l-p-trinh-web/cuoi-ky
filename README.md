@@ -102,7 +102,7 @@ FakeAuto là một nền tảng web được thiết kế để hỗ trợ việ
    - Khởi động backend:
      ```bash
      cd backend
-     npm run dev
+     npm run start
      ```
    - Khởi động frontend:
      ```bash
