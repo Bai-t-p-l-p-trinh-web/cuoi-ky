@@ -158,8 +158,6 @@ FakeAuto là một nền tảng web được thiết kế để hỗ trợ việ
 - **Lâm Nhật Tiên** (N23DCCN198, D23CQCN03-N)
 - **Lê Viết Xuân** (N23DCCN069, D23CQCN01-N)
 
-## Giấy phép
-Dự án được cấp phép theo MIT License. Xem chi tiết trong tệp [LICENSE](LICENSE).
 
 ## Lời cảm ơn
 - **Giảng viên hướng dẫn**: Nguyễn Văn Hữu Hoàng
